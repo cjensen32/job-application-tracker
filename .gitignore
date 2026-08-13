@@ -1,0 +1,8 @@
+.idea/
+
+# Keep shared configs
+!.idea/runConfigurations/
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
+!.idea/vcs.xml
+!.idea/modules.xml
