@@ -3,6 +3,15 @@
 **Goal:** Understand what a JVM project *is* before a generator makes one for you. **You'll be able to answer:** *"Walk
 me through what happens when you run `mvn package`."*
 
+**Progress** — tick these off as you go:
+
+- [ ] Step 1 — The directory layout
+- [ ] Step 2 — Write a minimal `pom.xml`
+- [ ] Step 3 — Compile and run something
+- [ ] Step 4 — Add a dependency, and see scope
+- [ ] Step 5 — Package it
+- [ ] Lifecycle read + self-check answered
+
 ---
 
 ## Why Maven exists at all
@@ -29,6 +38,8 @@ means the same thing everywhere.
 
 Maven is **convention over configuration**: it doesn't ask where your code is, it *requires* a specific layout. Create
 it:
+
+- [ ] Create the three source directories
 
 ```bash
 mkdir -p src/main/java/com/connorjensen/jobtracker
@@ -60,6 +71,8 @@ at that domain.
 ## Step 2 — Write a minimal `pom.xml`
 
 Create `pom.xml` in the repo root. Type it rather than pasting, and read the annotations below:
+
+- [ ] Write `pom.xml`
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -98,7 +111,7 @@ Create `pom.xml` in the repo root. Type it rather than pasting, and read the ann
 
 ## Step 3 — Compile and run something
 
-Create `src/main/java/com/connorjensen/jobtracker/Main.java`:
+- [ ] Create `src/main/java/com/connorjensen/jobtracker/Main.java`:
 
 ```java
 package com.connorjensen.jobtracker;
@@ -112,11 +125,13 @@ public class Main {
 
 Then:
 
+- [ ] Compile it
+
 ```bash
 mvn compile
 ```
 
-Now look at what appeared:
+- [ ] Look at what appeared
 
 ```bash
 find target -type f
@@ -125,7 +140,7 @@ find target -type f
 You should see `target/classes/com/connorjensen/jobtracker/Main.class` — **bytecode**, not source. The directory
 structure inside `target/classes` mirrors your package structure, because that's how the JVM locates a class at runtime.
 
-Run it directly, without Maven:
+- [ ] Run it directly, without Maven
 
 ```bash
 java -cp target/classes com.connorjensen.jobtracker.Main
@@ -139,7 +154,7 @@ instead of one directory.
 
 ## Step 4 — Add a dependency, and see scope
 
-Add this inside `<project>`, after `</properties>`:
+- [ ] Add this inside `<project>`, after `</properties>`:
 
 ```xml
 
@@ -178,7 +193,7 @@ actually meet:
 ancient (2.12.4) and **silently ignores JUnit 5 tests** — they don't fail, they just don't run, which is a genuinely
 nasty first bug. Pinning 3.5.2 fixes it. This is the only plugin config you need until Spring Boot arrives.
 
-Verify nothing broke:
+- [ ] Verify nothing broke
 
 ```bash
 mvn test
@@ -190,6 +205,8 @@ You'll see `No tests to run` — correct, you haven't written one. Lesson 1 does
 
 ## Step 5 — Package it
 
+- [ ] Build the jar
+
 ```bash
 mvn package
 find target -name "*.jar"
@@ -198,7 +215,7 @@ find target -name "*.jar"
 You now have `target/job-application-tracker-1.0-SNAPSHOT.jar` — note the filename is literally
 `artifactId-version.jar`.
 
-Try to run it:
+- [ ] Try to run it — and watch it fail
 
 ```bash
 java -jar target/job-application-tracker-1.0-SNAPSHOT.jar
@@ -237,6 +254,8 @@ So `mvn package` actually:
 
 Answer these out loud before moving on. (No quiz yet — XP is banked once at the end of the chapter,
 after the capstone.)
+
+- [ ] Answered all five without opening the answers
 
 1. Why does Java need a classpath when Python doesn't?
 2. What's the difference between `target/classes` and `target/*.jar`?

@@ -6,6 +6,15 @@ hold many applications in a collection you can query.
 
 **Prerequisite:** Lesson 1 (you have `Application`, `ApplicationDto`, `Main`, and a passing test).
 
+**Progress** — tick these off as you go:
+
+- [ ] Step 1 — Packages (all three checkpoints, ending green)
+- [ ] Step 2 — The `enum`: your first real type
+- [ ] Step 3 — Collections: `List`, `Map`, and generics
+- [ ] Step 4 — Streams: filtering without a loop
+- [ ] Step 5 — `Optional`: the return type that admits it might be empty
+- [ ] Self-check answered
+
 ---
 
 ## Step 1 — Packages: stop putting everything in one bucket
@@ -27,7 +36,7 @@ com.connorjensen.jobtracker
 └── controller/        HTTP endpoints (Chapter 2)
 ```
 
-Make the move:
+- [ ] Make the move
 
 ```bash
 mkdir -p src/main/java/com/connorjensen/jobtracker/{model,repository,service,dto}
@@ -39,14 +48,16 @@ git mv src/main/java/com/connorjensen/jobtracker/ApplicationDto.java  src/main/j
 
 ### Checkpoint 1 — moving the files breaks nothing
 
-Before you change a single line of Java, run:
+- [ ] Before you change a single line of Java, run:
 
 ```bash
 mvn clean compile
 ```
 
 **It succeeds.** That is the surprise worth sitting with, because the obvious mental model — "the
-folder is the package" — has just failed to predict reality. Look at where the output landed:
+folder is the package" — has just failed to predict reality.
+
+- [ ] Look at where the output landed
 
 ```bash
 find target/classes -name "*.class"
@@ -97,10 +108,12 @@ import at all.
 
 *Now* do the real work. Two edits:
 
-1. `Application.java` — change the first line to `package com.connorjensen.jobtracker.model;`
-2. `ApplicationDto.java` — change it to `package com.connorjensen.jobtracker.dto;`
+- [ ] `Application.java` — change the first line to `package com.connorjensen.jobtracker.model;`
+- [ ] `ApplicationDto.java` — change it to `package com.connorjensen.jobtracker.dto;`
 
 Stop there, before touching `Main.java`, and compile:
+
+- [ ] Compile, and read the failure
 
 ```bash
 mvn clean compile
@@ -122,12 +135,14 @@ class **no** implicit access to a different package. Not even a child one: `...j
 not "inside" `...jobtracker` in any way the compiler cares about. Package names look hierarchical and
 aren't.
 
-3. `Main.java` — say where they went:
+- [ ] `Main.java` — say where they went:
 
 ```java
 import com.connorjensen.jobtracker.dto.ApplicationDto;
 import com.connorjensen.jobtracker.model.Application;
 ```
+
+- [ ] Compile again, and check the output tree
 
 ```bash
 mvn clean compile && find target/classes -name "*.class"
@@ -144,6 +159,8 @@ directories agree for the first time.
 
 ### Checkpoint 3 — the test has the same problem
 
+- [ ] Run the tests, and watch them fail the same way
+
 ```bash
 mvn test
 ```
@@ -156,13 +173,16 @@ Same cause: `ApplicationTest` declares `package com.connorjensen.jobtracker` and
 tests no longer live there. Tests live in a package that matches the code they test, so move it to
 mirror the main tree:
 
+- [ ] Move the test file
+
 ```bash
 mkdir -p src/test/java/com/connorjensen/jobtracker/model
 git mv src/test/java/com/connorjensen/jobtracker/ApplicationTest.java src/test/java/com/connorjensen/jobtracker/model/
 ```
 
-...then set its package to `com.connorjensen.jobtracker.model` and import `ApplicationDto` from
-`...jobtracker.dto`. (It needs no import for `Application` — same package now.)
+- [ ] ...then set its package to `com.connorjensen.jobtracker.model` and import `ApplicationDto` from
+  `...jobtracker.dto`. (It needs no import for `Application` — same package now.)
+- [ ] Run the tests once more
 
 ```bash
 mvn test
@@ -187,7 +207,7 @@ string and hope. In TypeScript you'd write a union type — which vanishes at ru
 Java's `enum` <sup>[J5](NOTES.md#enums)</sup> is a real class with a fixed set of instances, checked at
 **compile time** and present at **runtime**.
 
-Create `src/main/java/com/connorjensen/jobtracker/model/Status.java`:
+- [ ] Create `src/main/java/com/connorjensen/jobtracker/model/Status.java`:
 
 ```java
 package com.connorjensen.jobtracker.model;
@@ -211,8 +231,9 @@ Five lines, and you get a lot:
   `?status=OFFER` into a `Status`.
 - `switch` over an enum can be checked for exhaustiveness by the compiler.
 
-Now wire it into `Application`. Add the field, default it in the constructor, and give it a getter
-and setter:
+Now wire it into `Application`.
+
+- [ ] Add the field, default it in the constructor, and give it a getter and setter
 
 ```java
     private Status status;
@@ -237,9 +258,10 @@ That default in the constructor is a **business rule enforced by the type system
 possible to construct an `Application` with no status. Compare to a Python dict, where
 `app["status"]` might just... not be there.
 
-While you're in the file, add the two remaining fields from PROJECT.md — `notes` and `jobUrl`, both
-`String`, both with getter and setter, neither in the constructor (they're optional at creation
-time). And add an `id`:
+- [ ] While you're in the file, add the two remaining fields from PROJECT.md — `notes` and `jobUrl`,
+  both `String`, both with getter and setter, neither in the constructor (they're optional at
+  creation time)
+- [ ] And add an `id`:
 
 ```java
     private Long id;
@@ -283,7 +305,7 @@ Application found = byId.get(1L);   // returns null if absent
 
 `Map` is how you'll fake a database table in the capstone: id → row.
 
-Try it in `Main` — replace the body with:
+- [ ] Try it in `Main` — replace the body with:
 
 ```java
 List<Application> applications = new ArrayList<>();
@@ -307,6 +329,8 @@ need `import java.util.ArrayList;`, `java.util.List;`, and the `model` imports.
 
 You could filter with a `for` loop and an `if`. Java's idiomatic answer is a **stream** <sup>[J8](NOTES.md#lambdas-streams-and-method-references)</sup>, and it
 will look extremely familiar:
+
+- [ ] Try it in `Main`
 
 ```java
 List<Application> interviewing = applications.stream()
@@ -342,6 +366,8 @@ and it's the single most common source of production crashes — `NullPointerExc
 
 `Optional<T>` <sup>[J8](NOTES.md#optional)</sup> is a box that either contains a value or doesn't, and **the type
 signature says so**:
+
+- [ ] Try it in `Main`, and handle the empty case at least two of the ways below
 
 ```java
 Optional<Application> found = applications.stream()
@@ -387,6 +413,8 @@ the compiler helps enforce. That's the whole answer.
 ---
 
 ## Self-check
+
+- [ ] Answered all seven without opening the answers
 
 1. You `git mv` a class into a new directory and change nothing else. Does `mvn compile` fail? Where
    does its `.class` file end up, and why?

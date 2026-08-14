@@ -6,6 +6,15 @@ through its constructor — with no framework anywhere.
 
 **Prerequisite:** Lesson 2 (packages, `Status`, collections, `Optional`).
 
+**Progress** — tick these off as you go:
+
+- [ ] Step 1 — The interface
+- [ ] Step 2 — One implementation (finished, compiling)
+- [ ] Step 3 — Injection: the whole idea in six lines
+- [ ] Step 4 — Wire it up in `main`
+- [ ] Step 5 — Why this makes tests possible
+- [ ] Self-check answered
+
 This is the highest-leverage lesson in Chapter 1. Everything Spring does in Chapter 2 is this,
 automated. If you understand this lesson, Spring is a convenience. If you skip it, Spring is magic.
 
@@ -40,7 +49,7 @@ which one).
 
 An interface is a contract: method signatures, no bodies. No fields, no constructor, no logic.
 
-Create `src/main/java/com/connorjensen/jobtracker/repository/ApplicationRepository.java`:
+- [ ] Create `src/main/java/com/connorjensen/jobtracker/repository/ApplicationRepository.java`:
 
 ```java
 package com.connorjensen.jobtracker.repository;
@@ -78,7 +87,7 @@ best possible way to understand what it's doing.
 
 ## Step 2 — One implementation
 
-Create `src/main/java/com/connorjensen/jobtracker/repository/InMemoryApplicationRepository.java`:
+- [ ] Create `src/main/java/com/connorjensen/jobtracker/repository/InMemoryApplicationRepository.java`:
 
 ```java
 package com.connorjensen.jobtracker.repository;
@@ -118,7 +127,11 @@ Three things to read carefully:
   column. Save an object that already has an id and it's an update instead. That's why `Long id`
   needed to be nullable back in Lesson 2.
 
-**Finish the class yourself.** `findAll` returns `new ArrayList<>(storage.values())`, `findById` uses
+Now write the rest:
+
+- [ ] **Finish the class yourself** — `findAll`, `findById`, `findByStatus`, `deleteById`
+
+`findAll` returns `new ArrayList<>(storage.values())`, `findById` uses
 `Optional.ofNullable(storage.get(id))`, `findByStatus` is a stream `.filter(...).toList()`, and
 `deleteById` returns whether `storage.remove(id)` gave back a non-null value.
 
@@ -128,6 +141,8 @@ Three things to read carefully:
 
 Now the service. The rule: **it never says `new` for its dependency.** It declares what it needs and
 receives it.
+
+- [ ] Create `src/main/java/com/connorjensen/jobtracker/service/ApplicationService.java`:
 
 ```java
 package com.connorjensen.jobtracker.service;
@@ -164,6 +179,8 @@ Two details doing real work:
 Someone still has to decide which implementation gets used. In a framework-free app, that someone is
 `main`:
 
+- [ ] Build the object graph in `main`
+
 ```java
 public static void main(String[] args) {
     ApplicationRepository repository = new InMemoryApplicationRepository();
@@ -188,6 +205,8 @@ for them — and you'll be able to say exactly what it did, because you did it f
 Here's the concrete payoff, and it's the answer to "what does DI buy you." Because `ApplicationService`
 accepts *any* `ApplicationRepository`, a test can pass one that isn't real:
 
+- [ ] Read this one — you'll write it for real in the capstone
+
 ```java
 class AlwaysEmptyRepository implements ApplicationRepository {
     @Override public Optional<Application> findById(Long id) { return Optional.empty(); }
@@ -211,6 +230,8 @@ done, which is worth more than the definition.
 ---
 
 ## Self-check
+
+- [ ] Answered all five without opening the answers
 
 1. What's the difference between an interface and a class that has no fields?
 2. Why does `ApplicationService` declare the field as `ApplicationRepository` and not

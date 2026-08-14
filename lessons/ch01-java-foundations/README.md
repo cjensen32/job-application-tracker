@@ -21,6 +21,10 @@ the finished app. Its model, repository interface and service survive to v1 unch
 | 3 | [Interfaces & dependency injection](03-interfaces-and-di.md) | "What is dependency injection and what does it buy you?" | ☐ |
 | ★ | [**Capstone — The Tracker Core**](CAPSTONE.md) | all of the above, about code you wrote | ☐ |
 
+**Tracking progress:** every lesson opens with a **Progress** checklist mirroring its steps, and
+carries a `- [ ]` on each thing you actually do — create a file, run a command, observe an output.
+Tick them in the file as you go; the table above is the chapter-level view of the same thing.
+
 **Reference:** [GLOSSARY.md](GLOSSARY.md) — every term in the chapter with its Python/JS equivalent,
 plus the five answers you should have cold.
 

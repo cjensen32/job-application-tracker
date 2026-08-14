@@ -5,6 +5,15 @@ instead. **You'll be able to answer:** *"When would you use a `record` instead o
 
 **Prerequisite:** Lesson 0 (you need a working `mvn test`).
 
+**Progress** — tick these off as you go:
+
+- [ ] Step 1 — The traditional class
+- [ ] Step 2 — `static` vs instance, and why `main` is weird
+- [ ] Step 3 — The same thing as a `record`
+- [ ] Step 4 — The difference that actually matters (`mvn test` green)
+- [ ] Step 5 — So which do I use?
+- [ ] Self-check answered
+
 ---
 
 ## The core difference from Flask
@@ -28,7 +37,7 @@ data twice.
 
 ## Step 1 — The traditional class
 
-Create `src/main/java/com/connorjensen/jobtracker/Application.java`:
+- [ ] Create `src/main/java/com/connorjensen/jobtracker/Application.java`:
 
 ```java
 package com.connorjensen.jobtracker;
@@ -84,7 +93,7 @@ the company can't change." Encapsulation lets you enforce that; a Python dict ca
 
 ## Step 2 — `static` vs instance, and why `main` is weird
 
-Add a method to `Application`:
+- [ ] Add a method to `Application`:
 
 ```java
     public String summary() {
@@ -104,7 +113,7 @@ public static void main(String[] args);
 `Main.main(...)` with no object involved. `main` must be static for an obvious reason: when the JVM starts, **no objects
 exist yet**. Something has to run before anything can be constructed.
 
-Try it in `Main.java`:
+- [ ] Try it in `Main.java`:
 
 ```java
 package com.connorjensen.jobtracker;
@@ -120,6 +129,8 @@ public class Main {
 }
 ```
 
+- [ ] Compile and run it
+
 ```bash
 mvn compile
 java -cp target/classes com.connorjensen.jobtracker.Main
@@ -132,7 +143,7 @@ memory-ish hash. **Java has no useful default `toString()`.** Hold onto that.
 
 ## Step 3 — The same thing as a `record`
 
-Create `src/main/java/com/connorjensen/jobtracker/ApplicationDto.java`:
+- [ ] Create `src/main/java/com/connorjensen/jobtracker/ApplicationDto.java`:
 
 ```java
 package com.connorjensen.jobtracker;
@@ -154,7 +165,7 @@ it's very nearly equivalent. The compiler generates:
 It's the closest thing Java has to a TypeScript `interface` or a Python `@dataclass(frozen=True)`. The tradeoff: a
 record is **immutable** — no setters, ever. Fields are final. To "change" one you construct a new one.
 
-Add to `main`:
+- [ ] Add to `main`, then recompile and run:
 
 ```java
         ApplicationDto dto = new ApplicationDto("Acme Corp", "Backend Engineer", LocalDate.of(2026, 8, 1));
@@ -170,7 +181,7 @@ Recompile and run. You get
 
 Readable `toString` is nice. **Value equality** is the real reason records exist. Prove it with a test.
 
-Create `src/test/java/com/connorjensen/jobtracker/ApplicationTest.java`:
+- [ ] Create `src/test/java/com/connorjensen/jobtracker/ApplicationTest.java`:
 
 ```java
 package com.connorjensen.jobtracker;
@@ -203,6 +214,8 @@ class ApplicationTest {
     }
 }
 ```
+
+- [ ] Run the tests
 
 ```bash
 mvn test
@@ -245,6 +258,8 @@ constructor and mutable fields" is a much better answer than "records are shorte
 ---
 
 ## Self-check
+
+- [ ] Answered all five without opening the answers
 
 1. Why must `main` be `static`?
 2. What does `private` on a field actually prevent?

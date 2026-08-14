@@ -3,7 +3,9 @@
 *How chapters in this repo get built. **This file is meant to be edited** — when something works
 badly, change the rule here rather than quietly doing it differently next chapter.*
 
-Last revised: 2026-08-13 (after Chapter 1 — pacing feedback: "about right, can speed up as we
+Last revised: 2026-08-14 (added the checkbox convention — see *Checkboxes* below).
+
+Previously: 2026-08-13 (after Chapter 1 — pacing feedback: "about right, can speed up as we
 progress").
 
 ---
@@ -51,6 +53,31 @@ lessons/chNN-slug/
     error message maps to one cause.
   - When a mechanism is easier to see by contrast, give the command that succeeds in one state and
     fails in the other, and put it in a `<details>` block so it stays optional.
+
+## Checkboxes
+
+Lessons are worked through with a file open and things getting ticked off, so **every lesson and
+capstone carries two tiers of `- [ ]`**:
+
+1. **A `**Progress**` list at the top**, directly after the goal / prerequisite block and before the
+   first `---`. One item per `## Step`, phrased with the step's own wording so the two read as the
+   same list, plus a final item for the self-check (capstones: a final item for the quiz).
+2. **Inline boxes on every action inside a step** — anything the reader *does*: create a file, edit a
+   file, run a command, observe an output. A box goes on its own line immediately above the code
+   fence it belongs to; the fence stays unindented so it's still copy-pasteable.
+
+Rules that keep it useful rather than noisy:
+
+- **Actions only.** Explanation, tables of concepts, and "here's what that printed" prose get no box.
+  If ticking it wouldn't mean something happened, it isn't a box.
+- **Existing numbered instruction lists become checkbox lists** (capstone contract behaviours,
+  supported commands, stretch goals, interview questions). Reference tables stay tables — checkbox
+  syntax doesn't render inside a table cell.
+- A checkbox item that wraps gets its continuation lines indented two spaces, or the list breaks.
+- Prefer the imperative voice already in the text (`Create …`, `Run …`, `Finish the class yourself`)
+  so converting a line to a box is usually just prefixing `- [ ]`.
+
+Chapter 1 is the reference example.
 
 ## Capstones
 
