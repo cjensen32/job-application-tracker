@@ -1,6 +1,10 @@
 # Maven build output
 target/
 
+# Claude Code worktrees — real branch checkouts that live inside the repo.
+# Ignored so they don't surface as untracked files in the parent checkout.
+.claude/worktrees/
+
 .idea/
 
 # Keep shared configs

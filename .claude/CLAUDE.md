@@ -51,3 +51,16 @@ Full-stack CRUD app for tracking job applications, built to practice Full Stack 
 **Planned build order** (see PROJECT.md for full detail): skeleton API + Postgres connection → CRUD endpoints with DTOs/validation → filtering/sorting/pagination (`GET /api/applications?status=...`, `Pageable`) → `Interview` relationship → centralized error handling (`@ControllerAdvice` + custom exceptions like `ApplicationNotFoundException`) → JWT auth scoping applications to a user → test coverage across service/controller/repository layers → React frontend → stretch goals (status history, dashboard, reminders, deployment).
 
 When implementing against this plan, follow the milestone order in PROJECT.md rather than jumping ahead (e.g. don't add auth before CRUD endpoints exist).
+
+## Git and worktrees
+
+Background Claude sessions isolate their work into `.claude/worktrees/<name>/`. These are **real git checkouts inside the repo**, not scratch copies — they share the same `.git` object store and their branches are ordinary branches. `.claude/worktrees/` is gitignored so they don't surface as untracked files in the parent checkout.
+
+Four behaviours that reliably cause confusion:
+
+- **A worktree branch with no commits is invisible to branch diffs.** Edits sitting in a worktree's working tree are uncommitted, so the branch still points at whatever it was created from and `git diff main..<branch>` is legitimately empty. Commit *inside the worktree* (`cd .claude/worktrees/<name> && git add -A && git commit`) before expecting the changes to appear anywhere else. This is the usual cause of "the branch exists but shows no changes".
+- **You cannot check out a branch that a worktree already has checked out.** Git allows one working tree per branch, so `git checkout <branch>` fails with `already used by worktree at ...`. Work on it by `cd`-ing into the worktree instead. Sessions also `lock` their worktree while running; `git worktree list` shows which.
+- **New worktrees default to branching from `origin/<default-branch>`, not local `HEAD`.** When local `main` is ahead of origin, that silently bases the work on stale files. Create from local HEAD explicitly when that matters: `git worktree add -b <name> .claude/worktrees/<name> HEAD`.
+- **`git worktree remove` discards uncommitted work** in that worktree with no recovery path. Check `git -C .claude/worktrees/<name> status` first.
+
+Prefer committing inside the worktree and merging from the parent over copying files between the two by hand.
