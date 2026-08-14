@@ -158,9 +158,7 @@ Add to `main`:
 
 ```java
         ApplicationDto dto = new ApplicationDto("Acme Corp", "Backend Engineer", LocalDate.of(2026, 8, 1));
-        System.out.
-
-println(dto);
+        System.out.println(dto);
 ```
 
 Recompile and run. You get
