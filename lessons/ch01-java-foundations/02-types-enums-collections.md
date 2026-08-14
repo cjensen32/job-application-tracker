@@ -8,8 +8,8 @@ hold many applications in a collection you can query.
 
 **Progress** — tick these off as you go:
 
-- [ ] Step 1 — Packages (all three checkpoints, ending green)
-- [ ] Step 2 — The `enum`: your first real type
+- [x] [Step 1](#step-1--packages-stop-putting-everything-in-one-bucket) — Packages (all three checkpoints, ending green)
+- [ ] [Step 2](#step-2--the-enum-your-first-real-type) — The `enum`: your first real type
 - [ ] Step 3 — Collections: `List`, `Map`, and generics
 - [ ] Step 4 — Streams: filtering without a loop
 - [ ] Step 5 — `Optional`: the return type that admits it might be empty
@@ -36,7 +36,7 @@ com.connorjensen.jobtracker
 └── controller/        HTTP endpoints (Chapter 2)
 ```
 
-- [ ] Make the move
+- [x] Make the move
 
 ```bash
 mkdir -p src/main/java/com/connorjensen/jobtracker/{model,repository,service,dto}
@@ -48,7 +48,7 @@ git mv src/main/java/com/connorjensen/jobtracker/ApplicationDto.java  src/main/j
 
 ### Checkpoint 1 — moving the files breaks nothing
 
-- [ ] Before you change a single line of Java, run:
+- [x] Before you change a single line of Java, run:
 
 ```bash
 mvn clean compile
@@ -57,7 +57,7 @@ mvn clean compile
 **It succeeds.** That is the surprise worth sitting with, because the obvious mental model — "the
 folder is the package" — has just failed to predict reality.
 
-- [ ] Look at where the output landed
+- [x] Look at where the output landed
 
 ```bash
 find target/classes -name "*.class"
@@ -108,12 +108,12 @@ import at all.
 
 *Now* do the real work. Two edits:
 
-- [ ] `Application.java` — change the first line to `package com.connorjensen.jobtracker.model;`
-- [ ] `ApplicationDto.java` — change it to `package com.connorjensen.jobtracker.dto;`
+- [x] `Application.java` — change the first line to `package com.connorjensen.jobtracker.model;`
+- [x] `ApplicationDto.java` — change it to `package com.connorjensen.jobtracker.dto;`
 
 Stop there, before touching `Main.java`, and compile:
 
-- [ ] Compile, and read the failure
+- [x] Compile, and read the failure
 
 ```bash
 mvn clean compile
@@ -135,14 +135,14 @@ class **no** implicit access to a different package. Not even a child one: `...j
 not "inside" `...jobtracker` in any way the compiler cares about. Package names look hierarchical and
 aren't.
 
-- [ ] `Main.java` — say where they went:
+- [x] `Main.java` — say where they went:
 
 ```java
 import com.connorjensen.jobtracker.dto.ApplicationDto;
 import com.connorjensen.jobtracker.model.Application;
 ```
 
-- [ ] Compile again, and check the output tree
+- [x] Compile again, and check the output tree
 
 ```bash
 mvn clean compile && find target/classes -name "*.class"
@@ -159,7 +159,7 @@ directories agree for the first time.
 
 ### Checkpoint 3 — the test has the same problem
 
-- [ ] Run the tests, and watch them fail the same way
+- [x] Run the tests, and watch them fail the same way
 
 ```bash
 mvn test
@@ -173,16 +173,16 @@ Same cause: `ApplicationTest` declares `package com.connorjensen.jobtracker` and
 tests no longer live there. Tests live in a package that matches the code they test, so move it to
 mirror the main tree:
 
-- [ ] Move the test file
+- [x] Move the test file
 
 ```bash
 mkdir -p src/test/java/com/connorjensen/jobtracker/model
 git mv src/test/java/com/connorjensen/jobtracker/ApplicationTest.java src/test/java/com/connorjensen/jobtracker/model/
 ```
 
-- [ ] ...then set its package to `com.connorjensen.jobtracker.model` and import `ApplicationDto` from
+- [x] ...then set its package to `com.connorjensen.jobtracker.model` and import `ApplicationDto` from
   `...jobtracker.dto`. (It needs no import for `Application` — same package now.)
-- [ ] Run the tests once more
+- [x] Run the tests once more
 
 ```bash
 mvn test
