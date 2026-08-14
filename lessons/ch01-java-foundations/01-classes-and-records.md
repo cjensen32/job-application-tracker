@@ -143,8 +143,8 @@ public record ApplicationDto(String company, String role, LocalDate appliedDate)
 }
 ```
 
-**That's the whole file.** It is not a stripped-down version of the class above — it's very nearly equivalent. The
-compiler generates:
+**That's the whole file.** <sup>[J16](NOTES.md#records)</sup> It is not a stripped-down version of the class above —
+it's very nearly equivalent. The compiler generates:
 
 - a constructor taking all three components
 - **accessors** — but named `company()`, *not* `getCompany()`
@@ -217,7 +217,8 @@ This bites people constantly: `list.contains(app)` returns false for a class eve
 list, because `contains` uses `equals()`. You'll rely on record equality in Lesson 2 and again when writing test
 assertions.
 
-> `@Test` is your first annotation. It's just metadata — it doesn't *do* anything. Surefire scans
+> `@Test` is your first annotation <sup>[J5](NOTES.md#annotations)</sup>. It's just metadata — it doesn't *do*
+> anything. Surefire scans
 > compiled classes, finds methods marked with it, and calls them. Keep that in mind for Lesson 4,
 > where Spring does the same trick at much larger scale.
 
@@ -271,9 +272,10 @@ constructor and mutable fields" is a much better answer than "records are shorte
 You now have a compiling project with a domain class, a record, and a passing test — no framework anywhere. Lesson 2
 turns `status` into an `enum`, puts these in a `List`, and filters them with streams, still with zero Spring.
 
-Run `/code-sensei:quiz` to bank the XP, and give me feedback on pacing — too much hand-holding, too little, or about
-right — before I write Lesson 2.
+XP is banked once at the end of the chapter, after the capstone — keep going.
 
 ---
 
-**Previous:** [Lesson 0 — Build System & Project Shape](lesson-00-build-system.md)
+**Previous:** [Lesson 0 — Build System & Project Shape](00-build-system.md) ·
+**Next:** [Lesson 2 — Packages, Enums, Collections, Optional](02-types-enums-collections.md) ·
+**Version history:** [NOTES.md](NOTES.md)

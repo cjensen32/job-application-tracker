@@ -4,20 +4,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-This repository currently contains only `PROJECT.md` (the spec/plan) and IDE metadata — no Spring Boot project has been scaffolded yet (no `pom.xml`, no source tree). There are no build, lint, or test commands to run until the skeleton from Milestone 1 exists. Once a Maven project is generated (e.g. via start.spring.io), update this file with the actual commands (`./mvnw spring-boot:run`, `./mvnw test`, `./mvnw test -Dtest=ClassName#method`, etc.) and any frontend tooling commands.
+Plain Maven project, no Spring Boot yet — Spring arrives in Chapter 2 of the learning plan. Java 21 (sdkman-managed Temurin), Maven 3.9, JUnit 5 with `maven-surefire-plugin` pinned to 3.5.2 (Maven's default 2.12.4 binding silently skips JUnit 5 tests).
 
-The user is using this project for interview practice and is teaching themselves the codebase via the CodeSensei plugin (`/code-sensei:*` commands) — favor explaining *why* behind non-trivial choices (JPA mappings, DTO/validation patterns, JWT auth flow) rather than just making changes silently, since that supports their learning goal.
+```bash
+mvn compile
+mvn test
+mvn test -Dtest=ClassName#methodName
+java -cp target/classes com.connorjensen.jobtracker.Main
+```
 
-## Learning plan drives the work
+Add `./mvnw spring-boot:run` and frontend commands here once those exist.
 
-`LEARNING.md` (repo root) sequences PROJECT.md's milestones into 14 lessons with concept goals and build goals, and should drive the order of work. Two of its conventions matter when writing code here:
+## This is a teaching repo first
 
-- **Explain before automating.** The first time a tool or concept appears, walk through it manually before reaching for the thing that generates it — hand-written `pom.xml` before start.spring.io, manual constructor wiring before `@Autowired`.
-- **Tests start at Lesson 5**, not at PROJECT.md's Milestone 7 — write them alongside each layer instead of backfilling.
+The user is teaching themselves Java through this project for interview practice, using the CodeSensei plugin (`/code-sensei:*`). **Do not write the project's source code for them unless they explicitly ask.** Lessons and capstone specs are yours to write; the implementation is theirs to type. Favor explaining *why* behind non-trivial choices over making changes silently.
 
-Background for calibrating explanations: one university Java course (exercises, never a full app), but real project experience with React/TSX and Python Flask/uvicorn. HTTP, REST, and JSON are familiar; Java idioms and the Spring layer are not. Analogies to Flask/React land well.
+`LEARNING.md` (repo root) sequences PROJECT.md's milestones into 6 chapters / 18 lessons and drives the order of work. Its conventions:
+
+- **Explain before automating.** The first time a tool or concept appears, walk through it manually before reaching for the thing that generates it — hand-written `pom.xml` before start.spring.io, manual constructor wiring before `@Autowired`, a console loop before `@RestController`.
+- **Revisit, don't restart.** Apply new concepts to code that already exists rather than greenfield examples.
+- **No throwaway work.** Every capstone builds part of the real project. Where something is temporary (in-memory repo, console UI), say up front what replaces it and what interface survives.
+- **Tests from Lesson 1**, not PROJECT.md's Milestone 7; formal deep-dive in Chapter 4.
 
 Update the progress table at the bottom of LEARNING.md as lessons complete.
+
+### Authoring lessons
+
+**[`lessons/AUTHORING.md`](../lessons/AUTHORING.md) is the spec for building chapters — read it before writing one, and revise it rather than silently deviating.** It covers the folder layout, sub-lesson and capstone rules, how the hidden capstone tests work, the XP/quiz gate, and the version-notes convention. Highlights that are easy to get wrong:
+
+- The capstone test lives **outside `src/`** so it can't break `mvn test` mid-chapter, and **the user does not read it** — so `CAPSTONE.md` must spell out every class name, method signature and behaviour it asserts. Always validate a new capstone test against a throwaway reference implementation in the scratchpad, then delete it.
+- **XP is banked once per chapter, after the capstone**, not per lesson. Sub-lessons end with self-check questions only.
+- Java version-history material (`[J8]`-style tags → the chapter's `NOTES.md`) stays out of the main lesson flow. The user works in deprecated codebases and finds language evolution genuinely interesting, so it's wanted — just sidelined.
+
+Background for calibrating explanations: one university Java course (exercises, never a full app), but real project experience with React/TSX and Python Flask/uvicorn. HTTP, REST, and JSON are familiar; Java idioms and the Spring layer are not. Analogies to Flask/React land well. Pacing after Chapter 1 can be faster than Lessons 0–1.
 
 ## Intended architecture (from PROJECT.md)
 

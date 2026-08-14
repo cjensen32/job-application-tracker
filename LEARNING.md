@@ -4,207 +4,195 @@ A lesson track that builds [PROJECT.md](PROJECT.md) one concept at a time.
 
 ## How this works
 
-**Calibration:** One Java course completed (academic exercises, never a full app). Real project experience in React/TSX
-and Python Flask/uvicorn — so HTTP, REST, JSON, and component wiring are already understood. The gap is *Java's way of
-saying those things*, plus the Spring framework layer.
+**Calibration:** One Java course completed (academic exercises, never a full app). Real project
+experience in React/TSX and Python Flask/uvicorn — so HTTP, REST, JSON, and component wiring are
+already understood. The gap is *Java's way of saying those things*, plus the Spring framework layer.
 
-**Format:** Mixed. Boilerplate gets scaffolded, but **the first time any tool or concept appears, it gets explained
-before it gets automated.** You will hand-write a minimal `pom.xml` before letting start.spring.io generate one. You
-will hand-wire a dependency before `@Autowired` does it for you. The point is that no part of the final app is magic.
+**Explain before automating.** The first time any tool or concept appears, it gets explained and done
+by hand before it gets automated. Hand-written `pom.xml` before start.spring.io; manual constructor
+wiring before `@Autowired`; a console loop before `@RestController`.
 
-**Every lesson has four parts:**
+**Revisit, don't restart.** New concepts get applied to code that already exists. Lesson 2 moves and
+re-packages the classes from Lesson 1; Chapter 3 swaps the storage under Chapter 1's service without
+editing it. Coming back to old code with a new idea is the point, not a detour.
 
-1. **Concept goals** — what you should be able to explain afterward
-2. **Build goal** — something that actually runs at the end
-3. **Interview check** — the question a real interviewer asks about this
-4. **Quiz gate** — `/code-sensei:quiz` before moving on; a concept counts as mastered at 3 correct
-
-**Testing note:** PROJECT.md lists tests as Milestone 7. This plan starts writing tests at Lesson 5 and does the formal
-deep-dive at Lesson 11. Writing tests alongside the code is both better practice and better learning than bolting them
-on at the end.
+**No throwaway work.** Every capstone builds a piece of the real project. Where something *is*
+temporary (the in-memory repository, the console UI), the lesson says up front what replaces it and
+why the interface around it survives.
 
 ---
 
-## Phase 1 — Java, without any framework
+## Chapter structure
+
+Each chapter is a folder with sub-lessons, a glossary, and a capstone:
+
+```
+lessons/ch01-java-foundations/
+├── README.md                       chapter map + what survives to v1
+├── 00-build-system.md              sub-lesson
+├── 01-classes-and-records.md       sub-lesson
+├── 02-...                          sub-lesson
+├── GLOSSARY.md                     terms + the answers to have cold
+├── NOTES.md                        version history — what each feature replaced, and why
+├── CAPSTONE.md                     the assignment — exact names and behaviour
+└── capstone/
+    └── ChapterNNCapstoneTest.java  the grader. Copied into src/test/, not read.
+```
+
+How chapters get authored is specified in [`lessons/AUTHORING.md`](lessons/AUTHORING.md) — a living
+document, revised whenever something works badly.
+
+**Sub-lessons** teach a concept, with a small amount of guided code. **Capstones** are where the code
+gets written — specified in prose in `CAPSTONE.md`, graded by a JUnit file that is deliberately not
+read. `CAPSTONE.md` names every class, method signature and behaviour the test checks, so peeking is
+never necessary; the test file just tells you when you're done.
+
+**Moving the goalposts is allowed.** If a capstone gets solved in a different but valid direction, or
+lands too easy or too hard, the test file and the instructions get rewritten to match. The target is
+a working project, not a specific keystroke sequence.
+
+**Every sub-lesson ends with** self-check questions (answers collapsed) and an interview question
+you'll be able to answer about code you wrote. **XP is banked once per chapter, after the capstone** —
+`/code-sensei:quiz` covers the whole chapter's concepts at once, so the reward is for having built
+the thing rather than for having read about it. A concept counts as mastered at 3 correct.
+
+**Version-history notes.** Java's backward compatibility is strict enough that "x became y because z"
+is unusually well-documented, and it's directly useful for working in older codebases. That material
+stays out of the main content — lessons carry only a tag like <sup>[J8]</sup> linking to the
+chapter's `NOTES.md`.
+
+**Testing note:** PROJECT.md lists tests as Milestone 7. Here, tests exist from Lesson 1 and get their
+formal deep-dive in Chapter 4. Writing tests alongside the code beats bolting them on at the end.
+
+---
+
+## Chapter 1 — Java Foundations *(no framework at all)*
+
+📁 [`lessons/ch01-java-foundations/`](lessons/ch01-java-foundations/README.md)
 
 *Goal: understand the language well enough that Spring looks like a library, not magic.*
 
-### Lesson 0 — Build system and project shape
+| # | Lesson | Concepts |
+|---|--------|----------|
+| 0 | [Build system & project shape](lessons/ch01-java-foundations/00-build-system.md) | `pom.xml`, coordinates, scopes, classpath, the Maven lifecycle, bytecode |
+| 1 | [Classes, objects, records](lessons/ch01-java-foundations/01-classes-and-records.md) | no free-floating functions, constructors, `static`, JavaBean convention, `record`, value vs identity equality |
+| 2 | [Packages, enums, collections, Optional](lessons/ch01-java-foundations/02-types-enums-collections.md) | package/import as the only visibility mechanism, layered package layout, `enum`, generics, `List`/`Map`, streams, `Optional` |
+| 3 | [Interfaces & dependency injection](lessons/ch01-java-foundations/03-interfaces-and-di.md) | interface vs implementation, constructor injection by hand, `final` fields, the composition root, why this is what makes tests possible |
 
-Before any code: what a JVM project actually is.
+**★ Capstone — [The Tracker Core](lessons/ch01-java-foundations/CAPSTONE.md):** a console-driven
+tracker with `Application`/`Status`, an `ApplicationRepository` interface, an in-memory
+implementation, and an `ApplicationService` wired by hand in `main`. Add, list, filter by status,
+update status, delete.
 
-- **Concepts:** What `pom.xml` is and why it exists (≈ `package.json` + build config in one file);
-  groupId/artifactId/version coordinates; dependency scopes; the standard `src/main/java` +
-  `src/test/java` layout and why it's rigid; compilation to `.class` files and what the classpath is (vs Python's import
-  path); what the Maven wrapper `./mvnw` does.
-- **Build goal:** Hand-write a minimal `pom.xml` with one dependency. Compile and run a `main()`
-  that prints something. No Spring, no generator.
-- **Interview check:** *"Walk me through what happens when you run `mvn package`."*
-- **Quiz gate:** `maven`, `classpath`, `jvm`
-
-### Lesson 1 — Classes, objects, and why everything lives in one
-
-- **Concepts:** No free-floating functions in Java — every function is a method on a class (contrast: Flask's
-  module-level `@app.route` functions); instance vs `static`; constructors; fields vs local variables; getters/setters
-  and what "POJO"/"bean" means; `record` (Java 21) as the concise version — closest thing to a TS `interface` or Python
-  `@dataclass`.
-- **Build goal:** Write `Application` twice — once as a traditional class with constructor + getters, once as a
-  `record`. Compare them.
-- **Interview check:** *"When would you use a `record` instead of a class?"*
-- **Quiz gate:** `classes`, `objects`, `records`
-
-### Lesson 2 — Types, enums, collections, and Optional
-
-- **Concepts:** Static typing and what the compiler catches that Python doesn't; `enum` for `Status`
-  (≈ a TS union type, but a real object); generics and `List<Application>` (≈ `list[Application]`);
-  `Map`; `Optional<T>` and why Java prefers it to returning `null` (≈ handling `None`, but enforced); a first look at
-  streams for filtering.
-- **Build goal:** An in-memory `List<Application>`, filtered by status with a stream, returning
-  `Optional<Application>` from a find-by-id.
-- **Interview check:** *"What problem does `Optional` solve, and when is it the wrong tool?"*
-- **Quiz gate:** `data-types`, `enums`, `generics`, `optional`
-
-### Lesson 3 — Interfaces and dependency injection, done by hand
-
-The single most important lesson for understanding Spring.
-
-- **Concepts:** Interface vs implementation; "program to an interface"; constructor injection written manually with no
-  framework; why this makes code testable (you can pass in a fake).
-- **Build goal:** An `ApplicationRepository` *interface* with an in-memory implementation, and an
-  `ApplicationService` that receives it through its constructor. Wire it together yourself in
-  `main()`.
-- **Interview check:** *"What is dependency injection and what does it buy you?"* — you'll be able to answer this from
-  having done it by hand, which is rare.
-- **Quiz gate:** `interfaces`, `dependency-injection`
+*Survives to v1:* the model, the repository interface, the service. *Replaced later:* the console
+loop (→ HTTP), the in-memory store (→ Postgres), the manual wiring (→ the Spring container).
 
 ---
 
-## Phase 2 — Spring Boot as a layer on top
+## Chapter 2 — Spring Boot and the HTTP Layer *(PROJECT.md Milestones 1–2)*
 
-*Goal: see the framework do exactly what you just did manually.*
+*Goal: watch the framework do exactly what you just did manually, then get it onto the network.*
 
-### Lesson 4 — Annotations, and what Spring actually is
+| # | Lesson | Concepts |
+|---|--------|----------|
+| 4 | Annotations & the Spring container | what an annotation *is* (metadata + reflection), the application context, `@Component`/`@Service`/`@Repository`, component scanning, `@SpringBootApplication`, auto-configuration, the Spring Boot Maven plugin finally making `java -jar` work |
+| 5 | The HTTP layer | `@RestController`, `@GetMapping`/`@PostMapping` (≈ `@app.route`), path variables and query params, `@RequestBody`, Jackson (≈ `jsonify`, automatic), `ResponseEntity` and picking status codes |
+| 6 | DTOs & validation | why exposing domain objects over HTTP is a smell, request vs response DTOs as `record`s, Bean Validation (`@NotBlank`, `@Valid`), where mapping code belongs |
 
-- **Concepts:** What an annotation *is* (metadata read via reflection at runtime — related to but not the same as a
-  Python decorator); the application context as a big registry of objects;
-  `@Component`/`@Service`/`@Repository`; `@SpringBootApplication` and component scanning; auto-configuration and why the
-  app boots a web server without you writing one.
-- **Build goal:** Port Lesson 3's code to Spring Boot. Delete your manual wiring, add annotations, print the bean list
-  to prove the container built the same object graph.
-- **Interview check:** *"What is the Spring IoC container doing at startup?"*
-- **Quiz gate:** `annotations`, `spring-context`, `beans`
+**★ Capstone — The Tracker API:** Chapter 1's object graph, wired by the container and reachable over
+HTTP. Full CRUD on `/api/applications` with validated DTOs and correct status codes, still backed by
+the in-memory repository. Graded by a test file plus a curl script.
 
-### Lesson 5 — The HTTP layer *(PROJECT.md Milestone 2, part 1)*
-
-Closest lesson to what you already know from Flask.
-
-- **Concepts:** `@RestController` and `@GetMapping`/`@PostMapping` (≈ `@app.route`); path variables and query params;
-  `@RequestBody`; Jackson auto-serializing objects to JSON (≈ `jsonify`, but automatic); `ResponseEntity` and choosing
-  correct status codes (201 vs 200, 204 vs 200).
-- **Build goal:** `GET /api/applications` and `POST /api/applications` against the in-memory repo. Hit them with curl.
-  **First test written here.**
-- **Interview check:** *"What status code do you return from a POST that creates a resource, and what header goes with
-  it?"*
-- **Quiz gate:** `rest-controllers`, `http-status-codes`, `json-serialization`
-
-### Lesson 6 — Persistence with JPA and Postgres *(Milestone 1's database half)*
-
-- **Concepts:** What an ORM does and what it costs; `@Entity`/`@Id`/`@GeneratedValue`; JPA (spec) vs Hibernate
-  (implementation) vs Spring Data JPA (convenience layer) — a common interview trip-up; the persistence context and
-  dirty checking; `JpaRepository` and derived query methods (`findByStatus` written as a method name, not SQL);
-  `application.properties` and `ddl-auto`.
-- **Build goal:** Swap the in-memory implementation for a real Postgres-backed one. The service layer above it should
-  not change — that's the payoff from Lesson 3.
-- **Interview check:** *"What does Hibernate give you that plain JDBC doesn't? What does it cost?"*
-- **Quiz gate:** `orm`, `jpa-entities`, `spring-data-repositories`
-
-### Lesson 7 — DTOs and validation *(Milestone 2, part 2)*
-
-- **Concepts:** Why exposing entities directly over HTTP is a design smell (coupling, over-fetching, mass-assignment);
-  request vs response DTOs as `record`s; Bean Validation (`@NotBlank`, `@Valid`); where mapping code belongs.
-- **Build goal:** `CreateApplicationRequest` / `ApplicationResponse` records, validated, with a 400 response on bad
-  input.
-- **Interview check:** *"Why not just return your JPA entity from the controller?"*
-- **Quiz gate:** `dtos`, `validation`
-
-### Lesson 8 — Filtering, sorting, pagination *(Milestone 3)*
-
-- **Concepts:** Derived query methods in depth; `Pageable` and `Page<T>`; why pagination is a correctness concern, not
-  an optimization; optional query params.
-- **Build goal:** `GET /api/applications?status=INTERVIEWING&page=0&size=20&sort=appliedDate,desc`
-- **Quiz gate:** `pagination`, `query-methods`
-
-### Lesson 9 — Entity relationships *(Milestone 4)*
-
-Highest-value interview topic in the whole project.
-
-- **Concepts:** `@OneToMany`/`@ManyToOne`; the owning side and where the foreign key actually lives;
-  `cascade`; `LAZY` vs `EAGER` fetching; the N+1 query problem and how to spot it in the SQL log; nested resource URL
-  design.
-- **Build goal:** `Interview` entity, `POST /api/applications/{id}/interviews`, plus SQL logging turned on so you can
-  *watch* N+1 happen and then fix it.
-- **Interview check:** *"Explain the N+1 problem and how you'd fix it."*
-- **Quiz gate:** `entity-relationships`, `lazy-loading`, `n-plus-one`
-
-### Lesson 10 — Exceptions and error handling *(Milestone 5)*
-
-- **Concepts:** Checked vs unchecked exceptions (a genuine Java-ism with no Python equivalent); custom exception types;
-  `@ControllerAdvice` + `@ExceptionHandler` as cross-cutting concern handling; designing a consistent JSON error body.
-- **Build goal:** `ApplicationNotFoundException` → a clean 404 JSON body, handled globally rather than in every
-  controller method.
-- **Interview check:** *"Checked or unchecked for a 'not found' condition — and why?"*
-- **Quiz gate:** `exceptions`, `error-handling`
+*The point:* the service and repository from Chapter 1 are not edited. Only the layer above changes.
 
 ---
 
-## Phase 3 — Production concerns
+## Chapter 3 — Persistence *(Milestones 1, 3, 4)*
 
-### Lesson 11 — Testing, properly *(Milestone 7)*
+*Goal: swap storage without the layers above noticing, then query it properly.*
 
-- **Concepts:** The test pyramid; JUnit 5 (`@Test`, assertions, lifecycle); Mockito for unit-testing the service with a
-  fake repository — this is the payoff for Lesson 3; `@WebMvcTest` + MockMvc for controllers; `@DataJpaTest` for
-  repositories; test slices and why they're faster than booting the whole app.
-- **Build goal:** Backfill coverage across all three layers.
-- **Interview check:** *"What do you mock, and what do you deliberately not mock?"*
-- **Quiz gate:** `unit-testing`, `mocking`, `integration-testing`
+| # | Lesson | Concepts |
+|---|--------|----------|
+| 7 | JPA & Postgres | what an ORM does and what it costs, `@Entity`/`@Id`/`@GeneratedValue`, JPA (spec) vs Hibernate (implementation) vs Spring Data JPA (convenience) — a common interview trip-up, the persistence context and dirty checking, `JpaRepository`, `application.properties`, `ddl-auto` |
+| 8 | Filtering, sorting, pagination | derived query methods in depth, `Pageable`/`Page<T>`, why pagination is correctness rather than optimization, optional query params |
+| 9 | Entity relationships | `@OneToMany`/`@ManyToOne`, the owning side and where the FK lives, `cascade`, `LAZY` vs `EAGER`, the N+1 problem, nested resource URLs |
 
-### Lesson 12 — Security and JWT *(Milestone 6)*
+**★ Capstone — The Tracker, Persisted:** the same API against Postgres, with `Interview` as a child
+entity, `POST /api/applications/{id}/interviews`, and
+`GET /api/applications?status=INTERVIEWING&page=0&size=20&sort=appliedDate,desc`. SQL logging on, so
+N+1 gets *watched* happening and then fixed.
 
-Hardest lesson — deliberately last on the backend, once everything else is stable and tested.
+*The payoff:* deleting `InMemoryApplicationRepository` should not require touching
+`ApplicationService`.
 
-- **Concepts:** The Spring Security filter chain and where your code plugs into it;
-  `UserDetailsService`; password hashing with BCrypt; what a JWT actually is (header/payload/signature — decodeable, not
-  encrypted, a common misconception); stateless auth vs sessions; scoping every query to the current user.
-- **Build goal:** `/api/auth/register` + `/api/auth/login`, a JWT filter, and applications that only return rows
-  belonging to the logged-in user.
-- **Interview check:** *"Where would you store the JWT on the client, and what's the tradeoff?"*
-- **Quiz gate:** `authentication`, `jwt`, `password-hashing`
+---
 
-### Lesson 13 — Frontend integration *(Milestone 8)*
+## Chapter 4 — Making It Robust *(Milestones 5, 7)*
 
-Light lesson — you already know React. Focus is the seam between the two apps.
+| # | Lesson | Concepts |
+|---|--------|----------|
+| 10 | Exceptions & error handling | checked vs unchecked (a genuine Java-ism with no Python equivalent), custom exception types, `@ControllerAdvice` + `@ExceptionHandler`, designing one consistent JSON error body |
+| 11 | Unit testing & Mockito | the test pyramid, JUnit 5 lifecycle, mocking the repository to test the service — the direct payoff for Lesson 3, what to mock and what never to mock |
+| 12 | Test slices | `@WebMvcTest` + MockMvc, `@DataJpaTest`, why slices beat booting the whole app, testing the error contract from Lesson 10 |
 
-- **Concepts:** CORS and why the browser blocks you (and why curl didn't); attaching the JWT to requests; loading/error
-  states against a real API; wiring the status filter to the query params from Lesson 8.
-- **Build goal:** List view with filter, add/edit form, delete, login screen. **v1 Definition of Done reached.**
+**★ Capstone — Hardened:** `ApplicationNotFoundException` → a clean 404 body, applied everywhere, plus
+real coverage across all three layers.
+
+---
+
+## Chapter 5 — Security *(Milestone 6)*
+
+*Hardest chapter, deliberately last on the backend — once everything else is stable and tested.*
+
+| # | Lesson | Concepts |
+|---|--------|----------|
+| 13 | Users & password hashing | the `User` entity, `UserDetailsService`, BCrypt and why hashing isn't encryption, registration |
+| 14 | JWT & the filter chain | what a JWT actually is (header/payload/signature — decodeable, **not** encrypted), the Spring Security filter chain and where your filter plugs in, stateless auth vs sessions |
+| 15 | Scoping data to a user | getting the current user out of the security context, scoping every query, and the ways this goes wrong |
+
+**★ Capstone — Multi-user:** `/api/auth/register` and `/api/auth/login`, a JWT filter, and an API where
+you can only ever see your own applications.
+
+---
+
+## Chapter 6 — Frontend *(Milestone 8)*
+
+*Light chapter — React is already known. The focus is the seam between two apps.*
+
+| # | Lesson | Concepts |
+|---|--------|----------|
+| 16 | Wiring React to the API | CORS and why the browser blocks what curl didn't, loading/error states against a real API, driving the Lesson 8 query params from UI filters |
+| 17 | Auth in the browser | attaching the JWT, where to store it and the tradeoff, handling 401s |
+
+**★ Capstone — v1:** list view with filters, add/edit form, delete, login. **Definition of Done reached.**
 
 ---
 
 ## Progress
 
-| #  | Lesson                                                                | Milestone | Status |
-|----|-----------------------------------------------------------------------|-----------|--------|
-| 0  | [Build system & project shape](lessons/lesson-00-build-system.md)     | —         | ☐     |
-| 1  | [Classes, objects, records](lessons/lesson-01-classes-and-records.md) | —         | ☐     |
-| 2  | Types, enums, collections, Optional                                   | —         | ☐     |
-| 3  | Interfaces & manual DI                                                | —         | ☐     |
-| 4  | Annotations & the Spring container                                    | 1         | ☐     |
-| 5  | HTTP layer                                                            | 2         | ☐     |
-| 6  | JPA & Postgres                                                        | 1         | ☐     |
-| 7  | DTOs & validation                                                     | 2         | ☐     |
-| 8  | Filtering, sorting, pagination                                        | 3         | ☐     |
-| 9  | Entity relationships                                                  | 4         | ☐     |
-| 10 | Exceptions & error handling                                           | 5         | ☐     |
-| 11 | Testing                                                               | 7         | ☐     |
-| 12 | Security & JWT                                                        | 6         | ☐     |
-| 13 | Frontend integration                                                  | 8         | ☐     |
+| Ch | # | Lesson | Milestone | Status |
+|----|---|--------|-----------|--------|
+| 1 | 0 | [Build system & project shape](lessons/ch01-java-foundations/00-build-system.md) | — | ☑ |
+| 1 | 1 | [Classes, objects, records](lessons/ch01-java-foundations/01-classes-and-records.md) | — | ☑ |
+| 1 | 2 | [Packages, enums, collections, Optional](lessons/ch01-java-foundations/02-types-enums-collections.md) | — | ☐ |
+| 1 | 3 | [Interfaces & manual DI](lessons/ch01-java-foundations/03-interfaces-and-di.md) | — | ☐ |
+| 1 | ★ | [**Capstone — The Tracker Core**](lessons/ch01-java-foundations/CAPSTONE.md) | — | ☐ |
+| 2 | 4 | Annotations & the Spring container | 1 | ☐ |
+| 2 | 5 | The HTTP layer | 2 | ☐ |
+| 2 | 6 | DTOs & validation | 2 | ☐ |
+| 2 | ★ | **Capstone — The Tracker API** | 1–2 | ☐ |
+| 3 | 7 | JPA & Postgres | 1 | ☐ |
+| 3 | 8 | Filtering, sorting, pagination | 3 | ☐ |
+| 3 | 9 | Entity relationships | 4 | ☐ |
+| 3 | ★ | **Capstone — The Tracker, Persisted** | 1, 3, 4 | ☐ |
+| 4 | 10 | Exceptions & error handling | 5 | ☐ |
+| 4 | 11 | Unit testing & Mockito | 7 | ☐ |
+| 4 | 12 | Test slices | 7 | ☐ |
+| 4 | ★ | **Capstone — Hardened** | 5, 7 | ☐ |
+| 5 | 13 | Users & password hashing | 6 | ☐ |
+| 5 | 14 | JWT & the filter chain | 6 | ☐ |
+| 5 | 15 | Scoping data to a user | 6 | ☐ |
+| 5 | ★ | **Capstone — Multi-user** | 6 | ☐ |
+| 6 | 16 | Wiring React to the API | 8 | ☐ |
+| 6 | 17 | Auth in the browser | 8 | ☐ |
+| 6 | ★ | **Capstone — v1** | 8 | ☐ |

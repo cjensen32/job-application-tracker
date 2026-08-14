@@ -92,7 +92,7 @@ Create `pom.xml` in the repo root. Type it rather than pasting, and read the ann
   versions are treated as immutable forever. This is why you never republish a release version.
 - **`<packaging>`** — what to produce. `jar` is the default (a zip of compiled classes + metadata).
 - **`<maven.compiler.release>21</...>`** — compile targeting Java 21. This is what unlocks `record`
-  in Lesson 1.
+  in Lesson 1. <sup>[J9](NOTES.md#mavencompilerrelease)</sup>
 
 ---
 
@@ -235,15 +235,14 @@ So `mvn package` actually:
 
 ## Self-check
 
-Answer these out loud before moving on:
+Answer these out loud before moving on. (No quiz yet — XP is banked once at the end of the chapter,
+after the capstone.)
 
 1. Why does Java need a classpath when Python doesn't?
 2. What's the difference between `target/classes` and `target/*.jar`?
 3. If you add a dependency with `<scope>test</scope>`, can your `Main.java` import it?
 4. You run `mvn package` and a test fails. Do you get a jar?
 5. What are the three coordinates that uniquely identify any Maven artifact?
-
-Then: `/code-sensei:quiz` to lock it in.
 
 <details>
 <summary>Answers</summary>
@@ -260,4 +259,5 @@ Then: `/code-sensei:quiz` to lock it in.
 
 ---
 
-**Next:** [Lesson 1 — Classes, Objects, and Records](lesson-01-classes-and-records.md)
+**Next:** [Lesson 1 — Classes, Objects, and Records](01-classes-and-records.md) ·
+**Version history:** [NOTES.md](NOTES.md)
