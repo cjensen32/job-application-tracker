@@ -38,6 +38,19 @@ lessons/chNN-slug/
   pointing at the next one.
 - Flag things that will be replaced later, and say what replaces them. Nothing should feel like it
   might be wasted effort.
+- **Never assert a build state without a command that proves it.** Any claim that code compiles,
+  fails, passes or breaks must be paired with the command to run and the *actual* output — verified
+  by running it, not predicted. "The code won't compile until you fix three things" is a claim the
+  reader will test, and being wrong about it costs more trust than the lesson buys.
+  - Verify against a throwaway copy of the project in the scratchpad, never by editing the user's
+    source. Paste real compiler output, trimmed.
+  - Where the intuitive answer is wrong, make it a **checkpoint**: have the reader run the command
+    that contradicts their model *before* explaining why. Surprise first, mechanism second.
+  - Sequence steps so each one's failure is observed in isolation. If three edits are needed, don't
+    list all three and then compile — compile after the edit that actually breaks the build, so the
+    error message maps to one cause.
+  - When a mechanism is easier to see by contrast, give the command that succeeds in one state and
+    fails in the other, and put it in a `<details>` block so it stays optional.
 
 ## Capstones
 

@@ -37,19 +37,124 @@ git mv src/main/java/com/connorjensen/jobtracker/ApplicationDto.java  src/main/j
 
 (Plain `mv` works too if you haven't committed these yet.)
 
-Now **the code won't compile** until you fix three things — and this is the part worth internalizing:
+### Checkpoint 1 — moving the files breaks nothing
+
+Before you change a single line of Java, run:
+
+```bash
+mvn clean compile
+```
+
+**It succeeds.** That is the surprise worth sitting with, because the obvious mental model — "the
+folder is the package" — has just failed to predict reality. Look at where the output landed:
+
+```bash
+find target/classes -name "*.class"
+```
+
+```
+target/classes/com/connorjensen/jobtracker/Application.class      ← still flat
+target/classes/com/connorjensen/jobtracker/ApplicationDto.class   ← not model/ or dto/
+target/classes/com/connorjensen/jobtracker/Main.class
+```
+
+The `.class` files followed the **`package` declaration at the top of each file**, which you haven't
+touched — not the directory you just moved them into. Think of the directory as the address on the
+envelope and `package` as the return address written inside the letter. Java reads the letter.
+
+And since all three files still *declare* `package com.connorjensen.jobtracker;`, they are still in
+the same package as far as the compiler is concerned, so `Main` still sees `Application` with no
+import at all.
+
+> **"But doesn't javac check that the directory matches the package?"** No — and this trips up people
+> who've used Java for years. The directory convention is how the compiler **finds** a class it
+> wasn't handed. Maven globs every `.java` under `src/main/java` and passes the whole list to javac
+> explicitly, so javac never has to go looking, and never consults the directory. (Some IDEs and
+> linters flag the mismatch. `javac` itself does not.)
+>
+> <details>
+> <summary>Prove it: one command that succeeds before the move and fails after</summary>
+>
+> Compile *only* `Main.java`, and tell javac where to hunt for the classes it's missing:
+>
+> ```bash
+> javac -sourcepath src/main/java -d /tmp/out src/main/java/com/connorjensen/jobtracker/Main.java
+> ```
+>
+> **Before the move:** succeeds silently. javac needs `Application`, resolves the name
+> `com.connorjensen.jobtracker.Application` to the path `com/connorjensen/jobtracker/Application.java`
+> under the sourcepath, finds it, compiles it too.
+>
+> **After the move:** `error: cannot find symbol — class Application`. Same command, same package
+> declarations, same code. The only thing that changed is the folder, and the lookup now misses
+> because there's no `Application.java` at that path any more.
+>
+> So the directory matters for **finding**, and not for **validating**. Maven skips the finding step,
+> which is why `mvn compile` still passes and this command doesn't.
+> </details>
+
+### Checkpoint 2 — changing the `package` line is what breaks it
+
+*Now* do the real work. Two edits:
 
 1. `Application.java` — change the first line to `package com.connorjensen.jobtracker.model;`
 2. `ApplicationDto.java` — change it to `package com.connorjensen.jobtracker.dto;`
-3. `Main.java` — it can no longer see either class. Add imports:
+
+Stop there, before touching `Main.java`, and compile:
+
+```bash
+mvn clean compile
+```
+
+```
+[ERROR] .../jobtracker/Main.java:[7,5] cannot find symbol
+[ERROR]   symbol:   class Application
+[ERROR]   location: class com.connorjensen.jobtracker.Main
+[ERROR] .../jobtracker/Main.java:[11,5] cannot find symbol
+[ERROR]   symbol:   class ApplicationDto
+[ERROR]   location: class com.connorjensen.jobtracker.Main
+[INFO] BUILD FAILURE
+```
+
+Read that `location:` line — it's telling you exactly what went wrong. `Main` is still in
+`com.connorjensen.jobtracker`, `Application` has left for `...jobtracker.model`, and Java gives a
+class **no** implicit access to a different package. Not even a child one: `...jobtracker.model` is
+not "inside" `...jobtracker` in any way the compiler cares about. Package names look hierarchical and
+aren't.
+
+3. `Main.java` — say where they went:
 
 ```java
 import com.connorjensen.jobtracker.dto.ApplicationDto;
 import com.connorjensen.jobtracker.model.Application;
 ```
 
-Your test file has the same problem. Move it to mirror the main tree — tests live in a package that
-matches the code they test:
+```bash
+mvn clean compile && find target/classes -name "*.class"
+```
+
+```
+target/classes/com/connorjensen/jobtracker/dto/ApplicationDto.class    ← now nested
+target/classes/com/connorjensen/jobtracker/model/Application.class
+target/classes/com/connorjensen/jobtracker/Main.class
+```
+
+Green, and the output tree finally mirrors the source tree — because the `package` lines and the
+directories agree for the first time.
+
+### Checkpoint 3 — the test has the same problem
+
+```bash
+mvn test
+```
+
+```
+[ERROR] .../jobtracker/ApplicationTest.java:[16,5] cannot find symbol
+```
+
+Same cause: `ApplicationTest` declares `package com.connorjensen.jobtracker` and the classes it
+tests no longer live there. Tests live in a package that matches the code they test, so move it to
+mirror the main tree:
 
 ```bash
 mkdir -p src/test/java/com/connorjensen/jobtracker/model
@@ -57,7 +162,7 @@ git mv src/test/java/com/connorjensen/jobtracker/ApplicationTest.java src/test/j
 ```
 
 ...then set its package to `com.connorjensen.jobtracker.model` and import `ApplicationDto` from
-`...jobtracker.dto`.
+`...jobtracker.dto`. (It needs no import for `Application` — same package now.)
 
 ```bash
 mvn test
@@ -283,25 +388,30 @@ the compiler helps enforce. That's the whole answer.
 
 ## Self-check
 
-1. You move a class into a new directory. What two lines of code must change, and where?
-2. Why is `Status.APPLIED == Status.APPLIED` safe when `"APPLIED" == "APPLIED"` is not?
-3. Why `List<Application> x = new ArrayList<>()` instead of `ArrayList<Application> x = ...`?
-4. What happens if you call `.toList()` on the same stream twice?
-5. Give one place `Optional` should *not* be used, and why.
-6. Why `Long id` and not `long id`?
+1. You `git mv` a class into a new directory and change nothing else. Does `mvn compile` fail? Where
+   does its `.class` file end up, and why?
+2. What two lines of code must change to genuinely move a class to a new package, and where?
+3. Why is `Status.APPLIED == Status.APPLIED` safe when `"APPLIED" == "APPLIED"` is not?
+4. Why `List<Application> x = new ArrayList<>()` instead of `ArrayList<Application> x = ...`?
+5. What happens if you call `.toList()` on the same stream twice?
+6. Give one place `Optional` should *not* be used, and why.
+7. Why `Long id` and not `long id`?
 
 <details>
 <summary>Answers</summary>
 
-1. The `package` declaration in the moved file, and an `import` in every file that referenced it.
-2. Each enum constant is a single instance, so identity comparison is value comparison. `String`s
+1. No — it compiles fine. The `.class` file lands at the path matching the **`package` declaration**,
+   not the new directory. Maven hands javac an explicit list of every source file, so javac never has
+   to search the directory tree and never notices the mismatch.
+2. The `package` declaration in the moved file, and an `import` in every file that referenced it.
+3. Each enum constant is a single instance, so identity comparison is value comparison. `String`s
    with the same content can be separate objects, so `==` may be false — use `.equals()`.
-3. Declaring the interface type means the implementation can be swapped without changing any other
+4. Declaring the interface type means the implementation can be swapped without changing any other
    code, and it stops you from depending on `ArrayList`-specific methods.
-4. `IllegalStateException` — a stream is consumed by its terminal operation and cannot be reused.
-5. As a field (not serializable, extra object per instance), as a parameter (noisy for callers), or
+5. `IllegalStateException` — a stream is consumed by its terminal operation and cannot be reused.
+6. As a field (not serializable, extra object per instance), as a parameter (noisy for callers), or
    wrapping a collection (an empty collection already conveys "none").
-6. `Long` is an object and can be `null`, meaning "no id assigned yet." The primitive `long` would
+7. `Long` is an object and can be `null`, meaning "no id assigned yet." The primitive `long` would
    silently default to `0`, which is indistinguishable from a real id of 0.
 
 </details>
