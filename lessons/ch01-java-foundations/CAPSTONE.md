@@ -88,11 +88,26 @@ A class (not a record — Lesson 1 explains why).
 The interface from Lesson 3, unchanged:
 
 ```java
-Application save(Application application);
-List<Application> findAll();
-Optional<Application> findById(Long id);
-List<Application> findByStatus(Status status);
-boolean deleteById(Long id);
+package com.connorjensen.jobtracker.repository;
+
+import com.connorjensen.jobtracker.model.Application;
+import com.connorjensen.jobtracker.model.Status;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface ApplicationRepository {
+
+    Application save(Application application);
+
+    List<Application> findAll();
+
+    Optional<Application> findById(Long id);
+
+    List<Application> findByStatus(Status status);
+
+    boolean deleteById(Long id);
+}
 ```
 
 ### `com.connorjensen.jobtracker.repository.InMemoryApplicationRepository`
@@ -142,7 +157,27 @@ HTTP in Chapter 2.
 Rewrite `Main.main` to wire the object graph and then loop on `Scanner` input:
 
 ```java
-Scanner scanner = new Scanner(System.in);
+package com.connorjensen.jobtracker;
+
+import com.connorjensen.jobtracker.repository.ApplicationRepository;
+import com.connorjensen.jobtracker.repository.InMemoryApplicationRepository;
+import com.connorjensen.jobtracker.service.ApplicationService;
+
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        ApplicationRepository repository = new InMemoryApplicationRepository();
+        ApplicationService service = new ApplicationService(repository);
+
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine().trim();
+            // ... dispatch on the command, call the service, print the result
+        }
+    }
+}
 ```
 
 Support at least these commands — one box each:

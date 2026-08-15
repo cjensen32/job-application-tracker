@@ -3,7 +3,12 @@
 *How chapters in this repo get built. **This file is meant to be edited** — when something works
 badly, change the rule here rather than quietly doing it differently next chapter.*
 
-Last revised: 2026-08-14 (added the **Verify** block — every step must end with a command that proves
+Last revised: 2026-08-15 (added **Code fences** — every `java` fence must be a complete compilation
+unit. Prompted by Lesson 2's `Map` fragment being pasted into a real `.java` file, where it produced
+`unnamed classes are a preview feature` and broke `mvn compile` for the whole project. 23 of the
+chapter's 35 fences had the same defect. `lessons/tools/check-snippets.py` now enforces it).
+
+Previously: 2026-08-14 (added the **Verify** block — every step must end with a command that proves
 it landed. Prompted by Lesson 2 Step 3, where the step's only compile instruction was buried in a
 prose aside and the reader finished the step with a red build and no way to know).
 
@@ -99,6 +104,105 @@ Rules:
   or it belongs in the code fence they copy.
 - Steps whose whole point is an observed failure (Lesson 2's checkpoints) already satisfy this; they
   don't need a second block, but the step must still end green.
+
+## Code fences
+
+**Every ` ```java ` fence must be a complete Java compilation unit** — it opens with a type
+declaration and its braces balance. Never a bare statement, never a bare method or field at fence
+top level.
+
+The reason is concrete: a reader working through a lesson copies a fence into a `.java` file to try
+it. A fragment like
+
+```
+Map<Long, Application> byId = new HashMap<>();
+byId.put(1L, app);
+```
+
+pasted into a file is not "incomplete Java", it's a **different language feature** — javac reads
+top-level statements as an *implicitly declared class* (Java 21 preview), so the error is
+`unnamed classes are a preview feature and are disabled by default`, which says nothing about the
+real problem. Worse, one such file breaks `mvn compile` for the entire project, so every later
+lesson step fails for an unrelated reason. This happened.
+
+Fences come in two kinds. Both are complete units; they differ in what they're for.
+
+### 1. Project code
+
+Code that goes into the real project. Two shapes:
+
+- **Whole file** — `package`, imports, the complete type. Introduced by a checkbox naming the path
+  (`- [ ] Create src/main/java/.../Status.java:`). Must compile.
+- **Excerpt** — when the step adds a few members to a file that already exists. Wrap them in the
+  **real enclosing declaration** and elide the rest **with a comment**, never with a bare `...`:
+
+  ```markdown
+  ​```java
+  public class Application {
+
+      // ... company, role, appliedDate from Lesson 1 ...
+
+      private Status status;
+
+      public Status getStatus() {
+          return status;
+      }
+  }
+  ​```
+  ```
+
+  A comment is a legal statement position; `...` is not. The comment version parses clean and shows
+  the reader exactly where the members go. Excerpts don't have to *link* — referencing `Status`
+  before it's imported is fine — but they must **parse**.
+
+### 2. Standalone examples
+
+Illustrating a concept that has no home in the project yet. These are the ones most likely to get
+copied somewhere, so they get the strictest rule:
+
+- **Name the class `<Something>Example`.** The checker keys off the suffix, and it makes "this is
+  not your project code" unmissable at a glance.
+- **Fully self-contained and runnable** — imports included, no project types. If the example needs a
+  domain object, declare a stripped-down `record` *inside* the example class. It must compile and
+  run against a bare JDK with no classpath.
+- **Give it a `main` that prints something**, and show the expected output in a plain fence below.
+  An example the reader can run beats an example they can only read.
+- Tell them how to run it: `java MapExample.java` works directly on a single file (Java 11+, JEP
+  330) — no `javac`, no classpath, no project involvement.
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+public class MapExample {
+
+    record Application(String company) { }
+
+    public static void main(String[] args) {
+        Map<Long, Application> byId = new HashMap<>();
+        byId.put(1L, new Application("Acme Corp"));
+
+        System.out.println(byId.get(1L));    // present
+        System.out.println(byId.get(99L));   // absent -> null
+    }
+}
+```
+
+Standalone examples stay welcome — they're often the clearest way to isolate one idea away from
+project noise. The rule isn't "use fewer of them", it's "finish them."
+
+### Checking it
+
+```bash
+python3 lessons/tools/check-snippets.py
+```
+
+Extracts every `java` fence in `lessons/`, writes it to a file named after its type, and runs
+`javac`. Fences must parse; `*Example` classes must additionally compile and run clean. Run it
+before committing a chapter — it catches in a second what a reader would otherwise hit in the
+middle of Step 3.
+
+Non-`java` fences (`bash`, `console`, output blocks, the directory-tree diagrams) are unaffected.
 
 ## Checkboxes
 
