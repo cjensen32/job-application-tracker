@@ -19,12 +19,9 @@ hold many applications in a collection you can query.
 
 ## Step 1 — Packages: stop putting everything in one bucket
 
-Right now all four of your files sit in `com.connorjensen.jobtracker`. That's fine for four files and
-untenable for forty. Java's answer is **packages**, and unlike Python's flexible module layout, the
-package name *must* match the directory path — so reorganizing code means moving files.
+Right now all four of your files sit in `com.connorjensen.jobtracker`. That's fine for four files and untenable for forty. Java's answer is **packages**, and unlike Python's flexible module layout, the package name *must* match the directory path — so reorganizing code means moving files.
 
-The layout below is the one this project keeps to the end. Every Spring app you'll read in an
-interview uses some version of it:
+The layout below is the one this project keeps to the end. Every Spring app you'll read in an interview uses some version of it:
 
 ```
 com.connorjensen.jobtracker
@@ -54,8 +51,7 @@ git mv src/main/java/com/connorjensen/jobtracker/ApplicationDto.java  src/main/j
 mvn clean compile
 ```
 
-**It succeeds.** That is the surprise worth sitting with, because the obvious mental model — "the
-folder is the package" — has just failed to predict reality.
+**It succeeds.** That is the surprise worth sitting with, because the obvious mental model — "the folder is the package" — has just failed to predict reality.
 
 - [x] Look at where the output landed
 
@@ -69,13 +65,9 @@ target/classes/com/connorjensen/jobtracker/ApplicationDto.class   ← not model/
 target/classes/com/connorjensen/jobtracker/Main.class
 ```
 
-The `.class` files followed the **`package` declaration at the top of each file**, which you haven't
-touched — not the directory you just moved them into. Think of the directory as the address on the
-envelope and `package` as the return address written inside the letter. Java reads the letter.
+The `.class` files followed the **`package` declaration at the top of each file**, which you haven't touched — not the directory you just moved them into. Think of the directory as the address on the envelope and `package` as the return address written inside the letter. Java reads the letter.
 
-And since all three files still *declare* `package com.connorjensen.jobtracker;`, they are still in
-the same package as far as the compiler is concerned, so `Main` still sees `Application` with no
-import at all.
+And since all three files still *declare* `package com.connorjensen.jobtracker;`, they are still in the same package as far as the compiler is concerned, so `Main` still sees `Application` with no import at all.
 
 > **"But doesn't javac check that the directory matches the package?"** No — and this trips up people
 > who've used Java for years. The directory convention is how the compiler **finds** a class it
@@ -129,11 +121,7 @@ mvn clean compile
 [INFO] BUILD FAILURE
 ```
 
-Read that `location:` line — it's telling you exactly what went wrong. `Main` is still in
-`com.connorjensen.jobtracker`, `Application` has left for `...jobtracker.model`, and Java gives a
-class **no** implicit access to a different package. Not even a child one: `...jobtracker.model` is
-not "inside" `...jobtracker` in any way the compiler cares about. Package names look hierarchical and
-aren't.
+Read that `location:` line — it's telling you exactly what went wrong. `Main` is still in `com.connorjensen.jobtracker`, `Application` has left for `...jobtracker.model`, and Java gives a class **no** implicit access to a different package. Not even a child one: `...jobtracker.model` is not "inside" `...jobtracker` in any way the compiler cares about. Package names look hierarchical and aren't.
 
 - [x] `Main.java` — say where they went:
 
@@ -154,8 +142,7 @@ target/classes/com/connorjensen/jobtracker/model/Application.class
 target/classes/com/connorjensen/jobtracker/Main.class
 ```
 
-Green, and the output tree finally mirrors the source tree — because the `package` lines and the
-directories agree for the first time.
+Green, and the output tree finally mirrors the source tree — because the `package` lines and the directories agree for the first time.
 
 ### Checkpoint 3 — the test has the same problem
 
@@ -169,9 +156,7 @@ mvn test
 [ERROR] .../jobtracker/ApplicationTest.java:[16,5] cannot find symbol
 ```
 
-Same cause: `ApplicationTest` declares `package com.connorjensen.jobtracker` and the classes it
-tests no longer live there. Tests live in a package that matches the code they test, so move it to
-mirror the main tree:
+Same cause: `ApplicationTest` declares `package com.connorjensen.jobtracker` and the classes it tests no longer live there. Tests live in a package that matches the code they test, so move it to mirror the main tree:
 
 - [x] Move the test file
 
@@ -188,10 +173,7 @@ git mv src/test/java/com/connorjensen/jobtracker/ApplicationTest.java src/test/j
 mvn test
 ```
 
-Green again. The lesson here isn't the file shuffling — it's that **`package` and `import` are the
-only visibility mechanism Java has between files.** There's no `from . import *`, no implicit
-sibling access. A class in `model` cannot see a class in `service` unless it imports it, and that
-one-way import direction is how you'll keep the layers from tangling.
+Green again. The lesson here isn't the file shuffling — it's that **`package` and `import` are the only visibility mechanism Java has between files.** There's no `from . import *`, no implicit sibling access. A class in `model` cannot see a class in `service` unless it imports it, and that one-way import direction is how you'll keep the layers from tangling.
 
 > **Why `model` doesn't import `service`:** dependencies point *inward*. Controllers know about
 > services, services know about repositories, repositories know about models. Nothing points back
@@ -201,11 +183,9 @@ one-way import direction is how you'll keep the layers from tangling.
 
 ## Step 2 — The `enum`: your first real type
 
-PROJECT.md says an application's status is one of five values. In Python or JS you'd probably use a
-string and hope. In TypeScript you'd write a union type — which vanishes at runtime.
+PROJECT.md says an application's status is one of five values. In Python or JS you'd probably use a string and hope. In TypeScript you'd write a union type — which vanishes at runtime.
 
-Java's `enum` <sup>[J5](NOTES.md#enums)</sup> is a real class with a fixed set of instances, checked at
-**compile time** and present at **runtime**.
+Java's `enum` <sup>[J5](NOTES.md#enums)</sup> is a real class with a fixed set of instances, checked at **compile time** and present at **runtime**.
 
 - [x] Create `src/main/java/com/connorjensen/jobtracker/model/Status.java`:
 
@@ -223,12 +203,9 @@ public enum Status {
 
 Five lines, and you get a lot:
 
-- `Status.APPLIED` is a **singleton** — there is exactly one instance of it in the whole JVM, so
-  `==` works for comparison (unlike `String`, where `==` compares identity and burns beginners).
+- `Status.APPLIED` is a **singleton** — there is exactly one instance of it in the whole JVM, so `==` works for comparison (unlike `String`, where `==` compares identity and burns beginners).
 - `Status.values()` returns all five as an array.
-- `Status.valueOf("OFFER")` parses a string, and **throws** on anything else. That's your input
-  validation for free — and in Chapter 2, Spring will call this method for you to turn
-  `?status=OFFER` into a `Status`.
+- `Status.valueOf("OFFER")` parses a string, and **throws** on anything else. That's your input validation for free — and in Chapter 2, Spring will call this method for you to turn `?status=OFFER` into a `Status`.
 - `switch` over an enum can be checked for exhaustiveness by the compiler.
 
 Now wire it into `Application`.
@@ -254,23 +231,16 @@ Now wire it into `Application`.
     }
 ```
 
-That default in the constructor is a **business rule enforced by the type system**. It is not
-possible to construct an `Application` with no status. Compare to a Python dict, where
-`app["status"]` might just... not be there.
+That default in the constructor is a **business rule enforced by the type system**. It is not possible to construct an `Application` with no status. Compare to a Python dict, where`app["status"]` might just... not be there.
 
-- [x] While you're in the file, add the two remaining fields from PROJECT.md — `notes` and `jobUrl`,
-  both `String`, both with getter and setter, neither in the constructor (they're optional at
-  creation time)
+- [x] While you're in the file, add the two remaining fields from PROJECT.md — `notes` and `jobUrl`, both `String`, both with getter and setter, neither in the constructor (they're optional at creation time)
 - [x] And add an `id`:
 
 ```java
     private Long id;
 ```
 
-with `getId()` / `setId(Long id)`. Note **`Long`**, not `long` <sup>[J5](NOTES.md#long-vs-long-and-autoboxing)</sup> — the capital-L version is an
-*object* and can be `null`, which is exactly what you need to mean "not saved yet." The lowercase
-`long` is a primitive and would default to `0`. Chapter 3's database layer depends on this
-distinction.
+with `getId()` / `setId(Long id)`. Note **`Long`**, not `long` <sup>[J5](NOTES.md#long-vs-long-and-autoboxing)</sup> — the capital-L version is an *object* and can be `null`, which is exactly what you need to mean "not saved yet." The lowercase`long` is a primitive and would default to `0`. Chapter 3's database layer depends on this distinction.
 
 ### Verify
 
@@ -300,15 +270,11 @@ EOF
 jshell> jshell> var a = new Application(...)jshell> System.out.println(...)APPLIED / id=null
 ```
 
-(Piping into `jshell` echoes its prompt between statements — ignore the noise, the answer is
-`APPLIED / id=null` at the end.)
+(Piping into `jshell` echoes its prompt between statements — ignore the noise, the answer is`APPLIED / id=null` at the end.)
 
-`jshell` <sup>[J9](NOTES.md#jshell)</sup> is Java's REPL — the closest thing to `python3` at a prompt, and it will load your own
-compiled classes if you point `--class-path` at them. Handy for exactly this: checking one method
-without writing a `main`.
+`jshell` <sup>[J9](NOTES.md#jshell)</sup> is Java's REPL — the closest thing to `python3` at a prompt, and it will load your own compiled classes if you point `--class-path` at them. Handy for exactly this: checking one method without writing a `main`.
 
-If `getStatus()` prints `null`, the constructor is missing its `this.status = Status.APPLIED;`. If
-`id=0` rather than `id=null`, you declared `long` instead of `Long`.
+If `getStatus()` prints `null`, the constructor is missing its `this.status = Status.APPLIED;`. If `id=0` rather than `id=null`, you declared `long` instead of `Long`.
 
 ---
 
@@ -371,10 +337,7 @@ public class Main {
 
 `for (Application app : applications)` is the **enhanced for loop** <sup>[J5](NOTES.md#enhanced-for-loop)</sup> — Java's `for x in list`.
 
-Note the five imports above the class. `Status` needs one now even though `Application` already had
-one — they're separate classes, and Java imports classes, not packages-worth-of-classes. (`import
-com.connorjensen.jobtracker.model.*;` exists and is legal, but every style guide and IDE default
-prefers the explicit list, because `*` hides where a name came from.)
+Note the five imports above the class. `Status` needs one now even though `Application` already had one — they're separate classes, and Java imports classes, not packages-worth-of-classes. (`importcom.connorjensen.jobtracker.model.*;` exists and is legal, but every style guide and IDE default prefers the explicit list, because `*` hides where a name came from.)
 
 ### Verify
 
@@ -390,18 +353,15 @@ Globex - Platform Engineer [INTERVIEWING]
 Initech - Java Developer [APPLIED]
 ```
 
-Three lines, and only index 1 is `INTERVIEWING` — that's the `List` preserving insertion order and
-`get(1)` being zero-based.
+Three lines, and only index 1 is `INTERVIEWING` — that's the `List` preserving insertion order and`get(1)` being zero-based.
 
-If you see `cannot find symbol: class List` or `variable Status`, you skipped an import. The error's
-`location:` line tells you which file, and the `symbol:` line tells you which name to import.
+If you see `cannot find symbol: class List` or `variable Status`, you skipped an import. The error's`location:` line tells you which file, and the `symbol:` line tells you which name to import.
 
 ---
 
 ## Step 4 — Streams: filtering without a loop
 
-You could filter with a `for` loop and an `if`. Java's idiomatic answer is a **stream** <sup>[J8](NOTES.md#lambdas-streams-and-method-references)</sup>, and it
-will look extremely familiar:
+You could filter with a `for` loop and an `if`. Java's idiomatic answer is a **stream** <sup>[J8](NOTES.md#lambdas-streams-and-method-references)</sup>, and it will look extremely familiar:
 
 - [x] Try it in `Main`
 
@@ -411,13 +371,9 @@ List<Application> interviewing = applications.stream()
         .toList();
 ```
 
-That's JS `.filter()` with different punctuation. `app -> ...` is a **lambda** — an anonymous
-function. `.stream()` opens a pipeline, `.filter()` describes a step, and `.toList()` **terminates**
-it and produces a real list.
+That's JS `.filter()` with different punctuation. `app -> ...` is a **lambda** — an anonymous function. `.stream()` opens a pipeline, `.filter()` describes a step, and `.toList()` **terminates**it and produces a real list.
 
-The one non-obvious rule: a stream is **lazy and single-use**. Nothing happens until a terminal
-operation (`.toList()`, `.count()`, `.findFirst()`) runs, and you can't reuse the stream afterward.
-It's a pipeline description, not a collection.
+The one non-obvious rule: a stream is **lazy and single-use**. Nothing happens until a terminal operation (`.toList()`, `.count()`, `.findFirst()`) runs, and you can't reuse the stream afterward. It's a pipeline description, not a collection.
 
 The other operations you'll actually use:
 
@@ -448,8 +404,7 @@ Initech - Java Developer [APPLIED]
 interviewing: 1
 ```
 
-One, not three — the filter ran. If you get a compile error on `.toList()`, that method is Java 16+;
-on an older JDK it's `.collect(Collectors.toList())`.
+One, not three — the filter ran. If you get a compile error on `.toList()`, that method is Java 16+; on an older JDK it's `.collect(Collectors.toList())`.
 
 - [x] Now confirm the single-use rule for yourself — add a second terminal op to the *same* stream
 
@@ -469,9 +424,7 @@ Delete those three lines once you've seen it.
 
 ## Step 5 — `Optional`: the return type that admits it might be empty
 
-Here's the problem. You want "find the application with this id." Sometimes there isn't one. In
-Python you return `None` and hope the caller checks. In Java, returning `null` has the same flaw,
-and it's the single most common source of production crashes — `NullPointerException`.
+Here's the problem. You want "find the application with this id." Sometimes there isn't one. In Python you return `None` and hope the caller checks. In Java, returning `null` has the same flaw, and it's the single most common source of production crashes — `NullPointerException`.
 
 `Optional<T>` <sup>[J8](NOTES.md#optional)</sup> is a box that either contains a value or doesn't, and **the type
 signature says so**:
@@ -484,8 +437,7 @@ Optional<Application> found = applications.stream()
         .findFirst();
 ```
 
-`.findFirst()` returns `Optional<Application>` because it genuinely might not find one. Now the
-caller *cannot* accidentally use the value without confronting the empty case:
+`.findFirst()` returns `Optional<Application>` because it genuinely might not find one. Now the caller *cannot* accidentally use the value without confronting the empty case:
 
 ```java
 if (found.isPresent()) {
@@ -503,18 +455,13 @@ String company = found.map(Application::getCompany).orElse("not found");
 Application required = found.orElseThrow(() -> new IllegalArgumentException("No Globex application"));
 ```
 
-**When `Optional` is the wrong tool** — this is the second half of the interview question, and most
-candidates miss it:
+**When `Optional` is the wrong tool** — this is the second half of the interview question, and most candidates miss it:
 
-- **Not for fields.** `private Optional<String> notes;` is wrong — it isn't serializable and it adds
-  a wrapper object per instance. Use a nullable field.
-- **Not for method parameters.** Overload the method or pass `null`; forcing callers to wrap
-  arguments is noise.
-- **Not for collections.** An empty `List` already means "nothing" — `Optional<List<T>>` gives you
-  two ways to say the same thing.
+- **Not for fields.** `private Optional<String> notes;` is wrong — it isn't serializable and it adds a wrapper object per instance. Use a nullable field.
+- **Not for method parameters.** Overload the method or pass `null`; forcing callers to wrap arguments is noise.
+- **Not for collections.** An empty `List` already means "nothing" — `Optional<List<T>>` gives you two ways to say the same thing.
 
-`Optional` is for **return types**, where it documents "this may legitimately find nothing" in a way
-the compiler helps enforce. That's the whole answer.
+`Optional` is for **return types**, where it documents "this may legitimately find nothing" in a way the compiler helps enforce. That's the whole answer.
 
 > Spring Data hands you `Optional<T>` from `findById()` in Chapter 3. The pattern you write by hand
 > in the capstone is byte-for-byte the pattern the framework expects.
@@ -547,9 +494,7 @@ found: Globex - Platform Engineer
 missing: not found
 ```
 
-`.map()` on an empty `Optional` doesn't run the function and doesn't throw — it just stays empty, so
-`.orElse()` supplies the fallback. That's the whole point: no null check, no `NullPointerException`,
-and the compiler wouldn't have let you skip it.
+`.map()` on an empty `Optional` doesn't run the function and doesn't throw — it just stays empty, so`.orElse()` supplies the fallback. That's the whole point: no null check, no `NullPointerException`, and the compiler wouldn't have let you skip it.
 
 - [x] Finally, make sure you didn't break Lesson 1's tests
 
@@ -562,8 +507,7 @@ Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 ```
 
-(`mvn compile` never compiles `src/test` — a step that leaves the tests broken will still look green
-until you run `mvn test`. Worth remembering.)
+(`mvn compile` never compiles `src/test` — a step that leaves the tests broken will still look green until you run `mvn test`. Worth remembering.)
 
 ---
 
@@ -583,19 +527,13 @@ until you run `mvn test`. Worth remembering.)
 <details>
 <summary>Answers</summary>
 
-1. No — it compiles fine. The `.class` file lands at the path matching the **`package` declaration**,
-   not the new directory. Maven hands javac an explicit list of every source file, so javac never has
-   to search the directory tree and never notices the mismatch.
+1. No — it compiles fine. The `.class` file lands at the path matching the **`package` declaration**, not the new directory. Maven hands javac an explicit list of every source file, so javac never has to search the directory tree and never notices the mismatch.
 2. The `package` declaration in the moved file, and an `import` in every file that referenced it.
-3. Each enum constant is a single instance, so identity comparison is value comparison. `String`s
-   with the same content can be separate objects, so `==` may be false — use `.equals()`.
-4. Declaring the interface type means the implementation can be swapped without changing any other
-   code, and it stops you from depending on `ArrayList`-specific methods.
+3. Each enum constant is a single instance, so identity comparison is value comparison. `String`s with the same content can be separate objects, so `==` may be false — use `.equals()`.
+4. Declaring the interface type means the implementation can be swapped without changing any other code, and it stops you from depending on `ArrayList`-specific methods.
 5. `IllegalStateException` — a stream is consumed by its terminal operation and cannot be reused.
-6. As a field (not serializable, extra object per instance), as a parameter (noisy for callers), or
-   wrapping a collection (an empty collection already conveys "none").
-7. `Long` is an object and can be `null`, meaning "no id assigned yet." The primitive `long` would
-   silently default to `0`, which is indistinguishable from a real id of 0.
+6. As a field (not serializable, extra object per instance), as a parameter (noisy for callers), or wrapping a collection (an empty collection already conveys "none").
+7. `Long` is an object and can be `null`, meaning "no id assigned yet." The primitive `long` would silently default to `0`, which is indistinguishable from a real id of 0.
 
 </details>
 
@@ -603,9 +541,7 @@ until you run `mvn test`. Worth remembering.)
 
 ## Where this lands you
 
-You have a package structure, a type-safe `Status`, a collection of applications, and a way to
-express "might not be there." Lesson 3 turns the loose `List` in `Main` into a **repository behind an
-interface** — the single most important idea for understanding what Spring does for you.
+You have a package structure, a type-safe `Status`, a collection of applications, and a way to express "might not be there." Lesson 3 turns the loose `List` in `Main` into a **repository behind an interface** — the single most important idea for understanding what Spring does for you.
 
 ---
 

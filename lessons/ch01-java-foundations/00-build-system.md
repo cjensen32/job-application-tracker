@@ -1,16 +1,15 @@
 # Lesson 0 — Build System & Project Shape
 
-**Goal:** Understand what a JVM project *is* before a generator makes one for you. **You'll be able to answer:** *"Walk
-me through what happens when you run `mvn package`."*
+**Goal:** Understand what a JVM project *is* before a generator makes one for you. **You'll be able to answer:** *"Walk me through what happens when you run `mvn package`."*
 
 **Progress** — tick these off as you go:
 
-- [ ] Step 1 — The directory layout
-- [ ] Step 2 — Write a minimal `pom.xml`
-- [ ] Step 3 — Compile and run something
-- [ ] Step 4 — Add a dependency, and see scope
-- [ ] Step 5 — Package it
-- [ ] Lifecycle read + self-check answered
+- [x] [Step 1](#step-1--the-directory-layout) — The directory layout
+- [x] [Step 2] — Write a minimal `pom.xml`
+- [x] Step 3 — Compile and run something
+- [x] Step 4 — Add a dependency, and see scope
+- [x] Step 5 — Package it
+- [x] Lifecycle read + self-check answered
 
 ---
 

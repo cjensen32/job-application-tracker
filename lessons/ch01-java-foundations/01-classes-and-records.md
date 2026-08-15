@@ -7,12 +7,12 @@ instead. **You'll be able to answer:** *"When would you use a `record` instead o
 
 **Progress** — tick these off as you go:
 
-- [ ] Step 1 — The traditional class
-- [ ] Step 2 — `static` vs instance, and why `main` is weird
-- [ ] Step 3 — The same thing as a `record`
-- [ ] Step 4 — The difference that actually matters (`mvn test` green)
-- [ ] Step 5 — So which do I use?
-- [ ] Self-check answered
+- [x] Step 1 — The traditional class
+- [x] Step 2 — `static` vs instance, and why `main` is weird
+- [x] Step 3 — The same thing as a `record`
+- [x] Step 4 — The difference that actually matters (`mvn test` green)
+- [x] Step 5 — So which do I use?
+- [x] Self-check answered
 
 ---
 
