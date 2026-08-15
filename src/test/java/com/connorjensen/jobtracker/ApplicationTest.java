@@ -1,5 +1,8 @@
 package com.connorjensen.jobtracker;
 
+import com.connorjensen.jobtracker.dto.ApplicationDto;
+import com.connorjensen.jobtracker.model.Application;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

@@ -11,9 +11,9 @@ hold many applications in a collection you can query.
 - [x] [Step 1](#step-1--packages-stop-putting-everything-in-one-bucket) — Packages (all three checkpoints, ending green)
 - [x] [Step 2](#step-2--the-enum-your-first-real-type) — The `enum`: your first real type (ending green)
 - [x] [Step 3](#step-3--collections-list-map-and-generics) — Collections: `List`, `Map`, and generics (ending green)
-- [ ] [Step 4](#step-4--streams-filtering-without-a-loop) — Streams: filtering without a loop
-- [ ] [Step 5](#step-5--optional-the-return-type-that-admits-it-might-be-empty) — `Optional`: the return type that admits it might be empty
-- [ ] Self-check answered
+- [x] [Step 4](#step-4--streams-filtering-without-a-loop) — Streams: filtering without a loop
+- [x] [Step 5](#step-5--optional-the-return-type-that-admits-it-might-be-empty) — `Optional`: the return type that admits it might be empty
+- [x] Self-check answered
 
 ---
 
@@ -403,7 +403,7 @@ If you see `cannot find symbol: class List` or `variable Status`, you skipped an
 You could filter with a `for` loop and an `if`. Java's idiomatic answer is a **stream** <sup>[J8](NOTES.md#lambdas-streams-and-method-references)</sup>, and it
 will look extremely familiar:
 
-- [ ] Try it in `Main`
+- [x] Try it in `Main`
 
 ```java
 List<Application> interviewing = applications.stream()
@@ -431,7 +431,7 @@ The other operations you'll actually use:
 
 ### Verify
 
-- [ ] Print the filtered list's size, then compile and run
+- [x] Print the filtered list's size, then compile and run
 
 ```java
         System.out.println("interviewing: " + interviewing.size());
@@ -451,7 +451,7 @@ interviewing: 1
 One, not three — the filter ran. If you get a compile error on `.toList()`, that method is Java 16+;
 on an older JDK it's `.collect(Collectors.toList())`.
 
-- [ ] Now confirm the single-use rule for yourself — add a second terminal op to the *same* stream
+- [x] Now confirm the single-use rule for yourself — add a second terminal op to the *same* stream
 
 ```java
         var s = applications.stream();
@@ -476,7 +476,7 @@ and it's the single most common source of production crashes — `NullPointerExc
 `Optional<T>` <sup>[J8](NOTES.md#optional)</sup> is a box that either contains a value or doesn't, and **the type
 signature says so**:
 
-- [ ] Try it in `Main`, and handle the empty case at least two of the ways below
+- [x] Try it in `Main`, and handle the empty case at least two of the ways below
 
 ```java
 Optional<Application> found = applications.stream()
@@ -523,7 +523,7 @@ the compiler helps enforce. That's the whole answer.
 
 The interesting case is the *empty* one — a search that finds nothing has to not crash.
 
-- [ ] Search for a company that isn't there, and handle it without an `if`
+- [x] Search for a company that isn't there, and handle it without an `if`
 
 ```java
         Optional<Application> missing = applications.stream()
@@ -532,7 +532,7 @@ The interesting case is the *empty* one — a search that finds nothing has to n
         System.out.println("missing: " + missing.map(Application::getCompany).orElse("not found"));
 ```
 
-- [ ] Compile and run (you'll need `import java.util.Optional;`)
+- [x] Compile and run (you'll need `import java.util.Optional;`)
 
 ```bash
 mvn -q clean compile && java -cp target/classes com.connorjensen.jobtracker.Main
@@ -551,7 +551,7 @@ missing: not found
 `.orElse()` supplies the fallback. That's the whole point: no null check, no `NullPointerException`,
 and the compiler wouldn't have let you skip it.
 
-- [ ] Finally, make sure you didn't break Lesson 1's tests
+- [x] Finally, make sure you didn't break Lesson 1's tests
 
 ```bash
 mvn clean test
@@ -569,7 +569,7 @@ until you run `mvn test`. Worth remembering.)
 
 ## Self-check
 
-- [ ] Answered all seven without opening the answers
+- [x] Answered all seven without opening the answers
 
 1. You `git mv` a class into a new directory and change nothing else. Does `mvn compile` fail? Where
    does its `.class` file end up, and why?
