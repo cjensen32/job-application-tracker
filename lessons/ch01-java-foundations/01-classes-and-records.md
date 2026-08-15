@@ -93,11 +93,16 @@ the company can't change." Encapsulation lets you enforce that; a Python dict ca
 
 ## Step 2 — `static` vs instance, and why `main` is weird
 
-- [ ] Add a method to `Application`:
+- [ ] Add a method to `Application`, just below the getters:
 
 ```java
+public class Application {
+
+    // ... fields, constructor and getters from Step 1 ...
+
     public String summary() {
-    return company + " — " + role;
+        return company + " — " + role;
+    }
 }
 ```
 
@@ -106,7 +111,12 @@ the company can't change." Encapsulation lets you enforce that; a Python dict ca
 Compare to `Main.main()` from Lesson 0:
 
 ```java
-public static void main(String[] args);
+public class Main {
+
+    public static void main(String[] args) {
+        // ...
+    }
+}
 ```
 
 **`static`** means the method belongs to the *class itself*, not to any instance — you call it as
@@ -168,8 +178,15 @@ record is **immutable** — no setters, ever. Fields are final. To "change" one 
 - [ ] Add to `main`, then recompile and run:
 
 ```java
+public class Main {
+
+    public static void main(String[] args) {
+        // ... the Application lines from Step 2 ...
+
         ApplicationDto dto = new ApplicationDto("Acme Corp", "Backend Engineer", LocalDate.of(2026, 8, 1));
         System.out.println(dto);
+    }
+}
 ```
 
 Recompile and run. You get

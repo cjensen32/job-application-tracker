@@ -79,9 +79,34 @@ and `valueOf()` unless you write them.
 **Before:** collections held `Object`, and every read required a cast:
 
 ```java
-List applications = new ArrayList();
-applications.add(app);
-Application a = (Application) applications.get(0);   // ClassCastException at runtime if wrong
+import java.util.ArrayList;
+import java.util.List;
+
+public class RawTypesExample {
+
+    record Application(String company) { }
+
+    public static void main(String[] args) {
+        List applications = new ArrayList();          // no type parameter — this is a "raw type"
+        applications.add(new Application("Acme Corp"));
+        applications.add("not an application");       // compiles fine; nothing stops you
+
+        Application a = (Application) applications.get(0);
+        System.out.println(a.company());
+
+        try {
+            Application b = (Application) applications.get(1);
+            System.out.println(b.company());
+        } catch (ClassCastException e) {
+            System.out.println("ClassCastException at runtime");
+        }
+    }
+}
+```
+
+```
+Acme Corp
+ClassCastException at runtime
 ```
 
 **The `z` in "x changed to y because z":** Java 5 had to let Java 1.4 code and Java 5 code share the
@@ -119,9 +144,30 @@ Purely a typing-effort fix, no semantic change.
 **Before:** with the Collections Framework (1.2+), an explicit `Iterator`:
 
 ```java
-for (Iterator it = applications.iterator(); it.hasNext(); ) {
-    Application app = (Application) it.next();
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class IteratorExample {
+
+    record Application(String company) { }
+
+    public static void main(String[] args) {
+        List applications = new ArrayList();
+        applications.add(new Application("Acme Corp"));
+        applications.add(new Application("Globex"));
+
+        for (Iterator it = applications.iterator(); it.hasNext(); ) {
+            Application app = (Application) it.next();
+            System.out.println(app.company());
+        }
+    }
 }
+```
+
+```
+Acme Corp
+Globex
 ```
 
 **Before 1.2:** `Enumeration` with `hasMoreElements()`/`nextElement()`, over a `Vector`.
@@ -135,12 +181,41 @@ for (Iterator it = applications.iterator(); it.hasNext(); ) {
 **Before:** a loop with an `if`. For anything callback-shaped, an **anonymous inner class**:
 
 ```java
-Collections.sort(applications, new Comparator() {
-    public int compare(Object a, Object b) {
-        return ((Application) a).getAppliedDate().compareTo(((Application) b).getAppliedDate());
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+public class AnonymousClassExample {
+
+    record Application(String company, LocalDate appliedDate) { }
+
+    public static void main(String[] args) {
+        List applications = new ArrayList();
+        applications.add(new Application("Initech", LocalDate.of(2026, 8, 9)));
+        applications.add(new Application("Acme Corp", LocalDate.of(2026, 8, 1)));
+
+        Collections.sort(applications, new Comparator() {
+            public int compare(Object a, Object b) {
+                return ((Application) a).appliedDate().compareTo(((Application) b).appliedDate());
+            }
+        });
+
+        for (Object app : applications) {
+            System.out.println(((Application) app).company());
+        }
     }
-});
+}
 ```
+
+```
+Acme Corp
+Initech
+```
+
+(Sorted by date, so Acme Corp's 1 August comes before Initech's 9 August — the anonymous
+`Comparator` did its job.)
 
 Six lines of ceremony around one line of logic. Lambdas are, at the bytecode level, not just sugar
 for this — they compile to an `invokedynamic` instruction that builds the implementation at runtime,
@@ -190,10 +265,28 @@ letting the compiler convert — is **Java 5**.
 Autoboxing removed the ceremony and introduced a famous trap that still bites:
 
 ```java
-Long a = 127L, b = 127L;
-a == b;              // true  — small values are cached
-Long c = 128L, d = 128L;
-c == d;              // false — different objects
+public class AutoboxingExample {
+
+    public static void main(String[] args) {
+        Long a = 127L, b = 127L;
+        System.out.println(a == b);        // true  — small values come from a cache
+
+        Long c = 128L, d = 128L;
+        System.out.println(c == d);        // false — two separate objects
+
+        System.out.println(c.equals(d));   // true  — what you actually wanted
+    }
+}
+```
+
+```bash
+java AutoboxingExample.java
+```
+
+```
+true
+false
+true
 ```
 
 The `Integer`/`Long` cache for −128..127 is *required* by the spec, so the bug is deterministic and
@@ -252,6 +345,35 @@ and the compiler will reject every Java 9+ API you use.
 
 ---
 
+## Single-file source launch
+
+`java MapExample.java` — running a `.java` file directly, with no `javac` step and no `.class` file
+left behind. **Java 11** (2018), JEP 330.
+
+**Before:** `javac Foo.java && java -cp . Foo`, and you now have a `Foo.class` sitting in your
+directory. Two commands and a cleanup step to run five lines.
+
+The rule that makes it work: the file is compiled **in memory**, and the first class declared in it
+is the entry point. It only applies to a single file that needs nothing outside the JDK — the moment
+you have two source files or a dependency, you're back to `javac`.
+
+**Why it matters here:** it's the correct home for a throwaway experiment. Java's lack of a
+`python3 script.py` equivalent for eighteen years is why so much scratch code ends up pasted into a
+real source folder — and in a Maven project, one bad file under `src/main/java` fails
+`mvn compile` for *every* class, so an experiment breaks the whole build. Put scratch files anywhere
+*except* `src/`, and run them with `java Whatever.java`.
+
+Java 21 went further with **implicitly declared classes** (JEP 445, preview): a file containing bare
+statements and a `void main()` with no enclosing class. It's still preview in 21 — which is why
+pasting a bare fragment into a `.java` file produces the initially baffling
+`unnamed classes are a preview feature and are disabled by default` rather than a straight syntax
+error. It finalised in **Java 25** as `void main()` with compact source files.
+
+**Backport difficulty:** not applicable — it's a launcher feature. On Java 8 the answer is `javac`
+then `java`, or `jshell` from a newer JDK.
+
+---
+
 ## jshell
 
 Java's REPL, **Java 9**. `jshell --class-path target/classes` drops you at a prompt with your own
@@ -281,6 +403,7 @@ The tool doesn't care what compiled them.
 | `.toList()` on Stream | 16 | `.collect(Collectors.toList())` |
 | `var` | 10 | explicit types |
 | `List.of(...)` | 9 | `Collections.unmodifiableList(Arrays.asList(...))` |
+| `java Foo.java` (single-file launch) | 11 | `javac Foo.java && java -cp . Foo` |
 | `jshell` | 9 | a throwaway class with `main`, or Groovy/BeanShell |
 | `release` compiler flag | 9 | `source` + `target` |
 | streams, lambdas, method refs | 8 | loops, anonymous inner classes |

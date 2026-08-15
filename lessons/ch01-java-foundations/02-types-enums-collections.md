@@ -135,11 +135,19 @@ class **no** implicit access to a different package. Not even a child one: `...j
 not "inside" `...jobtracker` in any way the compiler cares about. Package names look hierarchical and
 aren't.
 
-- [x] `Main.java` — say where they went:
+- [x] `Main.java` — say where they went, with two `import` lines above the class:
 
 ```java
+package com.connorjensen.jobtracker;
+
 import com.connorjensen.jobtracker.dto.ApplicationDto;
 import com.connorjensen.jobtracker.model.Application;
+
+import java.time.LocalDate;
+
+public class Main {
+    // ... unchanged ...
+}
 ```
 
 - [x] Compile again, and check the output tree
@@ -236,6 +244,10 @@ Now wire it into `Application`.
 - [x] Add the field, default it in the constructor, and give it a getter and setter
 
 ```java
+public class Application {
+
+    // ... company, role, appliedDate from Lesson 1 ...
+
     private Status status;
 
     public Application(String company, String role, LocalDate appliedDate) {
@@ -252,6 +264,9 @@ Now wire it into `Application`.
     public void setStatus(Status status) {
         this.status = status;
     }
+
+    // ... getters from Lesson 1 unchanged ...
+}
 ```
 
 That default in the constructor is a **business rule enforced by the type system**. It is not
@@ -264,7 +279,12 @@ possible to construct an `Application` with no status. Compare to a Python dict,
 - [x] And add an `id`:
 
 ```java
+public class Application {
+
     private Long id;
+
+    // ... the rest of the class ...
+}
 ```
 
 with `getId()` / `setId(Long id)`. Note **`Long`**, not `long` <sup>[J5](NOTES.md#long-vs-long-and-autoboxing)</sup> — the capital-L version is an
@@ -317,10 +337,45 @@ If `getStatus()` prints `null`, the constructor is missing its `this.status = St
 You need somewhere to put many applications. Java's collections are typed:
 
 ```java
-List<Application> applications = new ArrayList<>();
+import java.util.ArrayList;
+import java.util.List;
+
+public class ListExample {
+
+    /** Stand-in for the real Application, so this example runs on its own. */
+    record Application(String company) { }
+
+    public static void main(String[] args) {
+        List<Application> applications = new ArrayList<>();
+        applications.add(new Application("Acme Corp"));
+        applications.add(new Application("Globex"));
+
+        System.out.println(applications.size());
+        System.out.println(applications.get(0));
+
+        // applications.add("oops");   // uncomment this and the file stops compiling
+    }
+}
 ```
 
-Read that as "a List of Application." The `<Application>` is a **generic type parameter**
+- [x] Run it without touching your project — save it as `ListExample.java` anywhere and run the file
+  directly
+
+```bash
+java ListExample.java
+```
+
+```
+2
+Application[company=Acme Corp]
+```
+
+> `java SomeFile.java` runs a single source file with no `javac` step and no classpath
+> <sup>[J11](NOTES.md#single-file-source-launch)</sup>. It's the right tool for a throwaway
+> experiment — and it keeps scratch code *out* of `src/`, where a stray file would break
+> `mvn compile` for the whole project.
+
+Read `List<Application>` as "a List of Application." The `<Application>` is a **generic type parameter**
 <sup>[J5](NOTES.md#generics)</sup> — it's what
 lets the compiler reject `applications.add("oops")` before the program ever runs.
 
@@ -336,16 +391,48 @@ Two things to notice:
 The other collection you need is `Map<K, V>` — a dictionary:
 
 ```java
-Map<Long, Application> byId = new HashMap<>();
-byId.put(1L, app);          // 1L is a long literal; plain 1 is an int
-Application found = byId.get(1L);   // returns null if absent
+import java.util.HashMap;
+import java.util.Map;
+
+public class MapExample {
+
+    /** Stand-in for the real Application, so this example runs on its own. */
+    record Application(String company) { }
+
+    public static void main(String[] args) {
+        Map<Long, Application> byId = new HashMap<>();
+        byId.put(1L, new Application("Acme Corp"));   // 1L is a long literal; plain 1 is an int
+
+        Application found = byId.get(1L);
+        System.out.println(found);
+
+        System.out.println(byId.get(99L));            // absent key
+    }
+}
 ```
+
+- [x] Same deal — save as `MapExample.java` and run it
+
+```bash
+java MapExample.java
+```
+
+```
+Application[company=Acme Corp]
+null
+```
+
+That second line is the one to remember: **`Map.get` returns `null` for a missing key**, it doesn't
+throw. Python's `dict[k]` raises `KeyError`; Java hands you a `null` that stays quiet until you call
+a method on it several lines later. Step 5 is about the fix.
 
 `Map` is how you'll fake a database table in the capstone: id → row.
 
 - [x] Try it in `Main` — replace the body with:
 
 ```java
+package com.connorjensen.jobtracker;
+
 import com.connorjensen.jobtracker.model.Application;
 import com.connorjensen.jobtracker.model.Status;
 
@@ -406,9 +493,16 @@ will look extremely familiar:
 - [ ] Try it in `Main`
 
 ```java
-List<Application> interviewing = applications.stream()
-        .filter(app -> app.getStatus() == Status.INTERVIEWING)
-        .toList();
+public class Main {
+
+    public static void main(String[] args) {
+        // ... the List<Application> from Step 3 ...
+
+        List<Application> interviewing = applications.stream()
+                .filter(app -> app.getStatus() == Status.INTERVIEWING)
+                .toList();
+    }
+}
 ```
 
 That's JS `.filter()` with different punctuation. `app -> ...` is a **lambda** — an anonymous
@@ -419,22 +513,71 @@ The one non-obvious rule: a stream is **lazy and single-use**. Nothing happens u
 operation (`.toList()`, `.count()`, `.findFirst()`) runs, and you can't reuse the stream afterward.
 It's a pipeline description, not a collection.
 
-The other operations you'll actually use:
+The other operations you'll actually use, in a file you can run as-is:
 
 ```java
-.map(Application::getCompany)                 // transform each element
-.sorted(Comparator.comparing(Application::getAppliedDate))
-.count()
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+
+public class StreamOpsExample {
+
+    record Application(String company, LocalDate appliedDate) { }
+
+    public static void main(String[] args) {
+        List<Application> applications = List.of(
+                new Application("Initech", LocalDate.of(2026, 8, 9)),
+                new Application("Acme Corp", LocalDate.of(2026, 8, 1)),
+                new Application("Globex", LocalDate.of(2026, 8, 5)));
+
+        // transform each element
+        List<String> companies = applications.stream()
+                .map(Application::company)
+                .toList();
+        System.out.println(companies);
+
+        // sort by a field
+        List<String> byDate = applications.stream()
+                .sorted(Comparator.comparing(Application::appliedDate))
+                .map(Application::company)
+                .toList();
+        System.out.println(byDate);
+
+        // count what survives a filter
+        System.out.println(applications.stream()
+                .filter(app -> app.company().startsWith("G"))
+                .count());
+    }
+}
 ```
 
-`Application::getCompany` is a **method reference** — shorthand for `app -> app.getCompany()`.
+```bash
+java StreamOpsExample.java
+```
+
+```
+[Initech, Acme Corp, Globex]
+[Acme Corp, Globex, Initech]
+1
+```
+
+`Application::company` is a **method reference** — shorthand for `app -> app.company()`. (It's
+`company()` and not `getCompany()` here only because this example uses a `record`; your real
+`Application` is a class, so it's `Application::getCompany`.)
 
 ### Verify
 
 - [ ] Print the filtered list's size, then compile and run
 
 ```java
+public class Main {
+
+    public static void main(String[] args) {
+        // ... the stream from above ...
+
         System.out.println("interviewing: " + interviewing.size());
+    }
+}
 ```
 
 ```bash
@@ -451,19 +594,41 @@ interviewing: 1
 One, not three — the filter ran. If you get a compile error on `.toList()`, that method is Java 16+;
 on an older JDK it's `.collect(Collectors.toList())`.
 
-- [ ] Now confirm the single-use rule for yourself — add a second terminal op to the *same* stream
+- [ ] Now confirm the single-use rule for yourself — run a second terminal op on the *same* stream
+
+Do this one in a scratch file rather than in `Main`, so you don't have to remember to undo it:
 
 ```java
-        var s = applications.stream();
-        s.toList();
-        s.count();      // <- run it and read the exception
+import java.util.List;
+import java.util.stream.Stream;
+
+public class StreamReuseExample {
+
+    public static void main(String[] args) {
+        List<String> companies = List.of("Acme Corp", "Globex", "Initech");
+
+        Stream<String> s = companies.stream();
+        s.toList();          // terminal operation #1 — consumes the stream
+
+        try {
+            s.count();       // terminal operation #2 — on an already-closed stream
+        } catch (IllegalStateException e) {
+            System.out.println("caught: " + e.getMessage());
+        }
+    }
+}
+```
+
+```bash
+java StreamReuseExample.java
 ```
 
 ```
-Exception in thread "main" java.lang.IllegalStateException: stream has already been operated upon or closed
+caught: stream has already been operated upon or closed
 ```
 
-Delete those three lines once you've seen it.
+Without the `try`, that's an uncaught exception that kills the program. A stream is consumed by its
+terminal operation — if you need to traverse twice, call `.stream()` twice.
 
 ---
 
@@ -479,28 +644,78 @@ signature says so**:
 - [ ] Try it in `Main`, and handle the empty case at least two of the ways below
 
 ```java
-Optional<Application> found = applications.stream()
-        .filter(app -> app.getCompany().equals("Globex"))
-        .findFirst();
+public class Main {
+
+    public static void main(String[] args) {
+        // ... the List<Application> from Step 3 ...
+
+        Optional<Application> found = applications.stream()
+                .filter(app -> app.getCompany().equals("Globex"))
+                .findFirst();
+    }
+}
 ```
 
 `.findFirst()` returns `Optional<Application>` because it genuinely might not find one. Now the
-caller *cannot* accidentally use the value without confronting the empty case:
+caller *cannot* accidentally use the value without confronting the empty case. Here are the five
+ways, in one file you can run:
 
 ```java
-if (found.isPresent()) {
-    System.out.println(found.get().summary());
+import java.util.List;
+import java.util.Optional;
+
+public class OptionalExample {
+
+    record Application(String company, String role) {
+        String summary() {
+            return company + " - " + role;
+        }
+    }
+
+    public static void main(String[] args) {
+        List<Application> applications = List.of(
+                new Application("Acme Corp", "Backend Engineer"),
+                new Application("Globex", "Platform Engineer"));
+
+        Optional<Application> found = applications.stream()
+                .filter(app -> app.company().equals("Globex"))
+                .findFirst();
+
+        // 1. check, then unwrap — the verbose way
+        if (found.isPresent()) {
+            System.out.println(found.get().summary());
+        }
+
+        // 2. same thing with no branch at all
+        found.ifPresent(app -> System.out.println(app.summary()));
+
+        // 3. supply a fallback
+        System.out.println(found.map(Application::company).orElse("not found"));
+
+        // 4. or blow up loudly, with a message you chose
+        Application required = found.orElseThrow(
+                () -> new IllegalArgumentException("No Globex application"));
+        System.out.println(required.company());
+
+        // 5. the case that actually matters — nothing found, and nothing crashes
+        Optional<Application> missing = applications.stream()
+                .filter(app -> app.company().equals("Nope Inc"))
+                .findFirst();
+        System.out.println(missing.map(Application::company).orElse("not found"));
+    }
 }
+```
 
-// or, better — no branch at all:
-found.ifPresent(app -> System.out.println(app.summary()));
+```bash
+java OptionalExample.java
+```
 
-// supply a fallback:
-Application app = found.orElse(null);
-String company = found.map(Application::getCompany).orElse("not found");
-
-// or blow up loudly with a message you chose:
-Application required = found.orElseThrow(() -> new IllegalArgumentException("No Globex application"));
+```
+Globex - Platform Engineer
+Globex - Platform Engineer
+Globex
+Globex
+not found
 ```
 
 **When `Optional` is the wrong tool** — this is the second half of the interview question, and most
@@ -526,10 +741,17 @@ The interesting case is the *empty* one — a search that finds nothing has to n
 - [ ] Search for a company that isn't there, and handle it without an `if`
 
 ```java
+public class Main {
+
+    public static void main(String[] args) {
+        // ... everything from Step 4 ...
+
         Optional<Application> missing = applications.stream()
                 .filter(app -> app.getCompany().equals("Nope Inc"))
                 .findFirst();
         System.out.println("missing: " + missing.map(Application::getCompany).orElse("not found"));
+    }
+}
 ```
 
 - [ ] Compile and run (you'll need `import java.util.Optional;`)

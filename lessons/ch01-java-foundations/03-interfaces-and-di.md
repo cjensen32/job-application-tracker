@@ -26,7 +26,15 @@ Right now `Main` holds a `List<Application>` and manipulates it directly. Suppos
 `ApplicationService` that does the same:
 
 ```java
+package com.connorjensen.jobtracker.service;
+
+import com.connorjensen.jobtracker.model.Application;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class ApplicationService {
+
     private final List<Application> applications = new ArrayList<>();   // ← the problem
 }
 ```
@@ -182,11 +190,20 @@ Someone still has to decide which implementation gets used. In a framework-free 
 - [ ] Build the object graph in `main`
 
 ```java
-public static void main(String[] args) {
-    ApplicationRepository repository = new InMemoryApplicationRepository();
-    ApplicationService service = new ApplicationService(repository);
+package com.connorjensen.jobtracker;
 
-    // ... use the service
+import com.connorjensen.jobtracker.repository.ApplicationRepository;
+import com.connorjensen.jobtracker.repository.InMemoryApplicationRepository;
+import com.connorjensen.jobtracker.service.ApplicationService;
+
+public class Main {
+
+    public static void main(String[] args) {
+        ApplicationRepository repository = new InMemoryApplicationRepository();
+        ApplicationService service = new ApplicationService(repository);
+
+        // ... use the service
+    }
 }
 ```
 
@@ -208,13 +225,34 @@ accepts *any* `ApplicationRepository`, a test can pass one that isn't real:
 - [ ] Read this one — you'll write it for real in the capstone
 
 ```java
-class AlwaysEmptyRepository implements ApplicationRepository {
-    @Override public Optional<Application> findById(Long id) { return Optional.empty(); }
-    // ... other methods
-}
+package com.connorjensen.jobtracker.service;
 
-// in a test:
-ApplicationService service = new ApplicationService(new AlwaysEmptyRepository());
+import com.connorjensen.jobtracker.model.Application;
+import com.connorjensen.jobtracker.repository.ApplicationRepository;
+import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
+
+class ApplicationServiceTest {
+
+    /** A fake repository that behaves as though the database were empty. */
+    static class AlwaysEmptyRepository implements ApplicationRepository {
+
+        @Override
+        public Optional<Application> findById(Long id) {
+            return Optional.empty();
+        }
+
+        // ... the other four methods, returning empty lists / false ...
+    }
+
+    @Test
+    void findsNothingWhenTheRepositoryIsEmpty() {
+        ApplicationService service = new ApplicationService(new AlwaysEmptyRepository());
+
+        // ... assert on what the service does with a missing application
+    }
+}
 ```
 
 Now you can test "what does the service do when the application doesn't exist?" without a database,
