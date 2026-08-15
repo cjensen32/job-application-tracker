@@ -9,10 +9,10 @@ hold many applications in a collection you can query.
 **Progress** — tick these off as you go:
 
 - [x] [Step 1](#step-1--packages-stop-putting-everything-in-one-bucket) — Packages (all three checkpoints, ending green)
-- [ ] [Step 2](#step-2--the-enum-your-first-real-type) — The `enum`: your first real type
-- [ ] Step 3 — Collections: `List`, `Map`, and generics
-- [ ] Step 4 — Streams: filtering without a loop
-- [ ] Step 5 — `Optional`: the return type that admits it might be empty
+- [x] [Step 2](#step-2--the-enum-your-first-real-type) — The `enum`: your first real type (ending green)
+- [x] [Step 3](#step-3--collections-list-map-and-generics) — Collections: `List`, `Map`, and generics (ending green)
+- [ ] [Step 4](#step-4--streams-filtering-without-a-loop) — Streams: filtering without a loop
+- [ ] [Step 5](#step-5--optional-the-return-type-that-admits-it-might-be-empty) — `Optional`: the return type that admits it might be empty
 - [ ] Self-check answered
 
 ---
@@ -207,7 +207,7 @@ string and hope. In TypeScript you'd write a union type — which vanishes at ru
 Java's `enum` <sup>[J5](NOTES.md#enums)</sup> is a real class with a fixed set of instances, checked at
 **compile time** and present at **runtime**.
 
-- [ ] Create `src/main/java/com/connorjensen/jobtracker/model/Status.java`:
+- [x] Create `src/main/java/com/connorjensen/jobtracker/model/Status.java`:
 
 ```java
 package com.connorjensen.jobtracker.model;
@@ -233,7 +233,7 @@ Five lines, and you get a lot:
 
 Now wire it into `Application`.
 
-- [ ] Add the field, default it in the constructor, and give it a getter and setter
+- [x] Add the field, default it in the constructor, and give it a getter and setter
 
 ```java
     private Status status;
@@ -258,10 +258,10 @@ That default in the constructor is a **business rule enforced by the type system
 possible to construct an `Application` with no status. Compare to a Python dict, where
 `app["status"]` might just... not be there.
 
-- [ ] While you're in the file, add the two remaining fields from PROJECT.md — `notes` and `jobUrl`,
+- [x] While you're in the file, add the two remaining fields from PROJECT.md — `notes` and `jobUrl`,
   both `String`, both with getter and setter, neither in the constructor (they're optional at
   creation time)
-- [ ] And add an `id`:
+- [x] And add an `id`:
 
 ```java
     private Long id;
@@ -271,6 +271,44 @@ with `getId()` / `setId(Long id)`. Note **`Long`**, not `long` <sup>[J5](NOTES.m
 *object* and can be `null`, which is exactly what you need to mean "not saved yet." The lowercase
 `long` is a primitive and would default to `0`. Chapter 3's database layer depends on this
 distinction.
+
+### Verify
+
+- [x] Build and run the existing tests
+
+```bash
+mvn clean test
+```
+
+```
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+- [x] Prove the two rules you just encoded — the constructor default, and `Long` being nullable
+
+```bash
+mvn -q compile && jshell --class-path target/classes -q <<'EOF'
+import com.connorjensen.jobtracker.model.*;
+var a = new Application("Acme", "Backend Engineer", java.time.LocalDate.of(2026,8,1));
+System.out.println(a.getStatus() + " / id=" + a.getId());
+/exit
+EOF
+```
+
+```
+jshell> jshell> var a = new Application(...)jshell> System.out.println(...)APPLIED / id=null
+```
+
+(Piping into `jshell` echoes its prompt between statements — ignore the noise, the answer is
+`APPLIED / id=null` at the end.)
+
+`jshell` <sup>[J9](NOTES.md#jshell)</sup> is Java's REPL — the closest thing to `python3` at a prompt, and it will load your own
+compiled classes if you point `--class-path` at them. Handy for exactly this: checking one method
+without writing a `main`.
+
+If `getStatus()` prints `null`, the constructor is missing its `this.status = Status.APPLIED;`. If
+`id=0` rather than `id=null`, you declared `long` instead of `Long`.
 
 ---
 
@@ -305,23 +343,58 @@ Application found = byId.get(1L);   // returns null if absent
 
 `Map` is how you'll fake a database table in the capstone: id → row.
 
-- [ ] Try it in `Main` — replace the body with:
+- [x] Try it in `Main` — replace the body with:
 
 ```java
-List<Application> applications = new ArrayList<>();
-applications.add(new Application("Acme Corp", "Backend Engineer", LocalDate.of(2026, 8, 1)));
-applications.add(new Application("Globex", "Platform Engineer", LocalDate.of(2026, 8, 5)));
-applications.add(new Application("Initech", "Java Developer", LocalDate.of(2026, 8, 9)));
+import com.connorjensen.jobtracker.model.Application;
+import com.connorjensen.jobtracker.model.Status;
 
-applications.get(1).setStatus(Status.INTERVIEWING);
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-for (Application app : applications) {
-    System.out.println(app.summary() + " [" + app.getStatus() + "]");
+public class Main {
+    public static void main(String[] args) {
+        List<Application> applications = new ArrayList<>();
+        applications.add(new Application("Acme Corp", "Backend Engineer", LocalDate.of(2026, 8, 1)));
+        applications.add(new Application("Globex", "Platform Engineer", LocalDate.of(2026, 8, 5)));
+        applications.add(new Application("Initech", "Java Developer", LocalDate.of(2026, 8, 9)));
+
+        applications.get(1).setStatus(Status.INTERVIEWING);
+
+        for (Application app : applications) {
+            System.out.println(app.summary() + " [" + app.getStatus() + "]");
+        }
+    }
 }
 ```
 
-`for (Application app : applications)` is the **enhanced for loop** <sup>[J5](NOTES.md#enhanced-for-loop)</sup> — Java's `for x in list`. You'll
-need `import java.util.ArrayList;`, `java.util.List;`, and the `model` imports.
+`for (Application app : applications)` is the **enhanced for loop** <sup>[J5](NOTES.md#enhanced-for-loop)</sup> — Java's `for x in list`.
+
+Note the five imports above the class. `Status` needs one now even though `Application` already had
+one — they're separate classes, and Java imports classes, not packages-worth-of-classes. (`import
+com.connorjensen.jobtracker.model.*;` exists and is legal, but every style guide and IDE default
+prefers the explicit list, because `*` hides where a name came from.)
+
+### Verify
+
+- [x] Compile and run it — this is the first step whose output you can actually read
+
+```bash
+mvn -q clean compile && java -cp target/classes com.connorjensen.jobtracker.Main
+```
+
+```
+Acme Corp - Backend Engineer [APPLIED]
+Globex - Platform Engineer [INTERVIEWING]
+Initech - Java Developer [APPLIED]
+```
+
+Three lines, and only index 1 is `INTERVIEWING` — that's the `List` preserving insertion order and
+`get(1)` being zero-based.
+
+If you see `cannot find symbol: class List` or `variable Status`, you skipped an import. The error's
+`location:` line tells you which file, and the `symbol:` line tells you which name to import.
 
 ---
 
@@ -355,6 +428,42 @@ The other operations you'll actually use:
 ```
 
 `Application::getCompany` is a **method reference** — shorthand for `app -> app.getCompany()`.
+
+### Verify
+
+- [ ] Print the filtered list's size, then compile and run
+
+```java
+        System.out.println("interviewing: " + interviewing.size());
+```
+
+```bash
+mvn -q clean compile && java -cp target/classes com.connorjensen.jobtracker.Main
+```
+
+```
+Acme Corp - Backend Engineer [APPLIED]
+Globex - Platform Engineer [INTERVIEWING]
+Initech - Java Developer [APPLIED]
+interviewing: 1
+```
+
+One, not three — the filter ran. If you get a compile error on `.toList()`, that method is Java 16+;
+on an older JDK it's `.collect(Collectors.toList())`.
+
+- [ ] Now confirm the single-use rule for yourself — add a second terminal op to the *same* stream
+
+```java
+        var s = applications.stream();
+        s.toList();
+        s.count();      // <- run it and read the exception
+```
+
+```
+Exception in thread "main" java.lang.IllegalStateException: stream has already been operated upon or closed
+```
+
+Delete those three lines once you've seen it.
 
 ---
 
@@ -409,6 +518,52 @@ the compiler helps enforce. That's the whole answer.
 
 > Spring Data hands you `Optional<T>` from `findById()` in Chapter 3. The pattern you write by hand
 > in the capstone is byte-for-byte the pattern the framework expects.
+
+### Verify
+
+The interesting case is the *empty* one — a search that finds nothing has to not crash.
+
+- [ ] Search for a company that isn't there, and handle it without an `if`
+
+```java
+        Optional<Application> missing = applications.stream()
+                .filter(app -> app.getCompany().equals("Nope Inc"))
+                .findFirst();
+        System.out.println("missing: " + missing.map(Application::getCompany).orElse("not found"));
+```
+
+- [ ] Compile and run (you'll need `import java.util.Optional;`)
+
+```bash
+mvn -q clean compile && java -cp target/classes com.connorjensen.jobtracker.Main
+```
+
+```
+Acme Corp - Backend Engineer [APPLIED]
+Globex - Platform Engineer [INTERVIEWING]
+Initech - Java Developer [APPLIED]
+interviewing: 1
+found: Globex - Platform Engineer
+missing: not found
+```
+
+`.map()` on an empty `Optional` doesn't run the function and doesn't throw — it just stays empty, so
+`.orElse()` supplies the fallback. That's the whole point: no null check, no `NullPointerException`,
+and the compiler wouldn't have let you skip it.
+
+- [ ] Finally, make sure you didn't break Lesson 1's tests
+
+```bash
+mvn clean test
+```
+
+```
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+(`mvn compile` never compiles `src/test` — a step that leaves the tests broken will still look green
+until you run `mvn test`. Worth remembering.)
 
 ---
 

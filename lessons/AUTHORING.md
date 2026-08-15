@@ -3,7 +3,11 @@
 *How chapters in this repo get built. **This file is meant to be edited** — when something works
 badly, change the rule here rather than quietly doing it differently next chapter.*
 
-Last revised: 2026-08-14 (added the checkbox convention — see *Checkboxes* below).
+Last revised: 2026-08-14 (added the **Verify** block — every step must end with a command that proves
+it landed. Prompted by Lesson 2 Step 3, where the step's only compile instruction was buried in a
+prose aside and the reader finished the step with a red build and no way to know).
+
+Previously: 2026-08-14 (added the checkbox convention — see *Checkboxes* below).
 
 Previously: 2026-08-13 (after Chapter 1 — pacing feedback: "about right, can speed up as we
 progress").
@@ -53,6 +57,48 @@ lessons/chNN-slug/
     error message maps to one cause.
   - When a mechanism is easier to see by contrast, give the command that succeeds in one state and
     fails in the other, and put it in a `<details>` block so it stays optional.
+
+## Verify blocks
+
+**Every `## Step` ends with a `### Verify` section.** No exceptions — a step the reader can finish
+without knowing whether it worked is a broken step. This is the same "prove it with a command" rule
+as above, applied at a fixed place so it can't be forgotten.
+
+A Verify block is exactly three things:
+
+1. A checkbox and the command, unindented so it copy-pastes.
+2. The **actual** output, trimmed — verified by running it against a scratchpad copy, never
+   predicted. If the step produces no visible output, the verify is the build state itself.
+3. One line naming the most likely failure and what it means.
+
+```markdown
+### Verify
+
+- [ ] Compile and run
+
+​```bash
+mvn -q clean compile && java -cp target/classes com.connorjensen.jobtracker.Main
+​```
+
+​```
+Acme Corp - Backend Engineer [APPLIED]
+​```
+
+If you get `cannot find symbol: class List`, you're missing an `import` — see the note above the fence.
+```
+
+Rules:
+
+- **`mvn compile` is not enough on its own once there's something to run.** A step that changes
+  behaviour verifies by running the thing and diffing the output; a step that only changes structure
+  verifies with the build.
+- **`mvn compile` does not compile tests.** Any step that touches `src/test` verifies with
+  `mvn test`, and the expected `Tests run:` line goes in the output block.
+- **Never leave the required command inside explanatory prose.** "You'll need `import java.util.List`"
+  at the end of a paragraph is not an instruction the reader will act on — it needs its own checkbox,
+  or it belongs in the code fence they copy.
+- Steps whose whole point is an observed failure (Lesson 2's checkpoints) already satisfy this; they
+  don't need a second block, but the step must still end green.
 
 ## Checkboxes
 
