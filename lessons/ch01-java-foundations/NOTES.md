@@ -252,6 +252,27 @@ and the compiler will reject every Java 9+ API you use.
 
 ---
 
+## jshell
+
+Java's REPL, **Java 9**. `jshell --class-path target/classes` drops you at a prompt with your own
+compiled classes loaded, and accepts bare expressions and statements with no enclosing class or
+`main`.
+
+**Before:** there wasn't one. For eighteen years, "try one line of Java" meant writing a throwaway
+class with a `public static void main(String[] args)`, compiling it, and running it — which is a
+large part of why Java earned its ceremony reputation next to `python3` at a prompt. The workarounds
+were IDE "scratch files" (IntelliJ) and third-party shells like BeanShell and Groovy.
+
+**Why it arrived so late:** it needed the JVM to support redefining classes and re-executing snippets
+cheaply, which is the same machinery Java 9's module system and `JEP 222` work made tractable. It's
+also the one Java 9 feature with *zero* backport story — it's a tool, not a language feature, so
+there's no "Java 8 equivalent" beyond installing Groovy.
+
+**On a Java 8 project:** you can still use a newer JDK's `jshell` against Java 8-compiled classes.
+The tool doesn't care what compiled them.
+
+---
+
 ## Quick reference — everything in Chapter 1
 
 | Feature | Introduced | Java 8 equivalent |
@@ -260,6 +281,7 @@ and the compiler will reject every Java 9+ API you use.
 | `.toList()` on Stream | 16 | `.collect(Collectors.toList())` |
 | `var` | 10 | explicit types |
 | `List.of(...)` | 9 | `Collections.unmodifiableList(Arrays.asList(...))` |
+| `jshell` | 9 | a throwaway class with `main`, or Groovy/BeanShell |
 | `release` compiler flag | 9 | `source` + `target` |
 | streams, lambdas, method refs | 8 | loops, anonymous inner classes |
 | `Optional` | 8 | `null` + null checks |
