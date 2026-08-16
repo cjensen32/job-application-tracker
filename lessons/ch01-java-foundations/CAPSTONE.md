@@ -6,12 +6,12 @@
 
 **Progress** — tick these off as you go:
 
-- [ ] Setup — capstone test installed, `mvn test` failing to compile
-- [ ] `model.Status`
-- [ ] `model.Application`
-- [ ] `repository.ApplicationRepository`
-- [ ] `repository.InMemoryApplicationRepository`
-- [ ] `service.ApplicationService`
+- [x] Setup — capstone test installed, `mvn test` failing to compile
+- [x] `model.Status`
+- [x] `model.Application`
+- [x] `repository.ApplicationRepository`
+- [x] `repository.InMemoryApplicationRepository`
+- [x] `service.ApplicationService`
 - [ ] `Main` — the console loop
 - [ ] Done when: `mvn test` green **and** the app runs
 - [ ] `/code-sensei:quiz` — the chapter's XP gate
@@ -28,7 +28,7 @@
 
 ## Setup
 
-- [ ] Install the capstone test and run it
+- [x] Install the capstone test and run it
 
 ```bash
 mkdir -p src/test/java/com/connorjensen/jobtracker/capstone
@@ -49,7 +49,7 @@ later.
 
 ### `com.connorjensen.jobtracker.model.Status`
 
-- [ ] Written
+- [x] Written
 
 An `enum` with exactly five constants:
 
@@ -59,7 +59,7 @@ APPLIED, PHONE_SCREEN, INTERVIEWING, OFFER, REJECTED
 
 ### `com.connorjensen.jobtracker.model.Application`
 
-- [ ] Written
+- [x] Written
 
 A class (not a record — Lesson 1 explains why).
 
@@ -77,7 +77,7 @@ A class (not a record — Lesson 1 explains why).
 
 ### `com.connorjensen.jobtracker.repository.ApplicationRepository`
 
-- [ ] Written
+- [x] Written
 
 The interface from Lesson 3, unchanged:
 
@@ -98,16 +98,16 @@ boolean deleteById(Long id);
 `implements ApplicationRepository`, with a **no-argument constructor** (the default one is fine). Required behaviour —
 one box per method:
 
-- [ ] `save` — if `getId()` is null, assign the next id and store it; **ids start at 1 and increment**. If the id is already set, overwrite the existing entry rather than adding a new one. Returns the application either way.
-- [ ] `findAll` — every stored application. **Never null**; empty list when empty.
-- [ ] `findById` — `Optional.of(...)` when present, `Optional.empty()` when not. Never null.
-- [ ] `findByStatus` — only matching applications; empty list when none match.
-- [ ] `deleteById` — `true` if something was removed, `false` if that id wasn't there. Deleting the same id twice give `true` then `false`.
+- [x] `save` — if `getId()` is null, assign the next id and store it; **ids start at 1 and increment**. If the id is already set, overwrite the existing entry rather than adding a new one. Returns the application either way.
+- [x] `findAll` — every stored application. **Never null**; empty list when empty.
+- [x] `findById` — `Optional.of(...)` when present, `Optional.empty()` when not. Never null.
+- [x] `findByStatus` — only matching applications; empty list when none match.
+- [x] `deleteById` — `true` if something was removed, `false` if that id wasn't there. Deleting the same id twice give `true` then `false`.
 
 ### `com.connorjensen.jobtracker.service.ApplicationService`
 
-- [ ] Constructor + `create` + `listAll` + `findById`
-- [ ] `listByStatus` + `updateStatus` (throwing) + `delete`
+- [x] Constructor + `create` + `listAll` + `findById`
+- [x] `listByStatus` + `updateStatus` (throwing) + `delete`
 
 | Member                                                                   | Behaviour                                                                                             |
 |--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|

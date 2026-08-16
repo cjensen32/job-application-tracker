@@ -174,8 +174,8 @@ you can only ever see your own applications.
 |----|---|--------|-----------|--------|
 | 1 | 0 | [Build system & project shape](lessons/ch01-java-foundations/00-build-system.md) | — | ☑ |
 | 1 | 1 | [Classes, objects, records](lessons/ch01-java-foundations/01-classes-and-records.md) | — | ☑ |
-| 1 | 2 | [Packages, enums, collections, Optional](lessons/ch01-java-foundations/02-types-enums-collections.md) | — | ☐ |
-| 1 | 3 | [Interfaces & manual DI](lessons/ch01-java-foundations/03-interfaces-and-di.md) | — | ☐ |
+| 1 | 2 | [Packages, enums, collections, Optional](lessons/ch01-java-foundations/02-types-enums-collections.md) | — | ☑ |
+| 1 | 3 | [Interfaces & dependency injection](lessons/ch01-java-foundations/03-interfaces-and-di.md) | — | ☑ |
 | 1 | ★ | [**Capstone — The Tracker Core**](lessons/ch01-java-foundations/CAPSTONE.md) | — | ☐ |
 | 2 | 4 | Annotations & the Spring container | 1 | ☐ |
 | 2 | 5 | The HTTP layer | 2 | ☐ |

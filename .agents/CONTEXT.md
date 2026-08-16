@@ -1,58 +1,37 @@
 # Project agent context
 
-This is the canonical repository guidance for every coding agent. Keep context,
-skills, local agent settings, and agent-managed worktrees under `.agents/`.
-Codex, Claude, and OpenCode discover this file through their user-level global
-bootstrap instructions.
+This is the canonical repository guidance for every coding agent. Keep context, skills, local agent settings, and agent-managed worktrees under `.agents/`. Codex, Claude, and OpenCode discover this file through their user-level global bootstrap instructions.
 
-Do not create provider-specific repository context files or aliases such as
-`AGENTS.md`, `CLAUDE.md`, `OPENCODE.md`, `.claude/`, `.codex/`, or `.opencode/`.
+Do not create provider-specific repository context files or aliases such as`AGENTS.md`, `CLAUDE.md`, `OPENCODE.md`, `.claude/`, `.codex/`, or `.opencode/`.
 
 ## Project state
 
-This is currently a Java 21, Maven, and JUnit 5 project. Chapter 1 builds the
-plain-Java core: the `Application`/`Status` model, repository interface and
-in-memory implementation, service layer, and a console composition root.
+This is currently a Java 21, Maven, and JUnit 5 project. Chapter 1 builds the plain-Java core: the `Application`/`Status` model, repository interface and in-memory implementation, service layer, and a console composition root.
 
-No Spring Boot yet: it arrives in Chapter 2 of the learning plan. Do not add
-Spring, JPA, a database, or other future-stack dependencies ahead of the
-lesson sequence.
+No Spring Boot yet: it arrives in Chapter 2 of the learning plan. Do not add Spring, JPA, a database, or other future-stack dependencies ahead of the lesson sequence.
 
-Leave `maven-surefire-plugin` pinned in `pom.xml`. Maven's default 2.12.4
-binding silently skips JUnit 5 tests, so unpinning makes the suite "pass" by
-running nothing.
+Leave `maven-surefire-plugin` pinned in `pom.xml`. Maven's default 2.12.4 binding silently skips JUnit 5 tests, so unpinning makes the suite "pass" by running nothing.
 
 ## Sources of truth
 
 - `PROJECT.md` defines the target domain model, stack, milestones, and v1.
 - `LEARNING.md` defines the teaching sequence and records lesson progress.
-- Each chapter's `README.md`, lessons, `GLOSSARY.md`, `NOTES.md`, and
-  `CAPSTONE.md` define that chapter's work.
+- Each chapter's `README.md`, lessons, `GLOSSARY.md`, `NOTES.md`, and`CAPSTONE.md` define that chapter's work.
 - `lessons/AUTHORING.md` defines how lessons and capstones are written.
-- `pom.xml` defines the dependencies and Java/build configuration that exist
-  now. Do not treat the planned stack in `PROJECT.md` as already installed.
+- `pom.xml` defines the dependencies and Java/build configuration that exist now. Do not treat the planned stack in `PROJECT.md` as already installed.
 
-When these disagree, preserve the learner's current working code and resolve
-the documentation conflict explicitly instead of guessing from the roadmap.
+When these disagree, preserve the learner's current working code and resolve the documentation conflict explicitly instead of guessing from the roadmap.
 
 ## This is a teaching repo first
 
-The user is teaching themselves Java through this project for interview
-practice, using the CodeSensei plugin (`/code-sensei:*`). **Do not write the
-project's source code for them unless they explicitly ask.** Lessons and
-capstone specs are yours to write; the implementation is theirs to type.
-Favor explaining *why* behind non-trivial choices over making changes
-silently.
+The user is teaching themselves Java through this project for interview practice, using the CodeSensei plugin (`/code-sensei:*`). **Do not write the project's source code for them unless they explicitly ask.** Lessons and capstone specs are yours to write; the implementation is theirs to type. Favor explaining *why* behind non-trivial choices over making changes silently.
 
-When coaching a capstone, do not open or use either copy of its grader as a
-solution guide:
+When coaching a capstone, do not open or use either copy of its grader as a solution guide:
 
 - `lessons/**/capstone/ChapterNNCapstoneTest.java`
 - `src/test/**/capstone/ChapterNNCapstoneTest.java`
 
-Work from `CAPSTONE.md` and the Maven test output. Reading or changing a grader
-is appropriate only when the user explicitly asks to author or revise lesson
-or capstone infrastructure.
+Work from `CAPSTONE.md` and the Maven test output. Reading or changing a grader is appropriate only when the user explicitly asks to author or revise lesson or capstone infrastructure.
 
 `LEARNING.md` (repo root) sequences PROJECT.md's milestones into 6 chapters / 18 lessons and drives the order of work. Its conventions:
 
@@ -71,30 +50,32 @@ Background for calibrating explanations: one university Java course (exercises, 
 
 ## Navigation and verification
 
-This repository is indexed by CodeGraph. When `.codegraph/` exists, use it
-before text search or broad file reading to locate or understand Java code:
+This repository is indexed by CodeGraph. When `.codegraph/` exists, use it before text search or broad file reading to locate or understand Java code:
 
 ```sh
 codegraph explore "<symbol names or question>"
 ```
 
-Use `rg`/`rg --files` for follow-up text and file searches. Do not regenerate,
-delete, or commit CodeGraph state unless the user asks.
+Use `rg`/`rg --files` for follow-up text and file searches. Do not regenerate, delete, or commit CodeGraph state unless the user asks.
 
-There is no Maven wrapper; use the installed `mvn`. The standard full
-verification command is:
+There is no Maven wrapper; use the installed `mvn`. The standard full verification command is:
 
 ```sh
 mvn test
 ```
 
-Run the narrowest useful check while iterating, then `mvn test` before handing
-off Java or build changes. A green Maven invocation must report a non-zero
-JUnit test count.
+Run the narrowest useful check while iterating, then `mvn test` before handing off Java or build changes. A green Maven invocation must report a non-zero JUnit test count.
 
-Before editing, inspect `git status` and preserve unrelated user work. Local
-agent settings and agent-managed worktrees belong under `.agents/`; the
-repository ignores `.agents/settings.local.json` and `.agents/worktrees/`.
+There is no `exec-maven-plugin` and no IDE run configuration in version control, so the console app runs off the plain classpath:
+
+```sh
+mvn compile
+java -cp target/classes com.connorjensen.jobtracker.Main
+```
+
+Chapter 1's capstone is done when `mvn test` is green *and* that command runs, so check both before calling the chapter finished.
+
+Before editing, inspect `git status` and preserve unrelated user work. Local agent settings and agent-managed worktrees belong under `.agents/`; the repository ignores `.agents/settings.local.json` and `.agents/worktrees/`.
 
 ## Intended architecture
 
