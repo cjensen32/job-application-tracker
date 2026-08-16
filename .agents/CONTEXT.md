@@ -1,4 +1,12 @@
-# CLAUDE.md
+# Project agent context
+
+This is the canonical repository guidance for every coding agent. Keep context,
+skills, local agent settings, and agent-managed worktrees under `.agents/`.
+Codex, Claude, and OpenCode discover this file through their user-level global
+bootstrap instructions.
+
+Do not create provider-specific repository context files or aliases such as
+`AGENTS.md`, `CLAUDE.md`, `OPENCODE.md`, `.claude/`, `.codex/`, or `.opencode/`.
 
 ## Project state
 

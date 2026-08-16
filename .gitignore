@@ -9,3 +9,10 @@ target/
 !.idea/inspectionProfiles/
 !.idea/vcs.xml
 !.idea/modules.xml
+
+*.swp
+*.swo
+
+# Local agent state lives under the shared .agents directory
+.agents/settings.local.json
+.agents/worktrees/
