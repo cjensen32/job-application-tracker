@@ -1,4 +1,6 @@
-package com.connorjensen.jobtracker;
+package com.connorjensen.jobtracker.dto;
+
+import com.connorjensen.jobtracker.model.Status;
 
 import java.time.LocalDate;
 
