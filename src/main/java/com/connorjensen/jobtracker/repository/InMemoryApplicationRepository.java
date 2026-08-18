@@ -1,16 +1,16 @@
 package com.connorjensen.jobtracker.repository;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import com.connorjensen.jobtracker.model.Application;
 import com.connorjensen.jobtracker.model.Status;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.Optional;
-import java.util.ArrayList;
-
 public class InMemoryApplicationRepository implements ApplicationRepository {
-  
+
   private final Map<Long, Application> storage = new HashMap<>();
   private long nextId = 1;
 
@@ -36,15 +36,13 @@ public class InMemoryApplicationRepository implements ApplicationRepository {
 
   @Override
   public List<Application> findByStatus(Status status) {
-    List<Application> found = storage.values()
-      .stream()
-      .filter(app -> app.getStatus() == status)
-      .toList();
-    
+    List<Application> found =
+        storage.values().stream().filter(app -> app.getStatus() == status).toList();
+
     return found;
   }
 
-  @Override 
+  @Override
   public boolean deleteById(Long id) {
     if (storage.containsKey(id)) {
       storage.remove(id);

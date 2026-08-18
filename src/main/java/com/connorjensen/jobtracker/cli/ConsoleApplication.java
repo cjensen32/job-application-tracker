@@ -1,7 +1,4 @@
-package com.connorjensen.jobtracker.util;
-
-import com.connorjensen.jobtracker.model.Application;
-import com.connorjensen.jobtracker.service.ApplicationService;
+package com.connorjensen.jobtracker.cli;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -10,13 +7,25 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
-public class ConsoleExperience {
-  ApplicationService service;
-  Scanner scanner;
+import com.connorjensen.jobtracker.model.Application;
+import com.connorjensen.jobtracker.service.ApplicationService;
 
-  public ConsoleExperience(ApplicationService service) {
+public class ConsoleApplication {
+  private ApplicationService service;
+  private Scanner scanner;
+  private ConsolePrompter prompter;
+  private ConsoleView consoleView;
+
+  public ConsoleApplication(ApplicationService service) {
     this.service = service;
     this.scanner = new Scanner(System.in);
+  }
+
+  public ConsoleApplication(
+      ApplicationService service, ConsolePrompter prompter, ConsoleView view) {
+    this.service = service;
+    this.prompter = prompter;
+    this.consoleView = view;
   }
 
   public void startCLI(ApplicationService service) {
@@ -42,7 +51,8 @@ public class ConsoleExperience {
   }
 
   public static void printHeader() {
-    System.out.print("""
+    System.out.print(
+        """
                 ==============================================
                 Welcome to Job Application Tracker!!
                 What would you like to do?
@@ -51,7 +61,15 @@ public class ConsoleExperience {
   }
 
   public static void printOptions() {
-    List<String> options = new ArrayList<>(List.of("Create new application", "List all applications", "List applications with status", "Update status on application", "Delete application by id", "Quit Application"));
+    List<String> options =
+        new ArrayList<>(
+            List.of(
+                "Create new application",
+                "List all applications",
+                "List applications with status",
+                "Update status on application",
+                "Delete application by id",
+                "Quit Application"));
 
     for (int i = 0; i < options.size(); i++) {
       System.out.println(" (" + i + "): " + options.get(i));
@@ -60,7 +78,8 @@ public class ConsoleExperience {
   }
 
   public static void printOptionsError() {
-    System.out.print("""
+    System.out.print(
+        """
                 ==============================================
                 ERROR IN ENTRY: Please try to enter again!!
                 ==============================================
@@ -95,7 +114,7 @@ public class ConsoleExperience {
     System.out.print("Enter job name:\n> ");
     String role = this.scanner.nextLine();
 
-    LocalDate appliedDate = LocalDate.now();  // Set to current date as default
+    LocalDate appliedDate = LocalDate.now(); // Set to current date as default
     boolean datePassCheck = false;
     while (!datePassCheck) {
       try {
@@ -119,7 +138,11 @@ public class ConsoleExperience {
     for (Application entry : service.listAll()) {
       applicationsListValues.add(entry.toValuesList());
     }
-    ApplicationTextTable applicationTextTable = new ApplicationTextTable(service.getLabels(), applicationsListValues);
-    applicationTextTable.toTable();
+    TextTable textTable = new TextTable(service.getLabels(), applicationsListValues);
+    textTable.toTable();
+  }
+
+  public void run() {
+    startCLI(this.service);
   }
 }

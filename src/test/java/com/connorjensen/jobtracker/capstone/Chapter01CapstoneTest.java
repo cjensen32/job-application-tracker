@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -60,18 +61,19 @@ class Chapter01CapstoneTest {
 
   private static final LocalDate DATE = LocalDate.of(2026, 8, 1);
   private static final String HEADER = "Job Application Tracker\n";
-  private static final String MENU = """
+  private static final String MENU =
+      """
       0 Create application
       1 List applications
       2 Filter applications by status
       3 Edit application
       4 Delete application
       5 Quit
-      """ + "> ";
+      """
+          + "> ";
   private static final String STATUS_ERROR =
       "Choose one of: APPLIED, PHONE_SCREEN, INTERVIEWING, OFFER, REJECTED.\n";
-  private static final String URL_ERROR =
-      "Enter a blank value or an absolute HTTP(S) URL.\n";
+  private static final String URL_ERROR = "Enter a blank value or an absolute HTTP(S) URL.\n";
 
   @Nested
   @DisplayName("existing model and repository contract")
@@ -89,7 +91,7 @@ class Chapter01CapstoneTest {
       Application application = sample("Acme");
 
       assertAll(
-          () -> assertEquals(null, application.getId()),
+          () -> assertNull(application.getId()),
           () -> assertEquals(Status.APPLIED, application.getStatus()),
           () -> assertEquals("Acme", application.getCompany()),
           () -> assertEquals("Engineer", application.getRole()),
@@ -145,12 +147,13 @@ class Chapter01CapstoneTest {
 
     @Test
     void requestRecordsHaveThePublishedComponentsAndValueEquality() {
-      CreateApplicationRequest create = createRequest(
-          "Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1");
-      CreateApplicationRequest equal = createRequest(
-          "Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1");
-      UpdateApplicationRequest update = new UpdateApplicationRequest(
-          "Globex", "Senior Engineer", DATE.plusDays(1), Status.OFFER, "Note", "");
+      CreateApplicationRequest create =
+          createRequest("Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1");
+      CreateApplicationRequest equal =
+          createRequest("Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1");
+      UpdateApplicationRequest update =
+          new UpdateApplicationRequest(
+              "Globex", "Senior Engineer", DATE.plusDays(1), Status.OFFER, "Note", "");
 
       assertAll(
           () -> assertTrue(CreateApplicationRequest.class.isRecord()),
@@ -168,8 +171,9 @@ class Chapter01CapstoneTest {
     void requestBasedCreateCopiesEveryFieldAndDefaultsStatus() {
       ApplicationService service = service();
 
-      Application created = service.create(createRequest(
-          "Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1"));
+      Application created =
+          service.create(
+              createRequest("Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1"));
 
       assertAll(
           () -> assertEquals(1L, created.getId()),
@@ -185,13 +189,14 @@ class Chapter01CapstoneTest {
     void fullUpdateCopiesEveryFieldAndPersistsIt() {
       ApplicationService service = service();
       Long id = service.create("Acme", "Engineer", DATE).getId();
-      UpdateApplicationRequest request = new UpdateApplicationRequest(
-          "Globex",
-          "Senior Engineer",
-          DATE.plusDays(4),
-          Status.INTERVIEWING,
-          "Second round",
-          "https://example.com/jobs/2");
+      UpdateApplicationRequest request =
+          new UpdateApplicationRequest(
+              "Globex",
+              "Senior Engineer",
+              DATE.plusDays(4),
+              Status.INTERVIEWING,
+              "Second round",
+              "https://example.com/jobs/2");
 
       Application updated = service.update(id, request);
       Application reloaded = service.findById(id).orElseThrow();
@@ -211,15 +216,17 @@ class Chapter01CapstoneTest {
       ApplicationService service = service();
 
       assertAll(
-          () -> assertThrows(
-              IllegalArgumentException.class,
-              () -> service.updateStatus(99L, Status.OFFER)),
-          () -> assertThrows(
-              IllegalArgumentException.class,
-              () -> service.update(
-                  99L,
-                  new UpdateApplicationRequest(
-                      "Acme", "Engineer", DATE, Status.OFFER, "", ""))));
+          () ->
+              assertThrows(
+                  IllegalArgumentException.class, () -> service.updateStatus(99L, Status.OFFER)),
+          () ->
+              assertThrows(
+                  IllegalArgumentException.class,
+                  () ->
+                      service.update(
+                          99L,
+                          new UpdateApplicationRequest(
+                              "Acme", "Engineer", DATE, Status.OFFER, "", ""))));
     }
 
     @Test
@@ -244,8 +251,7 @@ class Chapter01CapstoneTest {
       Application created = service.create(createRequest("Acme", "Engineer", DATE, "", ""));
       service.update(
           created.getId(),
-          new UpdateApplicationRequest(
-              "Globex", "SRE", DATE, Status.PHONE_SCREEN, "", ""));
+          new UpdateApplicationRequest("Globex", "SRE", DATE, Status.PHONE_SCREEN, "", ""));
 
       assertAll(
           () -> assertEquals(42L, created.getId()),
@@ -271,22 +277,21 @@ class Chapter01CapstoneTest {
     @Test
     void cliConstructorsMatchThePublishedDependencyGraph() {
       assertAll(
-          () -> assertPublicConstructor(
-              ConsolePrompter.class, Scanner.class, PrintStream.class),
-          () -> assertPublicConstructor(
-              ConsoleView.class, PrintStream.class, TextTable.class),
-          () -> assertPublicConstructor(
-              ConsoleApplication.class,
-              ApplicationService.class,
-              ConsolePrompter.class,
-              ConsoleView.class),
+          () -> assertPublicConstructor(ConsolePrompter.class, Scanner.class, PrintStream.class),
+          () -> assertPublicConstructor(ConsoleView.class, PrintStream.class, TextTable.class),
+          () ->
+              assertPublicConstructor(
+                  ConsoleApplication.class,
+                  ApplicationService.class,
+                  ConsolePrompter.class,
+                  ConsoleView.class),
           () -> assertPublicConstructor(TextTable.class));
     }
 
     @Test
     void oldUtilityCliTypesAreGone() {
       assertAll(
-          () -> assertClassMissing("com.connorjensen.jobtracker.util.ConsoleExperience"),
+          () -> assertClassMissing("com.connorjensen.jobtracker.cli.ConsoleExperience"),
           () -> assertClassMissing("com.connorjensen.jobtracker.util.ApplicationTextTable"),
           () -> assertClassMissing("com.connorjensen.jobtracker.util.Centering"));
     }
@@ -336,10 +341,7 @@ class Chapter01CapstoneTest {
     @Test
     void emptyBodyRendersHeaderAndOneClosingBorder() {
       assertEquals(
-          expected(
-              "+---------+------+",
-              "| Company | Role |",
-              "+---------+------+"),
+          expected("+---------+------+", "| Company | Role |", "+---------+------+"),
           render(row("Company", "Role"), new ArrayList<>()));
     }
 
@@ -347,11 +349,7 @@ class Chapter01CapstoneTest {
     void headerShorterThanBodyGainsBlankColumns() {
       assertEquals(
           expected(
-              "+-----+-----+",
-              "|  A  |     |",
-              "+-----+-----+",
-              "| one | two |",
-              "+-----+-----+"),
+              "+-----+-----+", "|  A  |     |", "+-----+-----+", "| one | two |", "+-----+-----+"),
           render(row("A"), body(row("one", "two"))));
     }
 
@@ -382,13 +380,15 @@ class Chapter01CapstoneTest {
 
     @Test
     void sixColumnApplicationTableEndsWithOneNewline() {
-      String result = render(
-          row("ID", "Company", "Role", "Applied Date", "Status", "URL"),
-          body(row("1", "Acme", "Engineer", "2026-08-01", "APPLIED", "")));
+      String result =
+          render(
+              row("ID", "Company", "Role", "Applied Date", "Status", "URL"),
+              body(row("1", "Acme", "Engineer", "2026-08-01", "APPLIED", "")));
 
       assertAll(
-          () -> assertTrue(result.contains(
-              "| ID | Company |   Role   | Applied Date | Status  | URL |")),
+          () ->
+              assertTrue(
+                  result.contains("| ID | Company |   Role   | Applied Date | Status  | URL |")),
           () -> assertTrue(result.endsWith("\n")),
           () -> assertFalse(result.endsWith("\n\n")));
     }
@@ -402,9 +402,7 @@ class Chapter01CapstoneTest {
 
       render(header, rows);
 
-      assertAll(
-          () -> assertEquals(headerSnapshot, header),
-          () -> assertEquals(rowsSnapshot, rows));
+      assertAll(() -> assertEquals(headerSnapshot, header), () -> assertEquals(rowsSnapshot, rows));
     }
   }
 
@@ -414,15 +412,16 @@ class Chapter01CapstoneTest {
 
     @Test
     void createAcceptsEveryField() {
-      SessionResult result = session(
-          script(
-              "0",
-              "  Acme  ",
-              " Engineer ",
-              "2026-08-01",
-              " Referral ",
-              " https://example.com/jobs/1 ",
-              "5"));
+      SessionResult result =
+          session(
+              script(
+                  "0",
+                  "  Acme  ",
+                  " Engineer ",
+                  "2026-08-01",
+                  " Referral ",
+                  " https://example.com/jobs/1 ",
+                  "5"));
       Application created = result.service().listAll().getFirst();
 
       assertAll(
@@ -432,32 +431,39 @@ class Chapter01CapstoneTest {
           () -> assertEquals(Status.APPLIED, created.getStatus()),
           () -> assertEquals("Referral", created.getNotes()),
           () -> assertEquals("https://example.com/jobs/1", created.getJobUrl()),
-          () -> assertAppearsInOrder(
-              result.output(),
-              HEADER,
-              MENU,
-              "Company: ",
-              "Role: ",
-              "Applied date (YYYY-MM-DD): ",
-              "Notes (optional): ",
-              "Job URL (optional): ",
-              "Created application 1.\n",
-              MENU,
-              "Goodbye.\n"));
+          () ->
+              assertAppearsInOrder(
+                  result.output(),
+                  HEADER,
+                  MENU,
+                  "Company: ",
+                  "Role: ",
+                  "Applied date (YYYY-MM-DD): ",
+                  "Notes (optional): ",
+                  "Job URL (optional): ",
+                  "Created application 1.\n",
+                  MENU,
+                  "Goodbye.\n"));
     }
 
     @Test
     void emptyAndPopulatedListsUseExplicitOutput() {
       SessionResult empty = session(script("1", "5"));
-      SessionResult populated = session(
-          script("1", "5"),
-          service -> service.create(createRequest(
-              "Acme", "Engineer", DATE, "Hidden note", "https://example.com/jobs/1")));
+      SessionResult populated =
+          session(
+              script("1", "5"),
+              service ->
+                  service.create(
+                      createRequest(
+                          "Acme", "Engineer", DATE, "Hidden note", "https://example.com/jobs/1")));
 
       assertAll(
           () -> assertTrue(empty.output().contains("No applications found.\n")),
-          () -> assertTrue(populated.output().contains(
-              "| ID | Company |   Role   | Applied Date | Status  |")),
+          () ->
+              assertTrue(
+                  populated
+                      .output()
+                      .contains("| ID | Company |   Role   | Applied Date | Status  |")),
           () -> assertTrue(populated.output().contains("| 1  |  Acme   | Engineer |")),
           () -> assertTrue(populated.output().contains("https://example.com/jobs/1")),
           () -> assertFalse(populated.output().contains("Hidden note")));
@@ -465,28 +471,29 @@ class Chapter01CapstoneTest {
 
     @Test
     void statusFilteringNormalizesSpacesAndReportsNoMatches() {
-      SessionResult result = session(
-          script("2", "phone screen", "2", "offer", "5"),
-          service -> {
-            Application created = service.create("Acme", "Engineer", DATE);
-            service.updateStatus(created.getId(), Status.PHONE_SCREEN);
-          });
+      SessionResult result =
+          session(
+              script("2", "phone screen", "2", "offer", "5"),
+              service -> {
+                Application created = service.create("Acme", "Engineer", DATE);
+                service.updateStatus(created.getId(), Status.PHONE_SCREEN);
+              });
 
       assertAll(
           () -> assertTrue(result.output().contains("PHONE_SCREEN")),
-          () -> assertTrue(result.output().contains(
-              "No applications found for status OFFER.\n")),
+          () -> assertTrue(result.output().contains("No applications found for status OFFER.\n")),
           () -> assertEquals(2, countOccurrences(result.output(), "Status: ")));
     }
 
     @Test
     void invalidStatusRetriesAndHyphenFormIsAccepted() {
-      SessionResult result = session(
-          script("2", "unknown", "phone-screen", "5"),
-          service -> {
-            Application created = service.create("Acme", "Engineer", DATE);
-            service.updateStatus(created.getId(), Status.PHONE_SCREEN);
-          });
+      SessionResult result =
+          session(
+              script("2", "unknown", "phone-screen", "5"),
+              service -> {
+                Application created = service.create("Acme", "Engineer", DATE);
+                service.updateStatus(created.getId(), Status.PHONE_SCREEN);
+              });
 
       assertAll(
           () -> assertEquals(1, countOccurrences(result.output(), STATUS_ERROR)),
@@ -501,18 +508,19 @@ class Chapter01CapstoneTest {
 
     @Test
     void fullEditShowsCurrentDataAndUpdatesEveryField() {
-      SessionResult result = session(
-          script(
-              "3",
-              "1",
-              "Globex",
-              "Senior Engineer",
-              "2026-08-05",
-              "offer",
-              "Final round",
-              "https://example.com/jobs/2",
-              "5"),
-          Chapter01CapstoneTest::seedCompleteApplication);
+      SessionResult result =
+          session(
+              script(
+                  "3",
+                  "1",
+                  "Globex",
+                  "Senior Engineer",
+                  "2026-08-05",
+                  "offer",
+                  "Final round",
+                  "https://example.com/jobs/2",
+                  "5"),
+              Chapter01CapstoneTest::seedCompleteApplication);
       Application updated = result.service().findById(1L).orElseThrow();
 
       assertAll(
@@ -522,30 +530,32 @@ class Chapter01CapstoneTest {
           () -> assertEquals(Status.OFFER, updated.getStatus()),
           () -> assertEquals("Final round", updated.getNotes()),
           () -> assertEquals("https://example.com/jobs/2", updated.getJobUrl()),
-          () -> assertAppearsInOrder(
-              result.output(),
-              "Current application\n",
-              "ID: 1\n",
-              "Company: Acme\n",
-              "Role: Engineer\n",
-              "Applied date: 2026-08-01\n",
-              "Status: APPLIED\n",
-              "Notes: Referral\n",
-              "URL: https://example.com/jobs/1\n",
-              "Company [Acme]: ",
-              "Role [Engineer]: ",
-              "Applied date [2026-08-01]: ",
-              "Status [APPLIED]: ",
-              "Notes [Referral] (blank keeps, - clears): ",
-              "Job URL [https://example.com/jobs/1] (blank keeps, - clears): ",
-              "Updated application 1.\n"));
+          () ->
+              assertAppearsInOrder(
+                  result.output(),
+                  "Current application\n",
+                  "ID: 1\n",
+                  "Company: Acme\n",
+                  "Role: Engineer\n",
+                  "Applied date: 2026-08-01\n",
+                  "Status: APPLIED\n",
+                  "Notes: Referral\n",
+                  "URL: https://example.com/jobs/1\n",
+                  "Company [Acme]: ",
+                  "Role [Engineer]: ",
+                  "Applied date [2026-08-01]: ",
+                  "Status [APPLIED]: ",
+                  "Notes [Referral] (blank keeps, - clears): ",
+                  "Job URL [https://example.com/jobs/1] (blank keeps, - clears): ",
+                  "Updated application 1.\n"));
     }
 
     @Test
     void blankEditKeepsRequiredValuesAndDashClearsOptionalValues() {
-      SessionResult result = session(
-          script("3", "1", "", "", "", "", "-", "-", "5"),
-          Chapter01CapstoneTest::seedCompleteApplication);
+      SessionResult result =
+          session(
+              script("3", "1", "", "", "", "", "-", "-", "5"),
+              Chapter01CapstoneTest::seedCompleteApplication);
       Application updated = result.service().findById(1L).orElseThrow();
 
       assertAll(
@@ -560,26 +570,26 @@ class Chapter01CapstoneTest {
 
     @Test
     void invalidEditValuesRetryOnlyTheirPrompt() {
-      SessionResult result = session(
-          script(
-              "3",
-              "1",
-              "",
-              "",
-              "not-a-date",
-              "2026-08-02",
-              "not-a-status",
-              "interviewing",
-              "",
-              "ftp://example.com/job",
-              "https://example.com/job",
-              "5"),
-          Chapter01CapstoneTest::seedCompleteApplication);
+      SessionResult result =
+          session(
+              script(
+                  "3",
+                  "1",
+                  "",
+                  "",
+                  "not-a-date",
+                  "2026-08-02",
+                  "not-a-status",
+                  "interviewing",
+                  "",
+                  "ftp://example.com/job",
+                  "https://example.com/job",
+                  "5"),
+              Chapter01CapstoneTest::seedCompleteApplication);
       Application updated = result.service().findById(1L).orElseThrow();
 
       assertAll(
-          () -> assertEquals(1, countOccurrences(
-              result.output(), "Enter a date as YYYY-MM-DD.\n")),
+          () -> assertEquals(1, countOccurrences(result.output(), "Enter a date as YYYY-MM-DD.\n")),
           () -> assertEquals(1, countOccurrences(result.output(), STATUS_ERROR)),
           () -> assertEquals(1, countOccurrences(result.output(), URL_ERROR)),
           () -> assertEquals(LocalDate.of(2026, 8, 2), updated.getAppliedDate()),
@@ -589,28 +599,27 @@ class Chapter01CapstoneTest {
 
     @Test
     void invalidAndMissingIdsDoNotCrashOrMutateState() {
-      SessionResult result = session(
-          script("3", "abc", "0", "-2", "99", "5"),
-          Chapter01CapstoneTest::seedCompleteApplication);
+      SessionResult result =
+          session(
+              script("3", "abc", "0", "-2", "99", "5"),
+              Chapter01CapstoneTest::seedCompleteApplication);
 
       assertAll(
-          () -> assertEquals(3, countOccurrences(
-              result.output(), "Enter a positive application ID.\n")),
-          () -> assertTrue(result.output().contains(
-              "No application found with ID 99.\n")),
+          () ->
+              assertEquals(
+                  3, countOccurrences(result.output(), "Enter a positive application ID.\n")),
+          () -> assertTrue(result.output().contains("No application found with ID 99.\n")),
           () -> assertEquals("Acme", result.service().findById(1L).orElseThrow().getCompany()));
     }
 
     @Test
     void deleteSucceedsOnceAndThenReportsMissing() {
-      SessionResult result = session(
-          script("4", "1", "4", "1", "5"),
-          Chapter01CapstoneTest::seedCompleteApplication);
+      SessionResult result =
+          session(script("4", "1", "4", "1", "5"), Chapter01CapstoneTest::seedCompleteApplication);
 
       assertAll(
           () -> assertTrue(result.output().contains("Deleted application 1.\n")),
-          () -> assertTrue(result.output().contains(
-              "No application found with ID 1.\n")),
+          () -> assertTrue(result.output().contains("No application found with ID 1.\n")),
           () -> assertTrue(result.service().listAll().isEmpty()));
     }
   }
@@ -621,34 +630,32 @@ class Chapter01CapstoneTest {
 
     @Test
     void invalidInputRetriesLocally() {
-      SessionResult result = session(
-          script(
-              "word",
-              "6",
-              "0",
-              "",
-              "Acme",
-              "",
-              "Engineer",
-              "bad-date",
-              "2026-08-01",
-              "",
-              "ftp://example.com/job",
-              "/relative",
-              "https://example.com/job",
-              "5"));
+      SessionResult result =
+          session(
+              script(
+                  "word",
+                  "6",
+                  "0",
+                  "",
+                  "Acme",
+                  "",
+                  "Engineer",
+                  "bad-date",
+                  "2026-08-01",
+                  "",
+                  "ftp://example.com/job",
+                  "/relative",
+                  "https://example.com/job",
+                  "5"));
 
       assertAll(
-          () -> assertEquals(2, countOccurrences(
-              result.output(), "Enter a number from 0 to 5.\n")),
+          () -> assertEquals(2, countOccurrences(result.output(), "Enter a number from 0 to 5.\n")),
           () -> assertEquals(2, countOccurrences(result.output(), "Value is required.\n")),
-          () -> assertEquals(1, countOccurrences(
-              result.output(), "Enter a date as YYYY-MM-DD.\n")),
+          () -> assertEquals(1, countOccurrences(result.output(), "Enter a date as YYYY-MM-DD.\n")),
           () -> assertEquals(2, countOccurrences(result.output(), URL_ERROR)),
           () -> assertEquals(2, countOccurrences(result.output(), "Company: ")),
           () -> assertEquals(2, countOccurrences(result.output(), "Role: ")),
-          () -> assertEquals(2, countOccurrences(
-              result.output(), "Applied date (YYYY-MM-DD): ")),
+          () -> assertEquals(2, countOccurrences(result.output(), "Applied date (YYYY-MM-DD): ")),
           () -> assertEquals(3, countOccurrences(result.output(), "Job URL (optional): ")),
           () -> assertEquals(1, result.service().listAll().size()));
     }
@@ -679,9 +686,8 @@ class Chapter01CapstoneTest {
 
     @Test
     void eofDuringEditDoesNotSavePartialChanges() {
-      SessionResult result = session(
-          "3\n1\nChanged Company\n",
-          Chapter01CapstoneTest::seedCompleteApplication);
+      SessionResult result =
+          session("3\n1\nChanged Company\n", Chapter01CapstoneTest::seedCompleteApplication);
       Application application = result.service().findById(1L).orElseThrow();
 
       assertAll(
@@ -693,13 +699,11 @@ class Chapter01CapstoneTest {
     @Test
     void mainRunsToCleanEof() throws Exception {
       String java = Path.of(System.getProperty("java.home"), "bin", "java").toString();
-      Process process = new ProcessBuilder(
-          java,
-          "-cp",
-          System.getProperty("java.class.path"),
-          Main.class.getName())
-          .redirectErrorStream(true)
-          .start();
+      Process process =
+          new ProcessBuilder(
+                  java, "-cp", System.getProperty("java.class.path"), Main.class.getName())
+              .redirectErrorStream(true)
+              .start();
 
       try (OutputStream input = process.getOutputStream()) {
         input.write(new byte[0]);
@@ -728,28 +732,21 @@ class Chapter01CapstoneTest {
   }
 
   private static CreateApplicationRequest createRequest(
-      String company,
-      String role,
-      LocalDate appliedDate,
-      String notes,
-      String jobUrl) {
+      String company, String role, LocalDate appliedDate, String notes, String jobUrl) {
     return new CreateApplicationRequest(company, role, appliedDate, notes, jobUrl);
   }
 
   private static void seedCompleteApplication(ApplicationService service) {
-    service.create(createRequest(
-        "Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1"));
+    service.create(
+        createRequest("Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1"));
   }
 
   private static SessionResult session(String input) {
-    return session(input, service -> { });
+    return session(input, service -> {});
   }
 
-  private static SessionResult session(
-      String input,
-      Consumer<ApplicationService> seed) {
-    ByteArrayInputStream bytesIn = new ByteArrayInputStream(
-        input.getBytes(StandardCharsets.UTF_8));
+  private static SessionResult session(String input, Consumer<ApplicationService> seed) {
+    ByteArrayInputStream bytesIn = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
     ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
     PrintStream output = new PrintStream(bytesOut, true, StandardCharsets.UTF_8);
     Scanner scanner = new Scanner(bytesIn, StandardCharsets.UTF_8);
@@ -813,9 +810,7 @@ class Chapter01CapstoneTest {
     int searchFrom = 0;
     for (String section : sections) {
       int index = output.indexOf(section, searchFrom);
-      assertTrue(
-          index >= 0,
-          "Expected this output after index " + searchFrom + ":\n" + section);
+      assertTrue(index >= 0, "Expected this output after index " + searchFrom + ":\n" + section);
       searchFrom = index + section.length();
     }
   }
@@ -850,8 +845,7 @@ class Chapter01CapstoneTest {
         className + " should be removed after the CLI refactor");
   }
 
-  private record SessionResult(String output, ApplicationService service) {
-  }
+  private record SessionResult(String output, ApplicationService service) {}
 
   private static final class RecordingRepository implements ApplicationRepository {
     private final List<String> calls = new ArrayList<>();
@@ -865,6 +859,19 @@ class Chapter01CapstoneTest {
       }
       rows.put(application.getId(), application);
       return application;
+    }
+
+    @Override
+    public Application update(Long id, UpdateApplicationRequest updateRequest) {
+      calls.add("update");
+      Application updatedApp;
+      if (findById(id).isPresent()) {
+        updatedApp = updateRequest.update(id);
+      } else {
+        updatedApp = updateRequest.update();
+      }
+      rows.put(id, updatedApp);
+      return updatedApp;
     }
 
     @Override
