@@ -31,6 +31,57 @@
       <artifactId>maven-surefire-plugin</artifactId>
       <version>3.5.2</version>
     </plugin>
+    <plugin>
+      <groupId>org.jacoco</groupId>
+      <artifactId>jacoco-maven-plugin</artifactId>
+      <version>0.8.15</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>prepare-agent</goal>
+          </goals>
+        </execution>
+        <execution>
+          <id>report</id>
+          <phase>verify</phase>
+          <goals>
+            <goal>report</goal>
+          </goals>
+          <configuration>
+            <formats>
+              <format>HTML</format>
+              <format>XML</format>
+            </formats>
+          </configuration>
+        </execution>
+        <execution>
+          <id>check-console-method-coverage</id>
+          <phase>verify</phase>
+          <goals>
+            <goal>check</goal>
+          </goals>
+          <configuration>
+            <haltOnFailure>false</haltOnFailure>
+            <rules>
+              <rule>
+                <element>CLASS</element>
+                <includes>
+                  <include>com.connorjensen.jobtracker.util.ConsoleExperience</include>
+                  <include>com.connorjensen.jobtracker.util.ApplicationTextTable</include>
+                </includes>
+                <limits>
+                  <limit>
+                    <counter>METHOD</counter>
+                    <value>MISSEDCOUNT</value>
+                    <maximum>0</maximum>
+                  </limit>
+                </limits>
+              </rule>
+            </rules>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
   </plugins>
 </build>
 
