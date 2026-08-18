@@ -67,6 +67,6 @@ public class Application {
     }
     
     public String summary() {
-        return company + " - " + role;
+        return company + " - " + role + " [" + status + "] ";
     }
 }
