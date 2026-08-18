@@ -309,9 +309,11 @@ Application found = byId.get(1L);   // returns null if absent
 
 `Map` is how you'll fake a database table in the capstone: id → row.
 
-- [x] Try it in `Main` — replace the body with:
+- [x] Replace `src/main/java/com/connorjensen/jobtracker/Main.java` with:
 
 ```java
+package com.connorjensen.jobtracker;
+
 import com.connorjensen.jobtracker.model.Application;
 import com.connorjensen.jobtracker.model.Status;
 
@@ -348,9 +350,9 @@ mvn -q clean compile && java -cp target/classes com.connorjensen.jobtracker.Main
 ```
 
 ```
-Acme Corp - Backend Engineer [APPLIED]
-Globex - Platform Engineer [INTERVIEWING]
-Initech - Java Developer [APPLIED]
+[null, Acme Corp, Backend Engineer, 2026-08-01, Applied, ] [APPLIED]
+[null, Globex, Platform Engineer, 2026-08-05, Interviewing, ] [INTERVIEWING]
+[null, Initech, Java Developer, 2026-08-09, Applied, ] [APPLIED]
 ```
 
 Three lines, and only index 1 is `INTERVIEWING` — that's the `List` preserving insertion order and`get(1)` being zero-based.

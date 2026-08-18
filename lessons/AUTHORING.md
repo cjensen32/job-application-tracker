@@ -2,7 +2,9 @@
 
 *How chapters in this repo get built. **This file is meant to be edited** — when something works badly, change the rule here rather than quietly doing it differently next chapter.*
 
-Last revised: 2026-08-17 (added concise-bullet and sentence-wrapping rules during the Chapter 1 capstone recalibration).
+Last revised: 2026-08-18 (clarified which Java fences are complete files, edit excerpts, API signatures, or standalone demonstrations).
+
+Previously: 2026-08-17 (added concise-bullet and sentence-wrapping rules during the Chapter 1 capstone recalibration).
 
 Previously: 2026-08-14 (added the **Verify** block — every step must end with a command that proves it landed. Prompted by Lesson 2 Step 3, where the step's only compile instruction was buried in a prose aside and the reader finished the step with a red build and no way to know).
 
@@ -44,6 +46,15 @@ lessons/chNN-slug/
   - Where the intuitive answer is wrong, make it a **checkpoint**: have the reader run the command that contradicts their model *before* explaining why. Surprise first, mechanism second.
   - Sequence steps so each one's failure is observed in isolation. If three edits are needed, don't list all three and then compile — compile after the edit that actually breaks the build, so the error message maps to one cause.
   - When a mechanism is easier to see by contrast, give the command that succeeds in one state and fails in the other, and put it in a `<details>` block so it stays optional.
+
+## Java code fences
+
+Introduce every `java` fence according to what the reader should do with it. Do not present a fragment as though it were a complete file.
+
+- **Whole file:** Name the destination path and include the package, imports, enclosing type, and complete braces. Its Verify block must compile it.
+- **Edit excerpt:** Name the existing file and insertion point. Show the real enclosing type when placement would otherwise be ambiguous, and use a legal comment such as `// ... existing fields ...` for omitted code.
+- **API signature:** A constructor or method signature may remain a fragment when the lesson is specifying shape rather than asking the reader to compile it independently. Label it as a contract.
+- **Standalone demonstration:** Include all imports and a runnable type that needs only the JDK. Verify it in the scratchpad and show actual output.
 
 ## Verify blocks
 
