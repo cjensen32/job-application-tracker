@@ -6,7 +6,7 @@ Do not create provider-specific repository context files or aliases such as`AGEN
 
 ## Project state
 
-This is currently a Java 21, Maven, and JUnit 5 project. Chapter 1 builds the plain-Java core: the `Application`/`Status` model, repository interface and in-memory implementation, service layer, and a console composition root.
+This is currently a Java 21, Maven, and JUnit 5 project. Chapter 1 has nine lessons and builds the complete plain-Java core: model, repository, service requests, role-specific console classes, tests, and quality gates.
 
 No Spring Boot yet: it arrives in Chapter 2 of the learning plan. Do not add Spring, JPA, a database, or other future-stack dependencies ahead of the lesson sequence.
 
@@ -33,7 +33,7 @@ When coaching a capstone, do not open or use either copy of its grader as a solu
 
 Work from `CAPSTONE.md` and the Maven test output. Reading or changing a grader is appropriate only when the user explicitly asks to author or revise lesson or capstone infrastructure.
 
-`LEARNING.md` (repo root) sequences PROJECT.md's milestones into 6 chapters / 18 lessons and drives the order of work. Its conventions:
+`LEARNING.md` (repo root) sequences PROJECT.md's milestones into 6 chapters / 23 numbered lessons (0–22) and drives the order of work. Its conventions:
 
 - **Explain before automating.** The first time a tool or concept appears, walk through it manually before reaching for the thing that generates it — hand-written `pom.xml` before start.spring.io, manual constructor wiring before `@Autowired`, a console loop before `@RestController`.
 - **Revisit, don't restart.** Apply new concepts to code that already exists rather than greenfield examples.
@@ -61,10 +61,10 @@ Use `rg`/`rg --files` for follow-up text and file searches. Do not regenerate, d
 There is no Maven wrapper; use the installed `mvn`. The standard full verification command is:
 
 ```sh
-mvn test
+mvn verify
 ```
 
-Run the narrowest useful check while iterating, then `mvn test` before handing off Java or build changes. A green Maven invocation must report a non-zero JUnit test count.
+Run `mvn -Dcheckstyle.skip test` while a structural capstone refactor is missing required types, then use `mvn verify` for final tests, Checkstyle, and JaCoCo reporting. A green Maven invocation must report a non-zero JUnit test count.
 
 There is no `exec-maven-plugin` and no IDE run configuration in version control, so the console app runs off the plain classpath:
 
@@ -73,7 +73,7 @@ mvn compile
 java -cp target/classes com.connorjensen.jobtracker.Main
 ```
 
-Chapter 1's capstone is done when `mvn test` is green *and* that command runs, so check both before calling the chapter finished.
+Chapter 1's capstone is done only when `mvn verify`, `mvn compile`, and that command all succeed, so check all three before calling the chapter finished.
 
 Before editing, inspect `git status` and preserve unrelated user work. Local agent settings and agent-managed worktrees belong under `.agents/`; the repository ignores `.agents/settings.local.json` and `.agents/worktrees/`.
 

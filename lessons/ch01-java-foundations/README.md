@@ -1,71 +1,67 @@
 # Chapter 1 — Java Foundations
 
-*No framework. Nothing but the language and a build tool.*
+*No production framework and no third-party runtime library.*
 
-The goal of this chapter is that when Spring Boot shows up in Chapter 2, it looks like a **library doing things you already did by hand** rather than magic. Every piece of Spring you meet later has a manual ancestor in here.
+The chapter ends with a complete console CRUD application whose boundaries resemble the later Spring application. The model, repository contract, service, request shapes, and dependency direction survive; the console, memory store, and manual wiring are replaced in later chapters.
 
-**Capstone:** [The Tracker Core](CAPSTONE.md) — a working console job tracker, layered exactly like the finished app. Its model, repository interface and service survive to v1 unchanged.
-
----
+**Capstone:** [The Tracker Core](CAPSTONE.md)
 
 ## Lessons
 
-| #  | Lesson                                                                  | You'll be able to answer                                             | Status |
-|----|-------------------------------------------------------------------------|----------------------------------------------------------------------|--------|
-| 0  | [Build system & project shape](00-build-system.md)                      | "Walk me through what happens when you run `mvn package`."           | ☑     |
-| 1  | [Classes, objects, records](01-classes-and-records.md)                  | "When would you use a `record` instead of a class?"                  | ☑     |
-| 2  | [Packages, enums, collections, Optional](02-types-enums-collections.md) | "What problem does `Optional` solve, and when is it the wrong tool?" | ☑     |
-| 3  | [Interfaces & dependency injection](03-interfaces-and-di.md)            | "What is dependency injection and what does it buy you?"             | ☑     |
-| ★ | [**Capstone — The Tracker Core**](CAPSTONE.md)                          | all of the above, about code you wrote                               | ☐     |
+| # | Lesson | Interview outcome | Status |
+|---|--------|-------------------|--------|
+| 0 | [Build system and project shape](00-build-system.md) | Explain `mvn package`, the classpath, and bytecode | ☑ |
+| 1 | [Classes, objects, and records](01-classes-and-records.md) | Choose between mutable entities and value records | ☑ |
+| 2 | [Packages, enums, collections, and Optional](02-types-enums-collections.md) | Explain typed absence, collections, and runtime enums | ☑ |
+| 3 | [Interfaces and dependency injection](03-interfaces-and-di.md) | Explain constructor injection and substitutability | ☑ |
+| 4 | [Control flow and exception boundaries](04-control-flow-and-exception-boundaries.md) | Place retries and exception handling at input boundaries | ☐ |
+| 5 | [Console I/O and validation](05-console-io-and-validation.md) | Validate dates, statuses, IDs, and URLs consistently | ☐ |
+| 6 | [Refactoring and package design](06-refactoring-and-package-design.md) | Split code by responsibility and control visibility | ☐ |
+| 7 | [Testing console applications](07-testing-console-applications.md) | Test streams, sessions, EOF, and exact tables safely | ☐ |
+| 8 | [Java quality standards](08-java-quality-standards.md) | Use Maven conventions and interpret quality-gate failures | ☐ |
+| ★ | [**Capstone — The Tracker Core**](CAPSTONE.md) | Defend the whole design using code you wrote | ☐ |
 
-**Tracking progress:** every lesson opens with a **Progress** checklist mirroring its steps, and carries a `- [ ]` on each thing you actually do — create a file, run a command, observe an output. Tick them in the file as you go; the table above is the chapter-level view of the same thing.
+Use [GLOSSARY.md](GLOSSARY.md) for quick recall, [NOTES.md](NOTES.md) for Java version history, [course standards](../course-standards/README.md) for repository-wide conventions, and [RECALIBRATION.md](RECALIBRATION.md) for the rationale and review history behind this expansion.
 
-**Reference:** [GLOSSARY.md](GLOSSARY.md) — every term in the chapter with its Python/JS equivalent, plus the five answers you should have cold.
+XP is banked once after the capstone quiz, not once per lesson.
 
-**Side reading:** [NOTES.md](NOTES.md) — what each feature replaced and why it changed. Lessons link here with tags like <sup>[J16](NOTES.md#records)</sup>. Optional, and aimed at working in codebases pinned to Java 8.
+## Target architecture
 
-**XP:** banked once, after the capstone — not per lesson.
-
----
-
-## What exists at the end of this chapter
-
-```
-src/main/java/com/connorjensen/jobtracker
-├── Main.java                                  console loop + hand-wired object graph
+```text
+src/main/java/com/connorjensen/jobtracker/
+├── Main.java
+├── cli/
+│   ├── ConsoleApplication.java
+│   ├── ConsolePrompter.java
+│   ├── ConsoleView.java
+│   └── TextTable.java
 ├── model/
-│   ├── Application.java                       the domain class
-│   ├── Status.java                            the enum
-│   └── (Interview.java — Chapter 3)
+│   ├── Application.java
+│   └── Status.java
 ├── repository/
-│   ├── ApplicationRepository.java             the interface ★
-│   └── InMemoryApplicationRepository.java     the throwaway implementation
-├── service/
-│   └── ApplicationService.java                business rules ★
-└── dto/
-    └── ApplicationDto.java                    (reworked in Chapter 2)
+│   ├── ApplicationRepository.java
+│   └── InMemoryApplicationRepository.java
+└── service/
+    ├── ApplicationService.java
+    ├── CreateApplicationRequest.java
+    └── UpdateApplicationRequest.java
 ```
 
-★ = survives to v1 essentially unchanged.
+`Main` is only the composition root. `ConsoleApplication` coordinates a session, `ConsolePrompter` owns input and local retries, `ConsoleView` owns output, and `TextTable` is a pure renderer.
 
----
+The Maven layout is a [course convention](../course-standards/README.md), not a rule of the Java language.
 
-## The through-line
+## Through-line
 
-Each lesson sets up a piece of framework machinery you'll meet later:
+| Chapter 1 mechanism | Later replacement |
+|---------------------|-------------------|
+| Hand-written POM and classpath | Spring Boot dependency management and plugin |
+| Request records | HTTP request DTOs in Lesson 11 |
+| `Scanner` validation and retry | Spring binding and Bean Validation in Lessons 10–11 |
+| Repository interface | Spring Data repository in Lesson 12 |
+| Manual constructor wiring | Spring container in Lesson 9 |
+| Console view | Controller plus JSON in Lesson 10 |
+| In-memory repository | Postgres in Lesson 12 |
+| Injected stream tests | MockMvc and test slices in Lesson 17 |
 
-| You do this manually                           | Later, this does it for you                                  |
-|------------------------------------------------|--------------------------------------------------------------|
-| Hand-write `pom.xml`, see the classpath        | start.spring.io + Spring Boot's dependency BOM               |
-| `@Test` as metadata something scans for        | Spring scanning for `@Service`, `@RestController`, `@Entity` |
-| `Application` class vs `ApplicationDto` record | JPA entity vs request/response DTO (Ch. 2–3)                 |
-| `Status.valueOf` in a try/catch                | Spring binding `?status=OFFER`, returning 400 on garbage     |
-| `Optional<Application> findById`               | Spring Data's `findById` — same signature                    |
-| `findByStatus` written by hand                 | Spring Data deriving the SQL from the method name            |
-| `new ApplicationService(repository)` in `main` | the application context building the same graph              |
-| `final` field set in the constructor           | constructor injection, the recommended Spring style          |
-| Writing a fake repository in a test            | Mockito generating it (Ch. 4)                                |
-
----
-
-**Next chapter:** Chapter 2 — Spring Boot and the HTTP layer. Same object graph, wired by the container, reachable over HTTP.
+**Next chapter:** Spring Boot and the HTTP layer, beginning with Lesson 9.
