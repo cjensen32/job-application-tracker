@@ -1,7 +1,7 @@
 # Maven build output
 target/
 
-.idea/
+.idea/*
 
 # Keep shared configs
 !.idea/runConfigurations/
