@@ -32,7 +32,7 @@ This feels like ceremony at first. The payoff shows up in Lesson 12: because the
 
 ## Step 1 — The traditional class
 
-- [ ] Create `src/main/java/com/connorjensen/jobtracker/Application.java`:
+- [x] Create `src/main/java/com/connorjensen/jobtracker/Application.java`:
 
 ```java
 package com.connorjensen.jobtracker;
@@ -81,7 +81,7 @@ Notice `role` has a setter but `company` doesn't — that's a deliberate design 
 
 ## Step 2 — `static` vs instance, and why `main` is weird
 
-- [ ] Add a method to `Application`:
+- [x] Add a method to `Application`:
 
 ```java
     public String summary() {
@@ -99,7 +99,7 @@ public static void main(String[] args);
 
 **`static`** means the method belongs to the *class itself*, not to any instance — you call it as `Main.main(...)` with no object involved. `main` must be static for an obvious reason: when the JVM starts, **no objects exist yet**. Something has to run before anything can be constructed.
 
-- [ ] Try it in `Main.java`:
+- [x] Try it in `Main.java`:
 
 ```java
 package com.connorjensen.jobtracker;
@@ -115,7 +115,7 @@ public class Main {
 }
 ```
 
-- [ ] Compile and run it
+- [x] Compile and run it
 
 ```bash
 mvn compile
@@ -128,7 +128,7 @@ The second line prints something like `com.connorjensen.jobtracker.Application@1
 
 ## Step 3 — The same thing as a `record`
 
-- [ ] Create `src/main/java/com/connorjensen/jobtracker/ApplicationDto.java`:
+- [x] Create `src/main/java/com/connorjensen/jobtracker/ApplicationDto.java`:
 
 ```java
 package com.connorjensen.jobtracker;
@@ -148,7 +148,7 @@ public record ApplicationDto(String company, String role, LocalDate appliedDate)
 
 It's the closest thing Java has to a TypeScript `interface` or a Python `@dataclass(frozen=True)`. The tradeoff: a record is **immutable** — no setters, ever. Fields are final. To "change" one you construct a new one.
 
-- [ ] Add to `main`, then recompile and run:
+- [x] Add to `main`, then recompile and run:
 
 ```java
         ApplicationDto dto = new ApplicationDto("Acme Corp", "Backend Engineer", LocalDate.of(2026, 8, 1));
@@ -163,7 +163,7 @@ Recompile and run. You get `ApplicationDto[company=Acme Corp, role=Backend Engin
 
 Readable `toString` is nice. **Value equality** is the real reason records exist. Prove it with a test.
 
-- [ ] Create `src/test/java/com/connorjensen/jobtracker/ApplicationTest.java`:
+- [x] Create `src/test/java/com/connorjensen/jobtracker/ApplicationTest.java`:
 
 ```java
 package com.connorjensen.jobtracker;
@@ -197,7 +197,7 @@ class ApplicationTest {
 }
 ```
 
-- [ ] Run the tests
+- [x] Run the tests
 
 ```bash
 mvn test
@@ -231,7 +231,7 @@ That table is a genuinely common interview question, and "records can't be JPA e
 
 ## Self-check
 
-- [ ] Answered all five without opening the answers
+- [x] Answered all five without opening the answers
 
 1. Why must `main` be `static`?
 2. What does `private` on a field actually prevent?

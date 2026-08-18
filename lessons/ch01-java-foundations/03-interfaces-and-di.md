@@ -74,7 +74,7 @@ Note the semicolons where bodies would be. Interface methods are implicitly `pub
 
 ## Step 2 — One implementation
 
-- [ ] Create `src/main/java/com/connorjensen/jobtracker/repository/InMemoryApplicationRepository.java`:
+- [x] Create `src/main/java/com/connorjensen/jobtracker/repository/InMemoryApplicationRepository.java`:
 
 ```java
 package com.connorjensen.jobtracker.repository;
@@ -175,7 +175,7 @@ Look at what you just built: a place that knows how to construct objects and han
 
 Here's the concrete payoff, and it's the answer to "what does DI buy you." Because `ApplicationService` accepts *any* `ApplicationRepository`, a test can pass one that isn't real:
 
-- [ ] Read this one — you'll write it for real in the capstone
+- [x] Read this one — you'll write it for real in the capstone
 
 ```java
 class AlwaysEmptyRepository implements ApplicationRepository {
@@ -195,7 +195,7 @@ Now you can test "what does the service do when the application doesn't exist?" 
 
 ## Self-check
 
-- [ ] Answered all five without opening the answers
+- [x] Answered all five without opening the answers
 
 1. What's the difference between an interface and a class that has no fields?
 2. Why does `ApplicationService` declare the field as `ApplicationRepository` and not `InMemoryApplicationRepository`?
