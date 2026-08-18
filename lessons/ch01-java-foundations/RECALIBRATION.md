@@ -18,13 +18,18 @@ This record explains why each change belongs in the Chapter 1 expansion and poin
 
 | Change | Why it belongs in this change set | Supporting document or evidence |
 |--------|-----------------------------------|---------------------------------|
+| Expand Chapter 1 from Lessons 0–3 to Lessons 0–8 | The existing capstone had already grown into a console application without first teaching its control flow, I/O, package design, test boundaries, or quality gates. | [Learning plan](../../LEARNING.md) |
 | Add control-flow and exception-boundary instruction | Menu retries, parse failures, guard clauses, and EOF are Java boundary skills required by the console application. | [Lesson 4](04-control-flow-and-exception-boundaries.md) |
 | Add console I/O and validation instruction | `Scanner`, `PrintStream`, UTF-8, `LocalDate`, enums, IDs, and HTTP(S) URI policy must be understood before they are tested. | [Lesson 5](05-console-io-and-validation.md) |
 | Add refactoring and package-design instruction | The previous `util` grouping mixed coordination, input, output, and rendering; role-specific classes make ownership and dependency direction visible. | [Lesson 6](06-refactoring-and-package-design.md), [course dependency direction](../course-standards/README.md#dependency-direction) |
+| Add console-testing instruction | Injected streams, exact rendering, full sessions, subprocess startup, EOF, and cleanup are needed to test the real boundary without global-state leaks. | [Lesson 7](07-testing-console-applications.md), [test-writing conventions](../testing-standards/README.md) |
+| Add Java quality instruction | Two-space formatting, import discipline, warnings, and Maven quality phases need an explanation before they become required gates. | [Lesson 8](08-java-quality-standards.md), [course standards](../course-standards/README.md) |
+| Renumber later lessons through Lesson 22 | Inserting five Chapter 1 lessons requires stable unique lesson numbers; Spring now starts at Lesson 9. | [Learning plan](../../LEARNING.md) |
+| Make Chapter 4 the dedicated test-writing and robustness chapter | Chapter 1 introduces testing mechanics, while a later chapter must teach maintainable test design, JUnit, Mockito, integration boundaries, and Spring slices in depth. | [Chapter 4 roadmap](../../LEARNING.md#chapter-4--test-writing-and-robustness-milestones-5-7), [test-writing conventions](../testing-standards/README.md) |
 | Add course-wide architecture and quality conventions | Maven layout, dependency direction, visibility, testing, and framework timing are repository decisions that later chapters need to reference consistently. | [Course standards](../course-standards/README.md), [Maven standard layout](https://maven.apache.org/guides/introduction/introduction-to-the-standard-directory-layout) |
 | Tighten Markdown authoring rules | Concise bullets and natural paragraph wrapping make lesson diffs easier to review and source easier to maintain. | [Authoring spec](../AUTHORING.md) |
 | Add Checkstyle 13.9.0 through Maven Checkstyle Plugin 3.6.0 | A pinned validate-phase check makes source rules deterministic for production and test code on Java 21. | [`pom.xml`](../../pom.xml), [`checkstyle.xml`](../../config/checkstyle/checkstyle.xml), [Checkstyle](https://checkstyle.org/) |
-| Add compiler lint warnings and retarget JaCoCo | Warnings create review evidence, and coverage must follow the new CLI class names rather than deleted utilities. | [`pom.xml`](../../pom.xml), [course quality gates](../course-standards/README.md#quality-gates) |
+| Add compiler lint warnings and retarget JaCoCo | Warnings create review evidence, and coverage must follow the new CLI class names rather than deleted utilities. | [`pom.xml`](../../pom.xml), [quality standards](08-java-quality-standards.md) |
 
 ## Suggested commit grouping
 
@@ -39,3 +44,9 @@ Include `pom.xml`, `config/checkstyle/checkstyle.xml`, `lessons/AUTHORING.md`, `
 #### 2. `LESSONS(ch 1) - add control flow validation and package design`
 
 Include Lessons 4–6, `GLOSSARY.md`, and the applicable rationale from this record. These five files teach control flow, EOF, console validation, constructor-injected streams, refactoring, request records, package dependencies, and the terms needed to discuss them.
+
+### Additional work
+
+#### 3. `LESSONS(ch 1) - add testing quality lessons and renumber roadmap`
+
+Include Lessons 7–8, `LEARNING.md`, `NOTES.md`, and the applicable rationale from this record. These five files add testing and Java quality instruction, make Chapter 4 the dedicated test-writing chapter, renumber the roadmap through Lesson 22, and record the associated Java version history.

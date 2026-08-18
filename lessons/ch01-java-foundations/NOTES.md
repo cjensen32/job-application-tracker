@@ -1,250 +1,111 @@
-# Chapter 1 — Version Notes
+# Chapter 1 — Java Version Notes
 
-*Why the Java in this chapter looks the way it does, and what it looked like before.*
-
-None of this is required to finish the chapter. It's here because knowing "this used to be X, and changed to Y because
-Z" is genuinely useful when you land in a codebase pinned to Java 8 — which is most of them.
-
-**How to read the tiers:**
-
-| Tier                 | Version | Why it matters                                                                                 |
-|----------------------|---------|------------------------------------------------------------------------------------------------|
-| **Modern**           | 16–21   | What this project targets                                                                      |
-| **Practical legacy** | 8       | Still the single most-deployed version. If you have to backport, this is the realistic target. |
-| **Deep legacy**      | 5       | The last time the language changed this much at once                                           |
-| **Curiosity**        | 1.1–1.4 | Pre-generics, pre-collections. Fun, rarely encountered.                                        |
-
-**The rule that explains most of this file:** the JDK will accept ugly language design before it will break code that
-already compiles. Almost every "why is it like that" answer below bottoms out there.
-
----
+This optional reference keeps language history out of the main lesson flow. Java 8 is the realistic legacy baseline, Java 5 is the deeper compatibility tier, and Java 1.x is historical context.
 
 ## Records
 
-`record ApplicationDto(String company, String role, LocalDate appliedDate) {}` — **Java 16** (2021), previewed in 14 and 15.
+Records became final in Java 16 after previews in Java 14 and 15.
 
-**Before (Java 8 and earlier):** the same thing by hand — private final fields, an all-args constructor, accessors, and hand-written `equals`, `hashCode`, and `toString`. Roughly 60 lines for three fields, and `equals`/`hashCode` written by hand is a classic source of subtle bugs (forget a field in `hashCode` and your `HashMap` lookups silently fail). IDEs generated it; Lombok's`@Value` annotation automated it; Java eventually absorbed the idea.
+Before records, a value carrier required fields, a constructor, accessors, `equals`, `hashCode`, and `toString`. On Java 8, write that class explicitly or generate it in the IDE.
 
-**Why accessors are `company()` and not `getCompany()`:** this was contentious. Records deliberately broke the JavaBean convention because a record is a *transparent carrier for its state*, not an object hiding fields behind an API. The practical consequence you'll hit: Jackson needed explicit record support (added 2.12) because its default logic looks for `getX()`.
+Records were added because data-only classes repeated mechanical code and mistakes in equality methods were common. Their restricted shape communicates that the values are the identity.
 
-**Backport difficulty:** trivial and mechanical. This is the easiest thing in the chapter to write for Java 8.
+## Switch expressions and arrows
 
----
+Switch expressions became final in Java 14 after previews in Java 12 and 13.
 
-## Enums
+Traditional Java 8 code uses colon labels, `break`, and a variable assigned inside each branch. Arrow cases prevent accidental fall-through and can return a value directly.
 
-`enum Status { APPLIED, ... }` — **Java 5** (2004).
+The Chapter 1 menu may use either statement form, but every selection must dispatch once and accidental fall-through is rejected by Checkstyle.
 
-**Before:** the *typesafe enum pattern*, popularized by Joshua Bloch in *Effective Java* — and the language feature is essentially that pattern promoted into syntax:
+## Text blocks
 
-```java
-public final class Status {
-    public static final Status APPLIED = new Status("APPLIED");
-    public static final Status OFFER = new Status("OFFER");
+Text blocks became final in Java 15 after previews in Java 13 and 14.
 
-    private final String name;
+Before them, multiline output used concatenated string literals with explicit `\n` characters. Java 8 code must use that form.
 
-    private Status(String name) {
-        this.name = name;
-    }   // private = nobody else can make one
+Text blocks improve readable exact-output contracts, but their indentation and trailing newline still matter in tests.
 
-    public String toString() {
-        return name;
-    }
-}
-```
+## Pattern matching for switch
 
-That's why enum constants work with `==`: they always were singletons. The language just stopped making you write it.
+Pattern matching for switch became final in Java 21.
 
-**Before *that* (Java 1.x):** `public static final int STATUS_APPLIED = 0;`. Type-unsafe — nothing stopped you passing`7`, or passing a day-of-week constant where a status was expected, and printing one gave you `0` instead of a name. This is exactly the "stringly typed" problem Lesson 2 describes, and it's why the pattern was invented.
+The Chapter 1 menu does not require type-pattern dispatch. Keeping menu dispatch to integer cases makes the boundary easier to read and backport.
 
-**Backport difficulty:** moderate. The pattern above works, but you lose `switch` support, `values()`, and `valueOf()`unless you write them.
+## Stream `toList`
 
----
+`Stream.toList()` arrived in Java 16 and returns an unmodifiable list.
 
-## Generics
+Java 8 uses `.collect(Collectors.toList())`, which commonly returns a mutable list. That mutability difference matters when callers expect to append values.
 
-`List<Application>` — **Java 5**.
+## Optional, streams, lambdas, and `java.time`
 
-**Before:** collections held `Object`, and every read required a cast:
+All arrived in Java 8.
 
-```java
-List applications = new ArrayList();
-applications.
+Before `Optional`, missing results usually returned null. Before streams and lambdas, collection transformations used loops or anonymous classes. Before `java.time`, applications used mutable `Date`, `Calendar`, and non-thread-safe `SimpleDateFormat`.
 
-add(app);
+Java kept the older APIs for compatibility, so modern code gained new packages and types instead of silently changing old behavior.
 
-Application a = (Application) applications.get(0);   // ClassCastException at runtime if wrong
-```
+## URI
 
-**The `z` in "x changed to y because z":** Java 5 had to let Java 1.4 code and Java 5 code share the same jars in the same JVM. The solution was **type erasure** — generics exist at compile time and are *erased* in the bytecode, so`List<String>` and `List<Integer>` are both just `List` at runtime. Old code could pass a raw `List` to new code and vice versa.
+`java.net.URI` has existed since Java 1.4.
 
-The price, still paid today:
+The class parses URI syntax but does not decide an application's policy. The capstone additionally requires an absolute `http` or `https` scheme because syntactically valid values such as `mailto:x@example.com` are not job links.
 
-- You can't write `new T[]`.
-- You can't overload on `List<String>` vs `List<Integer>` — same erased signature.
-- `instanceof List<String>` is illegal.
-- Raw types still compile, with a warning, purely for compatibility.
+## Standard charsets
 
-C# made the opposite choice two years later (reified generics, at the cost of breaking its 1.0 collections). Whether Java chose right is a genuinely good interview conversation.
+`StandardCharsets` arrived in Java 7.
 
-**Backport difficulty:** easy but ugly — delete the type parameters and add casts.
+Before it, code passed charset names such as `"UTF-8"` and handled the checked `UnsupportedEncodingException`. Named constants removed spelling mistakes and made guaranteed JVM charsets explicit.
 
----
+## Try-with-resources
 
-## The diamond operator
+Try-with-resources arrived in Java 7 and was enhanced in Java 9 to accept effectively final variables.
 
-`new ArrayList<>()` — **Java 7** (2011).
+Before it, cleanup lived in `finally` blocks and often lost or masked exceptions. Tests that replace global streams still need `finally` because restoring `System.in` or `System.out` is not a resource close operation.
 
-**Before:** `List<Map<String, List<Application>>> x = new ArrayList<Map<String, List<Application>>>();` Purely a typing-effort fix, no semantic change.
+## Enums, generics, annotations, enhanced for, and autoboxing
 
----
+These arrived in Java 5.
 
-## Enhanced for loop
+Before enums, code used integer constants or a hand-built typesafe-enum pattern. Before generics, collections stored `Object` and callers cast values. Before annotations, frameworks relied more heavily on naming, marker interfaces, and XML.
 
-`for (Application app : applications)` — **Java 5**.
+Autoboxing removed explicit wrapper construction but retained identity traps. Compare wrapper values with `equals`, not `==`.
 
-**Before:** with the Collections Framework (1.2+), an explicit `Iterator`:
+## Default interface methods
 
-```java
-for(Iterator it = applications.iterator(); it.
+Default methods arrived in Java 8 so interfaces could evolve without immediately breaking every implementation.
 
-hasNext(); ){
-Application app = (Application) it.next();
-}
-```
+Chapter 1 repository methods remain abstract because storage behavior belongs to the implementation and the test's foreign repository must provide it explicitly.
 
-**Before 1.2:** `Enumeration` with `hasMoreElements()`/`nextElement()`, over a `Vector`.
+## Maven compiler `release`
 
----
+The `--release` compiler option arrived in Java 9.
 
-## Lambdas, streams, and method references
+Earlier builds combined `source` and `target`, which could produce old bytecode while accidentally calling newer library APIs. `release` constrains syntax, bytecode, and the available platform API together.
 
-`.stream().filter(app -> ...).toList()` — **Java 8** (2014). `Application::getCompany` too.
+## JShell
 
-**Before:** a loop with an `if`. For anything callback-shaped, an **anonymous inner class**:
+JShell arrived in Java 9.
 
-```java
-Collections.sort(applications, new Comparator() {
-    public int compare (Object a, Object b){
-        return ((Application) a).getAppliedDate().compareTo(((Application) b).getAppliedDate());
-    }
-});
-```
+Before it, trying one Java expression required a scratch class, an IDE feature, or a third-party shell. A newer JDK's JShell can still inspect classes compiled for Java 8.
 
-Six lines of ceremony around one line of logic. Lambdas are, at the bytecode level, not just sugar for this — they compile to an `invokedynamic` instruction that builds the implementation at runtime, specifically so the JVM wasn't flooded with one extra class file per lambda.
+## Quick reference
 
-**The compatibility story worth knowing:** adding `stream()` to `Collection` should have been impossible — every existing class implementing `Collection` would have stopped compiling. So Java 8 invented **default methods**(`interface Collection { default Stream<E> stream() { ... } }`) to allow adding methods to published interfaces. An entire language feature exists so the standard library could grow without breaking the world. That's the single best example of Java's compatibility priorities shaping the language.
-
-**`.toList()` on a stream is newer than streams:** **Java 16**. From 8 to 15 it was
-`.collect(Collectors.toList())`. You will see the old form constantly. Small difference with teeth —
-`.toList()` returns an *unmodifiable* list, `Collectors.toList()` returns a mutable `ArrayList`.
-
-**Backport difficulty to Java 8:** trivial (swap `.toList()` for `.collect(Collectors.toList())`). **To Java 7:**rewrite as loops.
-
----
-
-## Optional
-
-`Optional<Application>` — **Java 8**.
-
-**Before:** return `null` and document it in a comment, or don't. This is the "billion dollar mistake" its inventor Tony Hoare apologized for — null references date to ALGOL W in 1965, and Java inherited them.
-
-Google's Guava library shipped an `Optional` in 2011; the JDK's version arrived three years later, designed primarily to give `Stream` a return type for `findFirst()` that couldn't be `null`. That origin is why the official guidance is *return types only* — it wasn't designed as a general-purpose nullable field wrapper, which is exactly the misuse Lesson 2 warns about.
-
-**Backport difficulty:** easy — return `null` and null-check. You lose the compiler's nagging, which was the entire point.
-
----
-
-## `Long` vs `long`, and autoboxing
-
-Wrapper types (`Long`, `Integer`) date to **Java 1.0**. **Autoboxing** — writing `Long id = 5L;` and letting the compiler convert — is **Java 5**.
-
-**Before:** `Long id = new Long(5);` and `long raw = id.longValue();`, explicitly, every time.
-
-Autoboxing removed the ceremony and introduced a famous trap that still bites:
-
-```java
-Long a = 127L, b = 127L;
-a ==b;              // true  — small values are cached
-        Long c = 128L, d = 128L;
-c ==d;              // false — different objects
-```
-
-The `Integer`/`Long` cache for −128..127 is *required* by the spec, so the bug is deterministic and looks like magic. Always `.equals()` on wrappers. This is a very common interview trick question.
-
----
-
-## `java.time` (`LocalDate`)
-
-**Java 8**. Before that, `java.util.Date` and `Calendar`.
-
-The old API was bad in specific, memorable ways: `Date` was mutable, months were **0-indexed** (December is 11), years counted from 1900, and `SimpleDateFormat` was not thread-safe — a genuinely common production bug when someone made one a static field.
-
-`java.time` came from Joda-Time via JSR-310, written by the same author. The old classes couldn't be fixed in place because too much code depended on their behaviour, bugs included — so the fix was a whole new package, and`java.util.Date` remains, deprecated in parts, forever.
-
-**Backport difficulty:** annoying. `Calendar` handling is verbose and the semantics differ. Joda-Time is the usual answer on Java 7 and below.
-
----
-
-## Annotations
-
-`@Test`, `@Override` — **Java 5**.
-
-**Before:** JUnit 3 found tests by **method naming convention** — any method starting with `test`, in a class extending`TestCase`. Marker interfaces (`Serializable`, `Cloneable`) played a similar role:implement an empty interface to signal metadata.
-
-Everything in Chapters 2 through 5 — every `@Service`, `@Entity`, `@GetMapping` — depends on this one Java 5 feature plus reflection. Spring predates annotations (2003) and originally did all its wiring in XML, which is why you'll still find `applicationContext.xml` in older enterprise code. If you work in deprecated codebases, you *will* meet XML-configured Spring.
-
-`@Override` is worth a note: it's checked at compile time, but it's an ordinary annotation, not a keyword. Java 5 only allowed it on class-method overrides; **Java 6** extended it to interface implementations — so on Java 5, the`@Override` in Lesson 3's repository would have been a compile error.
-
----
-
-## `maven.compiler.release`
-
-The `<maven.compiler.release>21</...>` in your `pom.xml` is **Java 9+**.
-
-**Before:** `<maven.compiler.source>` and `<target>`, which had a real flaw — you could compile targeting Java 6 bytecode while accidentally calling Java 8 library methods, producing a jar that compiled fine and threw`NoSuchMethodError` at runtime on an actual Java 6 JVM. `release` checks the API surface too, so it can't happen.
-
-**If you ever backport this project, `release` is the one flag that makes it honest.** Set it to 8 and the compiler will reject every Java 9+ API you use.
-
----
-
-## jshell
-
-Java's REPL, **Java 9**. `jshell --class-path target/classes` drops you at a prompt with your own compiled classes loaded, and accepts bare expressions and statements with no enclosing class or`main`.
-
-**Before:** there wasn't one. For eighteen years, "try one line of Java" meant writing a throwaway class with a`public static void main(String[] args)`, compiling it, and running it — which is a large part of why Java earned its ceremony reputation next to `python3` at a prompt. The workarounds were IDE "scratch files" (IntelliJ) and third-party shells like BeanShell and Groovy.
-
-**Why it arrived so late:** it needed the JVM to support redefining classes and re-executing snippets cheaply, which is the same machinery Java 9's module system and `JEP 222` work made tractable. It's also the one Java 9 feature with *zero* backport story — it's a tool, not a language feature, so there's no "Java 8 equivalent" beyond installing Groovy.
-
-**On a Java 8 project:** you can still use a newer JDK's `jshell` against Java 8-compiled classes. The tool doesn't care what compiled them.
-
----
-
-## Quick reference — everything in Chapter 1
-
-| Feature                          | Introduced | Java 8 equivalent                                      |
-|----------------------------------|------------|--------------------------------------------------------|
-| `record`                         | 16         | hand-written class with `equals`/`hashCode`/`toString` |
-| `.toList()` on Stream            | 16         | `.collect(Collectors.toList())`                        |
-| `var`                            | 10         | explicit types                                         |
-| `List.of(...)`                   | 9          | `Collections.unmodifiableList(Arrays.asList(...))`     |
-| `jshell`                         | 9          | a throwaway class with `main`, or Groovy/BeanShell     |
-| `release` compiler flag          | 9          | `source` + `target`                                    |
-| streams, lambdas, method refs    | 8          | loops, anonymous inner classes                         |
-| `Optional`                       | 8          | `null` + null checks                                   |
-| default interface methods        | 8          | abstract base class                                    |
-| `java.time`                      | 8          | `Calendar`, or Joda-Time                               |
-| diamond `<>`                     | 7          | repeat the type arguments                              |
-| try-with-resources               | 7          | `finally { close(); }`                                 |
-| `@Override` on interface methods | 6          | omit it                                                |
-| generics                         | 5          | raw types + casts                                      |
-| `enum`                           | 5          | typesafe enum pattern                                  |
-| annotations                      | 5          | naming conventions, marker interfaces, XML             |
-| enhanced for                     | 5          | explicit `Iterator`                                    |
-| autoboxing                       | 5          | `new Long(x)` / `x.longValue()`                        |
-| Collections Framework            | 1.2        | `Vector`, `Hashtable`, `Enumeration`                   |
-
----
+| Feature | Introduced | Java 8 equivalent |
+|---------|------------|-------------------|
+| records | 16 | explicit final value class |
+| text blocks | 15 | concatenated strings with `\n` |
+| switch expressions | 14 | colon cases, assignment, and `break` |
+| `Stream.toList()` | 16 | `collect(Collectors.toList())` |
+| pattern matching for switch | 21 | `if`/`else` plus casts |
+| JShell | 9 | scratch `main` class or third-party shell |
+| compiler `release` | 9 | `source` plus `target` |
+| Optional, streams, lambdas, `java.time` | 8 | nulls, loops, anonymous classes, legacy date APIs |
+| default interface methods | 8 | abstract base class or breaking interface change |
+| StandardCharsets | 7 | charset names plus checked exception handling |
+| try-with-resources | 7 | `finally` cleanup |
+| enums, generics, annotations, enhanced for, autoboxing | 5 | patterns, raw types, naming/XML, iterators, explicit wrappers |
+| URI | 1.4 | URL or manual string handling |
 
 **Chapter:** [Chapter 1 — Java Foundations](README.md) · **Terms:** [GLOSSARY.md](GLOSSARY.md)
