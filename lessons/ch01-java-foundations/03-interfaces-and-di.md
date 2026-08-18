@@ -1,8 +1,6 @@
 # Lesson 3 — Interfaces and Dependency Injection, By Hand
 
-**Goal:** Put your applications behind a *repository interface*, and hand a repository to a service
-through its constructor — with no framework anywhere.
-**You'll be able to answer:** *"What is dependency injection and what does it actually buy you?"*
+**Goal:** Put your applications behind a *repository interface*, and hand a repository to a service through its constructor — with no framework anywhere. **You'll be able to answer:** *"What is dependency injection and what does it actually buy you?"*
 
 **Prerequisite:** Lesson 2 (packages, `Status`, collections, `Optional`).
 
@@ -15,8 +13,7 @@ through its constructor — with no framework anywhere.
 - [x] Step 5 — Why this makes tests possible
 - [x] Self-check answered
 
-This is the highest-leverage lesson in Chapter 1. Everything Spring does in Chapter 2 is this,
-automated. If you understand this lesson, Spring is a convenience. If you skip it, Spring is magic.
+This is the highest-leverage lesson in Chapter 1. Everything Spring does in Chapter 2 is this, automated. If you understand this lesson, Spring is a convenience. If you skip it, Spring is magic.
 
 ---
 
@@ -26,12 +23,11 @@ Right now `Main` holds a `List<Application>` and manipulates it directly. Suppos
 
 ```java
 public class ApplicationService {
-    private final List<Application> applications = new ArrayList<>();   // ← the problem
+  private final List<Application> applications = new ArrayList<>();   // ← the problem
 }
 ```
 
-The service **constructs its own storage**. Three consequences, and the third is the one interviewers
-are listening for:
+The service **constructs its own storage**. Three consequences, and the third is the one interviewers are listening for:
 
 1. Swapping the `List` for Postgres means editing `ApplicationService`.
 2. Every `ApplicationService` gets its own private list — you can't share storage.
@@ -58,15 +54,15 @@ import java.util.Optional;
 
 public interface ApplicationRepository {
 
-    Application save(Application application);
+  Application save(Application application);
 
-    List<Application> findAll();
+  List<Application> findAll();
 
-    Optional<Application> findById(Long id);
+  Optional<Application> findById(Long id);
 
-    List<Application> findByStatus(Status status);
+  List<Application> findByStatus(Status status);
 
-    boolean deleteById(Long id);
+  boolean deleteById(Long id);
 }
 ```
 
@@ -90,20 +86,20 @@ import java.util.Map;
 
 public class InMemoryApplicationRepository implements ApplicationRepository {
 
-    private final Map<Long, Application> storage = new HashMap<>();
-    private long nextId = 1;
+  private final Map<Long, Application> storage = new HashMap<>();
+  private long nextId = 1;
 
-    @Override
-    public Application save(Application application) {
-        if (application.getId() == null) {
-            application.setId(nextId);
-            nextId++;
-        }
-        storage.put(application.getId(), application);
-        return application;
+  @Override
+  public Application save(Application application) {
+    if (application.getId() == null) {
+      application.setId(nextId);
+      nextId++;
     }
+    storage.put(application.getId(), application);
+    return application;
+  }
 
-    // ... the rest is yours to finish
+  // ... the rest is yours to finish
 }
 ```
 
@@ -118,8 +114,8 @@ Now write the rest:
 - [x] **Finish the class yourself** — `findAll`, `findById`, `findByStatus`, `deleteById`
 
 - `findAll` returns `new ArrayList<>(storage.values())`
-- `findById` uses `Optional.ofNullable(storage.get(id))`, 
-- `findByStatus` is a stream `.filter(...).toList()` 
+- `findById` uses `Optional.ofNullable(storage.get(id))`,
+- `findByStatus` is a stream `.filter(...).toList()`
 - `deleteById` returns whether `storage.remove(id)` gave back a non-null value.
 
 ---
@@ -137,11 +133,11 @@ import com.connorjensen.jobtracker.repository.ApplicationRepository;
 
 public class ApplicationService {
 
-    private final ApplicationRepository repository;
+  private final ApplicationRepository repository;
 
-    public ApplicationService(ApplicationRepository repository) {
-        this.repository = repository;
-    }
+  public ApplicationService(ApplicationRepository repository) {
+    this.repository = repository;
+  }
 }
 ```
 
@@ -162,10 +158,10 @@ Someone still has to decide which implementation gets used. In a framework-free 
 
 ```java
 public static void main(String[] args) {
-    ApplicationRepository repository = new InMemoryApplicationRepository();
-    ApplicationService service = new ApplicationService(repository);
+  ApplicationRepository repository = new InMemoryApplicationRepository();
+  ApplicationService service = new ApplicationService(repository);
 
-    // ... use the service
+  // ... use the service
 }
 ```
 
@@ -183,8 +179,8 @@ Here's the concrete payoff, and it's the answer to "what does DI buy you." Becau
 
 ```java
 class AlwaysEmptyRepository implements ApplicationRepository {
-    @Override public Optional<Application> findById(Long id) { return Optional.empty(); }
-    // ... other methods
+  @Override public Optional<Application> findById(Long id) { return Optional.empty(); }
+  // ... other methods
 }
 
 // in a test:
@@ -228,5 +224,4 @@ The core object graph is complete. Lesson 4 adds the control-flow and recovery b
 
 ---
 
-**Previous:** [Lesson 2 — Packages, Enums, Collections, Optional](02-types-enums-collections.md) ·
-**Version history:** [NOTES.md](NOTES.md)
+**Previous:** [Lesson 2 — Packages, Enums, Collections, Optional](02-types-enums-collections.md) · **Version history:** [NOTES.md](NOTES.md)

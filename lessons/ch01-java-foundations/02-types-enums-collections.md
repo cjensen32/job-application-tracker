@@ -1,8 +1,6 @@
 # Lesson 2 — Packages, Enums, Collections, and Optional
 
-**Goal:** Give the project a real package structure, replace stringly-typed status with an `enum`, and
-hold many applications in a collection you can query.
-**You'll be able to answer:** *"What problem does `Optional` solve, and when is it the wrong tool?"*
+**Goal:** Give the project a real package structure, replace stringly-typed status with an `enum`, and hold many applications in a collection you can query. **You'll be able to answer:** *"What problem does `Optional` solve, and when is it the wrong tool?"*
 
 **Prerequisite:** Lesson 1 (you have `Application`, `ApplicationDto`, `Main`, and a passing test).
 
@@ -69,11 +67,7 @@ The `.class` files followed the **`package` declaration at the top of each file*
 
 And since all three files still *declare* `package com.connorjensen.jobtracker;`, they are still in the same package as far as the compiler is concerned, so `Main` still sees `Application` with no import at all.
 
-> **"But doesn't javac check that the directory matches the package?"** No — and this trips up people
-> who've used Java for years. The directory convention is how the compiler **finds** a class it
-> wasn't handed. Maven globs every `.java` under `src/main/java` and passes the whole list to javac
-> explicitly, so javac never has to go looking, and never consults the directory. (Some IDEs and
-> linters flag the mismatch. `javac` itself does not.)
+> **"But doesn't javac check that the directory matches the package?"** No — and this trips up people who've used Java for years. The directory convention is how the compiler **finds** a class it wasn't handed. Maven globs every `.java` under `src/main/java` and passes the whole list to javac explicitly, so javac never has to go looking, and never consults the directory. (Some IDEs and linters flag the mismatch. `javac` itself does not.)
 >
 > <details>
 > <summary>Prove it: one command that succeeds before the move and fails after</summary>
@@ -84,16 +78,11 @@ And since all three files still *declare* `package com.connorjensen.jobtracker;`
 > javac -sourcepath src/main/java -d /tmp/out src/main/java/com/connorjensen/jobtracker/Main.java
 > ```
 >
-> **Before the move:** succeeds silently. javac needs `Application`, resolves the name
-> `com.connorjensen.jobtracker.Application` to the path `com/connorjensen/jobtracker/Application.java`
-> under the sourcepath, finds it, compiles it too.
+> **Before the move:** succeeds silently. javac needs `Application`, resolves the name `com.connorjensen.jobtracker.Application` to the path `com/connorjensen/jobtracker/Application.java` under the sourcepath, finds it, compiles it too.
 >
-> **After the move:** `error: cannot find symbol — class Application`. Same command, same package
-> declarations, same code. The only thing that changed is the folder, and the lookup now misses
-> because there's no `Application.java` at that path any more.
+> **After the move:** `error: cannot find symbol — class Application`. Same command, same package declarations, same code. The only thing that changed is the folder, and the lookup now misses because there's no `Application.java` at that path any more.
 >
-> So the directory matters for **finding**, and not for **validating**. Maven skips the finding step,
-> which is why `mvn compile` still passes and this command doesn't.
+> So the directory matters for **finding**, and not for **validating**. Maven skips the finding step, which is why `mvn compile` still passes and this command doesn't.
 > </details>
 
 ### Checkpoint 2 — changing the `package` line is what breaks it
@@ -165,8 +154,7 @@ mkdir -p src/test/java/com/connorjensen/jobtracker/model
 git mv src/test/java/com/connorjensen/jobtracker/ApplicationTest.java src/test/java/com/connorjensen/jobtracker/model/
 ```
 
-- [x] ...then set its package to `com.connorjensen.jobtracker.model` and import `ApplicationDto` from
-  `...jobtracker.dto`. (It needs no import for `Application` — same package now.)
+- [x] ...then set its package to `com.connorjensen.jobtracker.model` and import `ApplicationDto` from `...jobtracker.dto`. (It needs no import for `Application` — same package now.)
 - [x] Run the tests once more
 
 ```bash
@@ -175,9 +163,7 @@ mvn test
 
 Green again. The lesson here isn't the file shuffling — it's that **`package` and `import` are the only visibility mechanism Java has between files.** There's no `from . import *`, no implicit sibling access. A class in `model` cannot see a class in `service` unless it imports it, and that one-way import direction is how you'll keep the layers from tangling.
 
-> **Why `model` doesn't import `service`:** dependencies point *inward*. Controllers know about
-> services, services know about repositories, repositories know about models. Nothing points back
-> up. If you ever find yourself wanting `model` to import `service`, the design has gone wrong.
+> **Why `model` doesn't import `service`:** dependencies point *inward*. Controllers know about services, services know about repositories, repositories know about models. Nothing points back up. If you ever find yourself wanting `model` to import `service`, the design has gone wrong.
 
 ---
 
@@ -193,11 +179,11 @@ Java's `enum` <sup>[J5](NOTES.md#enums)</sup> is a real class with a fixed set o
 package com.connorjensen.jobtracker.model;
 
 public enum Status {
-    APPLIED,
-    PHONE_SCREEN,
-    INTERVIEWING,
-    OFFER,
-    REJECTED
+  APPLIED,
+  PHONE_SCREEN,
+  INTERVIEWING,
+  OFFER,
+  REJECTED
 }
 ```
 
@@ -215,20 +201,20 @@ Now wire it into `Application`.
 ```java
     private Status status;
 
-    public Application(String company, String role, LocalDate appliedDate) {
-        this.company = company;
-        this.role = role;
-        this.appliedDate = appliedDate;
-        this.status = Status.APPLIED;   // a new application is always APPLIED
-    }
+public Application(String company, String role, LocalDate appliedDate) {
+  this.company = company;
+  this.role = role;
+  this.appliedDate = appliedDate;
+  this.status = Status.APPLIED;   // a new application is always APPLIED
+}
 
-    public Status getStatus() {
-        return status;
-    }
+public Status getStatus() {
+  return status;
+}
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
+public void setStatus(Status status) {
+  this.status = status;
+}
 ```
 
 That default in the constructor is a **business rule enforced by the type system**. It is not possible to construct an `Application` with no status. Compare to a Python dict, where`app["status"]` might just... not be there.
@@ -292,12 +278,8 @@ lets the compiler reject `applications.add("oops")` before the program ever runs
 
 Two things to notice:
 
-- **`List` on the left, `ArrayList` on the right.** `List` is an *interface* (the contract: add,
-  get, size); `ArrayList` is one *implementation* (backed by an array). Declaring the variable as the
-  interface means you could swap in `LinkedList` later without touching any other line. This is a
-  small preview of Lesson 3, and it's idiomatic Java — always declare the interface type.
-- **`new ArrayList<>()`** — the empty `<>` is the "diamond" <sup>[J7](NOTES.md#the-diamond-operator)</sup>. The compiler already knows the type from
-  the left side, so you don't repeat it.
+- **`List` on the left, `ArrayList` on the right.** `List` is an *interface* (the contract: add, get, size); `ArrayList` is one *implementation* (backed by an array). Declaring the variable as the interface means you could swap in `LinkedList` later without touching any other line. This is a small preview of Lesson 3, and it's idiomatic Java — always declare the interface type.
+- **`new ArrayList<>()`** — the empty `<>` is the "diamond" <sup>[J7](NOTES.md#the-diamond-operator)</sup>. The compiler already knows the type from the left side, so you don't repeat it.
 
 The other collection you need is `Map<K, V>` — a dictionary:
 
@@ -369,8 +351,8 @@ You could filter with a `for` loop and an `if`. Java's idiomatic answer is a **s
 
 ```java
 List<Application> interviewing = applications.stream()
-        .filter(app -> app.getStatus() == Status.INTERVIEWING)
-        .toList();
+    .filter(app -> app.getStatus() == Status.INTERVIEWING)
+    .toList();
 ```
 
 That's JS `.filter()` with different punctuation. `app -> ...` is a **lambda** — an anonymous function. `.stream()` opens a pipeline, `.filter()` describes a step, and `.toList()` **terminates**it and produces a real list.
@@ -382,7 +364,7 @@ The other operations you'll actually use:
 ```java
 .map(Application::getCompany)                 // transform each element
 .sorted(Comparator.comparing(Application::getAppliedDate))
-.count()
+    .count()
 ```
 
 `Application::getCompany` is a **method reference** — shorthand for `app -> app.getCompany()`.
@@ -428,15 +410,14 @@ Delete those three lines once you've seen it.
 
 Here's the problem. You want "find the application with this id." Sometimes there isn't one. In Python you return `None` and hope the caller checks. In Java, returning `null` has the same flaw, and it's the single most common source of production crashes — `NullPointerException`.
 
-`Optional<T>` <sup>[J8](NOTES.md#optional)</sup> is a box that either contains a value or doesn't, and **the type
-signature says so**:
+`Optional<T>` <sup>[J8](NOTES.md#optional)</sup> is a box that either contains a value or doesn't, and **the type signature says so**:
 
 - [x] Try it in `Main`, and handle the empty case at least two of the ways below
 
 ```java
 Optional<Application> found = applications.stream()
-        .filter(app -> app.getCompany().equals("Globex"))
-        .findFirst();
+    .filter(app -> app.getCompany().equals("Globex"))
+    .findFirst();
 ```
 
 `.findFirst()` returns `Optional<Application>` because it genuinely might not find one. Now the caller *cannot* accidentally use the value without confronting the empty case:
@@ -444,10 +425,10 @@ Optional<Application> found = applications.stream()
 ```java
 if (found.isPresent()) {
     System.out.println(found.get().summary());
-}
+    }
 
 // or, better — no branch at all:
-found.ifPresent(app -> System.out.println(app.summary()));
+    found.ifPresent(app -> System.out.println(app.summary()));
 
 // supply a fallback:
 Application app = found.orElse(null);
@@ -465,8 +446,7 @@ Application required = found.orElseThrow(() -> new IllegalArgumentException("No 
 
 `Optional` is for **return types**, where it documents "this may legitimately find nothing" in a way the compiler helps enforce. That's the whole answer.
 
-> Spring Data hands you `Optional<T>` from `findById()` in Chapter 3. The pattern you write by hand
-> in the capstone is byte-for-byte the pattern the framework expects.
+> Spring Data hands you `Optional<T>` from `findById()` in Chapter 3. The pattern you write by hand in the capstone is byte-for-byte the pattern the framework expects.
 
 ### Verify
 
@@ -476,8 +456,8 @@ The interesting case is the *empty* one — a search that finds nothing has to n
 
 ```java
         Optional<Application> missing = applications.stream()
-                .filter(app -> app.getCompany().equals("Nope Inc"))
-                .findFirst();
+    .filter(app -> app.getCompany().equals("Nope Inc"))
+    .findFirst();
         System.out.println("missing: " + missing.map(Application::getCompany).orElse("not found"));
 ```
 
@@ -517,8 +497,7 @@ Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 
 - [x] Answered all seven without opening the answers
 
-1. You `git mv` a class into a new directory and change nothing else. Does `mvn compile` fail? Where
-   does its `.class` file end up, and why?
+1. You `git mv` a class into a new directory and change nothing else. Does `mvn compile` fail? Where does its `.class` file end up, and why?
 2. What two lines of code must change to genuinely move a class to a new package, and where?
 3. Why is `Status.APPLIED == Status.APPLIED` safe when `"APPLIED" == "APPLIED"` is not?
 4. Why `List<Application> x = new ArrayList<>()` instead of `ArrayList<Application> x = ...`?
@@ -547,6 +526,4 @@ You have a package structure, a type-safe `Status`, a collection of applications
 
 ---
 
-**Previous:** [Lesson 1 — Classes, Objects, and Records](01-classes-and-records.md) ·
-**Next:** [Lesson 3 — Interfaces and Dependency Injection](03-interfaces-and-di.md) ·
-**Version history:** [NOTES.md](NOTES.md)
+**Previous:** [Lesson 1 — Classes, Objects, and Records](01-classes-and-records.md) · **Next:** [Lesson 3 — Interfaces and Dependency Injection](03-interfaces-and-di.md) · **Version history:** [NOTES.md](NOTES.md)

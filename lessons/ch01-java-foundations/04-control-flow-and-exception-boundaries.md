@@ -33,8 +33,20 @@ show menu → read valid selection → dispatch one operation → repeat
 A guard clause handles exceptional state early. It keeps the valid path flat:
 
 ```java
-if (selection == 5) {
-  return;
+public class selectionTest {
+  private int selection;
+
+  public SelectionTest(int selection) {
+    this.selection = selection;
+  }
+
+  public static boolean testNumber() {
+    if (this.selection==5) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 }
 ```
 
@@ -60,14 +72,37 @@ If compilation fails here, fix that existing failure before changing the control
 - [ ] Keep the dispatch block concerned only with which operation runs.
 
 ```java
-switch (selection) {
-  case 0 -> createApplication();
-  case 1 -> listApplications();
-  case 2 -> filterApplications();
-  case 3 -> editApplication();
-  case 4 -> deleteApplication();
-  case 5 -> running = false;
-  default -> throw new IllegalStateException("validated selection escaped its boundary");
+public class selectionTest {
+  private int selection;
+
+  public SelectionTest(int selection) {
+    this.selection = selection;
+  }
+
+  public void completeSelection() {
+    switch (selection) {
+      case
+          0 ->
+          createApplication();
+      case
+          1 ->
+          listApplications();
+      case
+          2 ->
+          filterApplications();
+      case
+          3 ->
+          editApplication();
+      case
+          4 ->
+          deleteApplication();
+      case
+          5 ->
+          running = false;
+      default ->
+          throw new IllegalStateException("validated selection escaped its boundary");
+    }
+  }
 }
 ```
 

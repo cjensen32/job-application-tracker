@@ -82,15 +82,15 @@ public record UpdateApplicationRequest(
 Keep the existing constructor and methods, then add the two overloads:
 
 ```java
-public ApplicationService(ApplicationRepository repository)
-public Application create(String company, String role, LocalDate appliedDate)
-public Application create(CreateApplicationRequest request)
-public List<Application> listAll()
-public Optional<Application> findById(Long id)
-public List<Application> listByStatus(Status status)
-public Application updateStatus(Long id, Status status)
-public Application update(Long id, UpdateApplicationRequest request)
-public boolean delete(Long id)
+public ApplicationService(ApplicationRepository repository);
+public Application create(String company, String role, LocalDate appliedDate);
+public Application create(CreateApplicationRequest request);
+public List<Application> listAll();
+public Optional<Application> findById(Long id);
+public List<Application> listByStatus(Status status);
+public Application updateStatus(Long id, Status status);
+public Application update(Long id, UpdateApplicationRequest request);
+public boolean delete(Long id);
 ```
 
 Required behavior:
@@ -108,26 +108,26 @@ Delete `util.ConsoleExperience`, `util.ApplicationTextTable`, and `util.Centerin
 Add these types in `com.connorjensen.jobtracker.cli`:
 
 ```java
-public ConsolePrompter(Scanner scanner, PrintStream output)
+public ConsolePrompter(Scanner scanner, PrintStream output);
 ```
 
 ```java
-public ConsoleView(PrintStream output, TextTable table)
+public ConsoleView(PrintStream output, TextTable table);
 ```
 
 ```java
 public ConsoleApplication(
     ApplicationService service,
     ConsolePrompter prompter,
-    ConsoleView view)
+    ConsoleView view);
 
-public void run()
+public void run();
 ```
 
 ```java
-public TextTable()
+public TextTable();
 
-public String render(List<String> header, List<List<String>> rows)
+public String render(List<String> header, List<List<String>> rows);
 ```
 
 Only those constructors, `ConsoleApplication.run()`, and `TextTable.render(...)` may be declared public in the CLI package. Inherited `Object` methods do not count.
@@ -353,14 +353,14 @@ Chapter 1 is complete only when all three commands succeed and create, list, fil
 
 ## What later chapters replace
 
-| Chapter 1 | Later replacement |
-|-----------|-------------------|
-| Manual object graph in `Main` | Spring application context in Lesson 9 |
-| Console input and view | HTTP controller, binding, and JSON in Lessons 10–11 |
-| Request records | HTTP request DTOs with Bean Validation in Lesson 11 |
-| In-memory repository | Spring Data and Postgres in Lesson 12 |
+| Chapter 1                                 | Later replacement                                        |
+|-------------------------------------------|----------------------------------------------------------|
+| Manual object graph in `Main`             | Spring application context in Lesson 9                   |
+| Console input and view                    | HTTP controller, binding, and JSON in Lessons 10–11      |
+| Request records                           | HTTP request DTOs with Bean Validation in Lesson 11      |
+| In-memory repository                      | Spring Data and Postgres in Lesson 12                    |
 | `IllegalArgumentException` for missing id | `ApplicationNotFoundException` and HTTP 404 in Lesson 15 |
-| Injected stream and subprocess tests | Mockito and Spring test slices in Lessons 16–17 |
+| Injected stream and subprocess tests      | Mockito and Spring test slices in Lessons 16–17          |
 
 ## Interview questions
 

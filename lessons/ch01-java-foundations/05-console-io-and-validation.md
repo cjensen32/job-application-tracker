@@ -49,9 +49,9 @@ If a test still calls `System.setOut`, first check whether output can be passed 
 
 Status examples:
 
-| Input | Normalized |
-|-------|------------|
-| `offer` | `OFFER` |
+| Input          | Normalized     |
+|----------------|----------------|
+| `offer`        | `OFFER`        |
 | `phone screen` | `PHONE_SCREEN` |
 | `phone-screen` | `PHONE_SCREEN` |
 

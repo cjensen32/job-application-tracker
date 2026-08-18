@@ -21,17 +21,17 @@
 - [ ] Move session coordination into `ConsoleApplication`.
 - [ ] Move input, parsing, and local retry loops into `ConsolePrompter`.
 - [ ] Move messages, details, and tables into `ConsoleView`.
-- [ ] Replace stateful `ApplicationTextTable` and `Centering` with pure `TextTable`.
+- [ ] Replace stateful `TextTable` and `Centering` with pure `TextTable`.
 - [ ] Remove the obsolete CLI utility classes only after every caller has moved.
 
 The split follows cohesion:
 
-| Class | Reason to change |
-|-------|------------------|
-| ConsoleApplication | Menu workflow changes |
-| ConsolePrompter | Input and validation policy changes |
-| ConsoleView | User-facing text changes |
-| TextTable | Rendering algorithm changes |
+| Class              | Reason to change                    |
+|--------------------|-------------------------------------|
+| ConsoleApplication | Menu workflow changes               |
+| ConsolePrompter    | Input and validation policy changes |
+| ConsoleView        | User-facing text changes            |
+| TextTable          | Rendering algorithm changes         |
 
 ### Verify
 

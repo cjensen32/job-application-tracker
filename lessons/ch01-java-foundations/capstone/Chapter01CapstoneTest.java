@@ -286,7 +286,7 @@ class Chapter01CapstoneTest {
     @Test
     void oldUtilityCliTypesAreGone() {
       assertAll(
-          () -> assertClassMissing("com.connorjensen.jobtracker.util.ConsoleExperience"),
+          () -> assertClassMissing("com.connorjensen.jobtracker.cli.ConsoleExperience"),
           () -> assertClassMissing("com.connorjensen.jobtracker.util.ApplicationTextTable"),
           () -> assertClassMissing("com.connorjensen.jobtracker.util.Centering"));
     }

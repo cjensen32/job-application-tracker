@@ -92,20 +92,20 @@ Before it, trying one Java expression required a scratch class, an IDE feature, 
 
 ## Quick reference
 
-| Feature | Introduced | Java 8 equivalent |
-|---------|------------|-------------------|
-| records | 16 | explicit final value class |
-| text blocks | 15 | concatenated strings with `\n` |
-| switch expressions | 14 | colon cases, assignment, and `break` |
-| `Stream.toList()` | 16 | `collect(Collectors.toList())` |
-| pattern matching for switch | 21 | `if`/`else` plus casts |
-| JShell | 9 | scratch `main` class or third-party shell |
-| compiler `release` | 9 | `source` plus `target` |
-| Optional, streams, lambdas, `java.time` | 8 | nulls, loops, anonymous classes, legacy date APIs |
-| default interface methods | 8 | abstract base class or breaking interface change |
-| StandardCharsets | 7 | charset names plus checked exception handling |
-| try-with-resources | 7 | `finally` cleanup |
-| enums, generics, annotations, enhanced for, autoboxing | 5 | patterns, raw types, naming/XML, iterators, explicit wrappers |
-| URI | 1.4 | URL or manual string handling |
+| Feature                                                | Introduced | Java 8 equivalent                                             |
+|--------------------------------------------------------|------------|---------------------------------------------------------------|
+| records                                                | 16         | explicit final value class                                    |
+| text blocks                                            | 15         | concatenated strings with `\n`                                |
+| switch expressions                                     | 14         | colon cases, assignment, and `break`                          |
+| `Stream.toList()`                                      | 16         | `collect(Collectors.toList())`                                |
+| pattern matching for switch                            | 21         | `if`/`else` plus casts                                        |
+| JShell                                                 | 9          | scratch `main` class or third-party shell                     |
+| compiler `release`                                     | 9          | `source` plus `target`                                        |
+| Optional, streams, lambdas, `java.time`                | 8          | nulls, loops, anonymous classes, legacy date APIs             |
+| default interface methods                              | 8          | abstract base class or breaking interface change              |
+| StandardCharsets                                       | 7          | charset names plus checked exception handling                 |
+| try-with-resources                                     | 7          | `finally` cleanup                                             |
+| enums, generics, annotations, enhanced for, autoboxing | 5          | patterns, raw types, naming/XML, iterators, explicit wrappers |
+| URI                                                    | 1.4        | URL or manual string handling                                 |
 
 **Chapter:** [Chapter 1 — Java Foundations](README.md) · **Terms:** [GLOSSARY.md](GLOSSARY.md)

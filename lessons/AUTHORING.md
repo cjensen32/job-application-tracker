@@ -2,7 +2,7 @@
 
 *How chapters in this repo get built. **This file is meant to be edited** — when something works badly, change the rule here rather than quietly doing it differently next chapter.*
 
-Last revised: 2026-08-18 (clarified which Java fences are complete files, edit excerpts, API signatures, or standalone demonstrations).
+Last revised: 2026-08-18 (made unwrapped prose a repository-wide Markdown rule and clarified which Java fences are complete files, edit excerpts, API signatures, or standalone demonstrations).
 
 Previously: 2026-08-17 (added concise-bullet and sentence-wrapping rules during the Chapter 1 capstone recalibration).
 
@@ -11,6 +11,15 @@ Previously: 2026-08-14 (added the **Verify** block — every step must end with 
 Previously: 2026-08-14 (added the checkbox convention — see *Checkboxes* below).
 
 Previously: 2026-08-13 (after Chapter 1 — pacing feedback: "about right, can speed up as we progress").
+
+---
+
+## Markdown source formatting
+
+- Apply this rule to every Markdown file in the repository, including project documentation, lesson files, agent context, skills, and notes.
+- Keep each prose paragraph, list item, and blockquote paragraph on one physical source line, regardless of length. Let the renderer handle visual wrapping.
+- Never insert a physical line break in the middle of a sentence.
+- Keep physical line breaks only when they are structurally or semantically intentional, such as a paragraph boundary, heading, new list item, table row, fenced or indented code line, HTML block boundary, or explicit Markdown hard break.
 
 ---
 
@@ -32,8 +41,6 @@ lessons/chNN-slug/
 ## Sub-lessons
 
 - Prefer concise bullets over long prose when a sequence, rule, or comparison can be scanned.
-- Do not insert hard line breaks inside sentences in newly written or materially revised Markdown.
-- Let renderers wrap prose naturally; use one source line per paragraph or list item.
 - One idea per lesson. **Harder topics get split into more sub-lessons, not longer ones.** Security is three; testing is two.
 - Teach the concept with a *small* amount of guided code. The bulk of the typing belongs in the capstone.
 - **Explain before automating.** First appearance of any tool or concept gets a manual pass. Once that's done, scaffolding is fine and wanted.
@@ -63,8 +70,7 @@ Introduce every `java` fence according to what the reader should do with it. Do 
 A Verify block is exactly three things:
 
 1. A checkbox and the command, unindented so it copy-pastes.
-2. The **actual** output, trimmed — verified by running it against a scratchpad copy, never
-   predicted. If the step produces no visible output, the verify is the build state itself.
+2. The **actual** output, trimmed — verified by running it against a scratchpad copy, never predicted. If the step produces no visible output, the verify is the build state itself.
 3. One line naming the most likely failure and what it means.
 
 ```markdown
