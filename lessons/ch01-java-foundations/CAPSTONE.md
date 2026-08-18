@@ -12,7 +12,7 @@
 - [x] `repository.ApplicationRepository`
 - [x] `repository.InMemoryApplicationRepository`
 - [x] `service.ApplicationService`
-- [ ] `Main` — the console loop
+- [~] `Main` — the console loop
 - [ ] Done when: `mvn test` green **and** the app runs
 - [ ] `/code-sensei:quiz` — the chapter's XP gate
 
@@ -140,8 +140,8 @@ Scanner scanner = new Scanner(System.in);
 
 Support at least these commands — one box each:
 
-- [ ] `add` — prompts for company, role, date; creates it
-- [ ] `list` — prints all applications with id, company, role, status
+- [x] `add` — prompts for company, role, date; creates it
+- [x] `list` — prints all applications with id, company, role, status
 - [ ] `list INTERVIEWING` — prints only that status
 - [ ] `status <id> <STATUS>` — updates one application's status
 - [ ] `delete <id>` — removes it

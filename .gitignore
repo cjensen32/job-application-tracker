@@ -16,3 +16,5 @@ target/
 # Local agent state lives under the shared .agents directory
 .agents/settings.local.json
 .agents/worktrees/
+.agents/notes
+***/.DS_Store
