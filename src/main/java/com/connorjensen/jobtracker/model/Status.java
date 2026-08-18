@@ -9,6 +9,11 @@ public enum Status {
 
   private final String label;
 
-  Status(String label) { this.label = label; }
-  public String getLabel() { return label; }
+  Status(String label) {
+    this.label = label;
+  }
+
+  public String getLabel() {
+    return label;
+  }
 }

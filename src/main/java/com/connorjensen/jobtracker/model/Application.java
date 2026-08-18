@@ -2,9 +2,7 @@ package com.connorjensen.jobtracker.model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Application {
   private Long id;
@@ -55,13 +53,17 @@ public class Application {
     this.id = id;
   }
 
-  public void setCompany(String company) { this.company = company; }
+  public void setCompany(String company) {
+    this.company = company;
+  }
 
   public void setRole(String role) {
     this.role = role;
   }
 
-  public void setAppliedDate(LocalDate appliedDate) { this.appliedDate = appliedDate; }
+  public void setAppliedDate(LocalDate appliedDate) {
+    this.appliedDate = appliedDate;
+  }
 
   public void setStatus(Status status) {
     this.status = status;
@@ -82,28 +84,16 @@ public class Application {
 
   public List<String> toValuesList() {
     return new ArrayList<>(
-      List.of(
-        String.valueOf(this.id),
-        this.company,
-        this.role,
-        String.valueOf(this.appliedDate),
-        this.status.getLabel(),
-        this.jobUrl
-      )
-    );
+        List.of(
+            String.valueOf(this.id),
+            this.company,
+            this.role,
+            String.valueOf(this.appliedDate),
+            this.status.getLabel(),
+            this.jobUrl));
   }
 
   public static List<String> toLabelsList() {
-    return new ArrayList<>(
-      List.of(
-        "ID",
-        "Company",
-        "Role",
-        "Applied Date",
-        "Status",
-        "URL"
-      ));
+    return new ArrayList<>(List.of("ID", "Company", "Role", "Applied Date", "Status", "URL"));
   }
-
-
 }

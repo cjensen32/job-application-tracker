@@ -1,15 +1,17 @@
-package com.connorjensen.jobtracker.util;
+package com.connorjensen.jobtracker.cli;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ApplicationTextTable {
+import com.connorjensen.jobtracker.util.Centering;
 
-  private final List<String> headerList;
-  private final List<List<String>> bodyRowsList;
-  private final List<Integer> columnWidthsList;
+public class TextTable {
 
-  public ApplicationTextTable(List<String> headerList, List<List<String>> bodyRowsList) {
+  private List<String> headerList;
+  private List<List<String>> bodyRowsList;
+  private List<Integer> columnWidthsList;
+
+  public TextTable(List<String> headerList, List<List<String>> bodyRowsList) {
     this.headerList = headerList;
     this.bodyRowsList = bodyRowsList;
     this.columnWidthsList = new ArrayList<>();
@@ -17,8 +19,12 @@ public class ApplicationTextTable {
     setColumnWidths();
   }
 
+  public TextTable() {}
+
   public void toTable() {
-    if (this.columnWidthsList.isEmpty()) { return; }
+    if (this.columnWidthsList.isEmpty()) {
+      return;
+    }
     int columnCount = this.headerList.size();
 
     // Print top border
@@ -28,8 +34,7 @@ public class ApplicationTextTable {
     System.out.print("|");
     for (int i = 0; i < columnCount; i++) {
       String header = this.headerList.get(i);
-      System.out.print(
-        Centering.center(header, this.columnWidthsList.get(i) + 2) + "|");
+      System.out.print(Centering.center(header, this.columnWidthsList.get(i) + 2) + "|");
     }
     System.out.println();
 
@@ -51,6 +56,10 @@ public class ApplicationTextTable {
       System.out.println();
     }
     printBorderLine();
+  }
+
+  public String render(List<String> header, List<List<String>> rows) {
+    return "";
   }
 
   public void setColumnWidths() {
@@ -112,9 +121,9 @@ public class ApplicationTextTable {
       // headerList is bigger than the bodyList
       maxSize = this.headerList.size();
       for (List<String> bodyRowList : this.bodyRowsList) {
-       while (bodyRowList.size() < maxSize) {
-         bodyRowList.add("");
-       }
+        while (bodyRowList.size() < maxSize) {
+          bodyRowList.add("");
+        }
       }
     } else {
       // headerList is smaller than the BodyList
