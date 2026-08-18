@@ -2,7 +2,9 @@
 
 *How chapters in this repo get built. **This file is meant to be edited** — when something works badly, change the rule here rather than quietly doing it differently next chapter.*
 
-Last revised: 2026-08-14 (added the **Verify** block — every step must end with a command that proves it landed. Prompted by Lesson 2 Step 3, where the step's only compile instruction was buried in a prose aside and the reader finished the step with a red build and no way to know).
+Last revised: 2026-08-17 (added concise-bullet and sentence-wrapping rules during the Chapter 1 capstone recalibration).
+
+Previously: 2026-08-14 (added the **Verify** block — every step must end with a command that proves it landed. Prompted by Lesson 2 Step 3, where the step's only compile instruction was buried in a prose aside and the reader finished the step with a red build and no way to know).
 
 Previously: 2026-08-14 (added the checkbox convention — see *Checkboxes* below).
 
@@ -27,6 +29,9 @@ lessons/chNN-slug/
 
 ## Sub-lessons
 
+- Prefer concise bullets over long prose when a sequence, rule, or comparison can be scanned.
+- Do not insert hard line breaks inside sentences in newly written or materially revised Markdown.
+- Let renderers wrap prose naturally; use one source line per paragraph or list item.
 - One idea per lesson. **Harder topics get split into more sub-lessons, not longer ones.** Security is three; testing is two.
 - Teach the concept with a *small* amount of guided code. The bulk of the typing belongs in the capstone.
 - **Explain before automating.** First appearance of any tool or concept gets a manual pass. Once that's done, scaffolding is fine and wanted.

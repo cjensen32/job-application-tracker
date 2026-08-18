@@ -13,6 +13,7 @@
 <properties>
   <maven.compiler.release>21</maven.compiler.release>
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <checkstyle.version>13.9.0</checkstyle.version>
 </properties>
 
 <dependencies>
@@ -28,8 +29,46 @@
   <plugins>
     <plugin>
       <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>3.13.0</version>
+      <configuration>
+        <showWarnings>true</showWarnings>
+        <compilerArgs>
+          <arg>-Xlint:all</arg>
+        </compilerArgs>
+      </configuration>
+    </plugin>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-surefire-plugin</artifactId>
       <version>3.5.2</version>
+    </plugin>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-checkstyle-plugin</artifactId>
+      <version>3.6.0</version>
+      <configuration>
+        <configLocation>config/checkstyle/checkstyle.xml</configLocation>
+        <consoleOutput>true</consoleOutput>
+        <failOnViolation>true</failOnViolation>
+        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+      </configuration>
+      <dependencies>
+        <dependency>
+          <groupId>com.puppycrawl.tools</groupId>
+          <artifactId>checkstyle</artifactId>
+          <version>${checkstyle.version}</version>
+        </dependency>
+      </dependencies>
+      <executions>
+        <execution>
+          <id>validate-style</id>
+          <phase>validate</phase>
+          <goals>
+            <goal>check</goal>
+          </goals>
+        </execution>
+      </executions>
     </plugin>
     <plugin>
       <groupId>org.jacoco</groupId>
@@ -66,8 +105,10 @@
               <rule>
                 <element>CLASS</element>
                 <includes>
-                  <include>com.connorjensen.jobtracker.util.ConsoleExperience</include>
-                  <include>com.connorjensen.jobtracker.util.ApplicationTextTable</include>
+                  <include>com.connorjensen.jobtracker.cli.ConsoleApplication</include>
+                  <include>com.connorjensen.jobtracker.cli.ConsolePrompter</include>
+                  <include>com.connorjensen.jobtracker.cli.ConsoleView</include>
+                  <include>com.connorjensen.jobtracker.cli.TextTable</include>
                 </includes>
                 <limits>
                   <limit>
