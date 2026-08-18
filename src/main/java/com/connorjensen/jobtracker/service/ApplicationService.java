@@ -17,16 +17,15 @@ public class ApplicationService {
     }
 
     public Application create(String company, String role, LocalDate appliedDate) {
-        Application newApplication = repository.save(new Application(company, role, appliedDate));
-        return newApplication;
+        return repository.save(new Application(company, role, appliedDate));
     }
 
     public List<Application> listAll() {
-        return repository.findAll(); 
+        return repository.findAll();
     }
 
     public Optional<Application> findById(Long id) {
-        return repository.findById(id); 
+        return repository.findById(id);
     }
 
     public List<Application> listByStatus(Status status) {
@@ -35,16 +34,18 @@ public class ApplicationService {
 
     public Application updateStatus(Long id, Status status) {
         Application app = repository.findById(id)
-            .orElseThrow(() -> (
+                .orElseThrow(() -> (
                         new IllegalArgumentException("No Application found with ID: " + id)
-                        ));
+                ));
 
         app.setStatus(status);
         return repository.save(app);
     }
-
     public boolean delete(Long id) {
         return repository.deleteById(id);
     }
 
+    public List<String> getLabels() {
+      return Application.toLabelsList();
+    };
 }
