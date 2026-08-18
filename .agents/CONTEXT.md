@@ -12,6 +12,27 @@ No Spring Boot yet: it arrives in Chapter 2 of the learning plan. Do not add Spr
 
 Leave `maven-surefire-plugin` pinned in `pom.xml`. Maven's default 2.12.4 binding silently skips JUnit 5 tests, so unpinning makes the suite "pass" by running nothing.
 
+## Commit messages
+
+Subject line: `C### GROUP(scope): summary`. `.githooks/prepare-commit-msg` prepends the counter.
+
+Groups separate authorship:
+
+- `COURSE(scope)` - agent-written course material. Author is `Course Author <noreply@teacher.ai>`.
+- `TRACKER(scope)` - the learner's Java under `src/`. Author is the learner.
+- `PROGRESS(scope)` - the learner's edits to lesson markdown, such as ticking checkboxes off.
+- `STYLE(scope)` - formatting only, no behavior change.
+- `FIX(scope)` - the learner correcting their own earlier Java.
+
+The body uses labelled sections in this order, omitting any that do not apply:
+
+- `DESCRIPTION:` - one or two sentences on what the commit is for.
+- `FILES:` - one bullet per file, written as `- path: what it is`.
+- `NOTES(subject):` - explanatory content that is not a file summary. Repeatable with different subjects.
+- `VERIFY(command):` - numbered steps and the real fenced output of that command.
+
+Never wrap a sentence or a bullet across lines. Keep every full statement on one line, at most 120 characters.
+
 ## Sources of truth
 
 - `PROJECT.md` defines the target domain model, stack, milestones, and v1.
