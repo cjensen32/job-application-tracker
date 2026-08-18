@@ -34,13 +34,30 @@ This record explains why each change belongs in the Chapter 1 expansion and poin
 | Add create/update request records and service overloads | A named immutable operation input avoids six positional parameters while compatibility methods remain useful and stable. | [Request record contract](CAPSTONE.md#request-records), [service contract](CAPSTONE.md#applicationservice) |
 | Define complete create/list/filter/edit/delete behavior | Chapter 1 now owns the complete plain-Java CRUD experience before HTTP and Spring replace the boundary. | [Menu behavior](CAPSTONE.md#menu-behavior), [later replacements](CAPSTONE.md#what-later-chapters-replace) |
 | Make table rendering pure and rectangular | Returning text makes exact tests independent of global output; null, whitespace, and ragged rows expose real boundary mistakes. | [TextTable contract](CAPSTONE.md#pure-texttable-contract), [Lesson 7 edge cases](07-testing-console-applications.md#step-2--test-tables-and-full-sessions-at-the-right-boundaries) |
+| Replace old CLI tests with the synchronized capstone grader | Tests for deleted utilities would freeze the obsolete design; the new grader tests the published architecture and behavior instead. | [Executable acceptance checklist](CAPSTONE.md#executable-acceptance-checklist), both `Chapter01CapstoneTest.java` copies |
+| Structure the grader as a future test-writing reference | Nested behavior groups, outcome names, visible arrange/act/assert spacing, explicit fixtures, exact small-boundary assertions, and bounded subprocesses model the later chapter's standards. | [Test-writing conventions](../testing-standards/README.md), [Lesson 7](07-testing-console-applications.md) |
 | Add Checkstyle 13.9.0 through Maven Checkstyle Plugin 3.6.0 | A pinned validate-phase check makes source rules deterministic for production and test code on Java 21. | [`pom.xml`](../../pom.xml), [`checkstyle.xml`](../../config/checkstyle/checkstyle.xml), [Checkstyle](https://checkstyle.org/) |
 | Add compiler lint warnings and retarget JaCoCo | Warnings create review evidence, and coverage must follow the new CLI class names rather than deleted utilities. | [`pom.xml`](../../pom.xml), [quality standards](08-java-quality-standards.md) |
 | Preserve learner-owned production code | The assignment must remain the learner's implementation work; infrastructure can intentionally make the checkout red until the contract is implemented. | [Project agent context](../../.agents/CONTEXT.md), [capstone constraints](CAPSTONE.md#constraints) |
 
+## Test-file structure decisions
+
+The capstone grader is deliberately organized as a reference rather than a one-off test dump:
+
+- `ExistingContractTests` protects the already learned model and repository behavior.
+- `ServiceTests` isolates request records, overloads, update behavior, and repository injection.
+- `ArchitectureTests` checks only documented public API and obsolete type removal.
+- `TextTableTests` treats pure returned text as an exact contract and checks caller immutability.
+- `ConsoleReadTests` and `ConsoleWriteTests` separate query and mutation workflows.
+- `ConsoleValidationTests` owns retries, quit, EOF, and real process startup.
+- Helpers are mechanical fixtures below the behavior groups and do not hide scenario values.
+- Ordinary session tests inject streams; only the real `Main` test starts a subprocess.
+
+Chapter 4 can cite this structure while adding parameterized tests, Mockito, integration test design, and Spring test slices.
+
 ## Suggested commit grouping
 
-These are review boundaries, not commits created by this change record. Commit messages follow the repository's existing `AREA(scope) - description` language and stay ordered by importance: groundwork, additional work, then minor synchronization.
+These are the review boundaries used for this recalibration. Commit messages follow the repository's existing `AREA(scope) - description` language and stay ordered by importance: groundwork, additional work, then minor synchronization.
 
 ### Groundwork
 
@@ -61,3 +78,29 @@ Include Lessons 7–8, `LEARNING.md`, `NOTES.md`, and the applicable rationale f
 #### 4. `CAPSTONE(ch 1) - recalibrate architecture and behavior contract`
 
 Include `CAPSTONE.md`, the chapter `README.md`, the narrow cross-reference updates in Lessons 1 and 3, `.agents/CONTEXT.md`, and the applicable rationale from this record. These six files define the exact target architecture and behavior, connect earlier lessons to the expanded sequence, preserve learner ownership, and synchronize repository guidance.
+
+### Minor and supporting work
+
+#### 5. `LESSONS(capstone) - replace legacy cli tests with synchronized grader`
+
+Include both identical capstone grader copies, the formatted `ApplicationTest`, deletion of `TextTableTest` and `ConsoleExperienceTest`, and the applicable rationale from this record. These six paths replace tests tied to obsolete utility classes with executable evidence for the published contract and preserve the final verification record.
+
+Keeping these groups separate lets a reviewer evaluate enforcement, pedagogy, contract, tests, and repository synchronization independently while still understanding why they form one recalibration.
+
+## Verification record
+
+The grader and build rules were validated in a temporary reference copy, then the entire temporary implementation was deleted.
+
+- `mvn clean verify`: success.
+- Checkstyle: zero violations.
+- JUnit: 40 tests, zero failures, zero errors, zero skipped; 38 capstone tests plus 2 existing application tests.
+- JaCoCo: report generated and non-blocking CLI method check met.
+- `mvn compile`: success.
+- `java -cp target/classes com.connorjensen.jobtracker.Main < /dev/null`: clean menu and `Goodbye.` output with exit code zero.
+- Temporary reference path: removed after validation and not recoverable from the working tree.
+
+The live learner checkout intentionally remains red because production was not implemented here:
+
+- Validate-phase Checkstyle currently reports 78 violations in the pre-refactor production sources.
+- `mvn -Dcheckstyle.skip test` currently reports 38 compilation errors for the six documented missing target types: four `cli` classes and two request records.
+- `git diff -- src/main/java` remains empty; no learner-owned production source was changed.
