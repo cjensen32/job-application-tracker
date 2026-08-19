@@ -11,5 +11,5 @@ public class ConsoleView {
     this.textTable = textTable;
   }
 
-
+  public static void menu() {}
 }

@@ -94,7 +94,7 @@ public class ConsoleApplication {
 }
 ```
 
-- [ ] Replace `src/main/java/com/connorjensen/jobtracker/Main.java` with the composition-root shape below. 
+- [x] Replace `src/main/java/com/connorjensen/jobtracker/Main.java` with the composition-root shape below. 
 
 ```java
 package com.connorjensen.jobtracker;

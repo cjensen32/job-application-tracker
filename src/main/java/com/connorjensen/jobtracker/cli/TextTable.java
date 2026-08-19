@@ -7,73 +7,65 @@ import com.connorjensen.jobtracker.util.Centering;
 
 public class TextTable {
 
-  private List<String> headerList;
-  private List<List<String>> bodyRowsList;
-  private List<Integer> columnWidthsList;
-
-  public TextTable(List<String> headerList, List<List<String>> bodyRowsList) {
-    this.headerList = headerList;
-    this.bodyRowsList = bodyRowsList;
-    this.columnWidthsList = new ArrayList<>();
-    standardizeInputValues();
-    setColumnWidths();
-  }
-
   public TextTable() {}
 
-  public void toTable() {
-    if (this.columnWidthsList.isEmpty()) {
-      return;
-    }
-    int columnCount = this.headerList.size();
+  public String render(List<String> headerList, List<List<String>> bodyRowsList) {
+    standardizeValues(headerList, bodyRowsList); // Fixes malformed data
+    List<Integer> columnWidthsList = getColumnWidths(headerList, bodyRowsList);
+    int columnCount = headerList.size();
+    StringBuilder tableBuilder = new StringBuilder();
 
     // Print top border
-    printBorderLine();
+    tableBuilder.append(buildBorder(columnWidthsList));
 
     // Print header row
-    System.out.print("|");
+    tableBuilder.append("|");
     for (int i = 0; i < columnCount; i++) {
-      String header = this.headerList.get(i);
-      System.out.print(Centering.center(header, this.columnWidthsList.get(i) + 2) + "|");
+      String header = headerList.get(i);
+      tableBuilder.append(Centering.center(header, columnWidthsList.get(i) + 2));
+      tableBuilder.append("|");
     }
-    System.out.println();
+    tableBuilder.append("\n");
 
     // print bottom border and return if bodyRowsList is empty
-    printBorderLine();
-    if (this.bodyRowsList.isEmpty()) {
-      return;
+    tableBuilder.append(buildBorder(columnWidthsList));
+    if (bodyRowsList.isEmpty()) {
+      return tableBuilder.toString();
     }
 
     // print body if bodyRowsList has entries/content
-    for (List<String> strings : this.bodyRowsList) {
-      System.out.print("|");
+    for (List<String> strings : bodyRowsList) {
+      tableBuilder.append("|");
 
       for (int k = 0; k < strings.size(); k++) {
         String cellValue = strings.get(k);
-        String centeredValue = Centering.center(cellValue, this.columnWidthsList.get(k) + 2);
-        System.out.print(centeredValue + "|");
+        String centeredValue = Centering.center(cellValue, columnWidthsList.get(k) + 2);
+        tableBuilder.append(centeredValue).append("|");
       }
-      System.out.println();
+      tableBuilder.append("\n");
     }
-    printBorderLine();
+    tableBuilder.append(buildBorder(columnWidthsList));
+
+    return tableBuilder.toString();
   }
 
-  public void setColumnWidths() {
+  public List<Integer> getColumnWidths(List<String> headerList, List<List<String>> bodyRowsList) {
     // Put all initial column widths in List
-    for (int i = 0; i < this.headerList.size(); i++) {
-      this.columnWidthsList.add(0);
-      String value = this.headerList.get(i);
+    List<Integer> columnWidthsList = new ArrayList<>();
+    for (int i = 0; i < headerList.size(); i++) {
+      columnWidthsList.add(0);
+      String value = headerList.get(i);
       int valueLength;
       if (value == null) {
         valueLength = 0;
       } else {
         valueLength = value.length();
       }
-      this.columnWidthsList.set(i, valueLength);
+      columnWidthsList.set(i, valueLength);
     }
 
     // Try to find bigger widths
-    for (List<String> rowList : this.bodyRowsList) {
+    for (List<String> rowList : bodyRowsList) {
       for (int i = 0; i < rowList.size(); i++) {
         String value = rowList.get(i);
         int currentLength;
@@ -82,50 +74,54 @@ public class TextTable {
         } else {
           currentLength = value.length();
         }
-        if (currentLength > this.columnWidthsList.get(i)) {
-          this.columnWidthsList.set(i, currentLength);
+        if (currentLength > columnWidthsList.get(i)) {
+          columnWidthsList.set(i, currentLength);
         }
       }
     }
+    return columnWidthsList;
   }
 
-  private void printBorderLine() {
-    int columnWidth;
-    for (Integer integer : this.columnWidthsList) {
-      columnWidth = integer;
-      System.out.print("+" + "-".repeat(columnWidth + 2));
+  public String buildBorder(List<Integer> columnWidthsList) {
+    StringBuilder borderBuilder = new StringBuilder();
+    int width;
+
+    for (Integer currWidth : columnWidthsList) {
+      width = currWidth;
+      borderBuilder.append("+").repeat("-", width + 2);
     }
-    System.out.print("+\n");
+    borderBuilder.append("+\n");
+
+    return borderBuilder.toString();
   }
 
-  private void standardizeInputValues() {
+  private void standardizeValues(List<String> headerList, List<List<String>> bodyRowsList) {
     // Get max list length for rows
     int maxRowLength = 0;
-    for (List<String> bodyRow : this.bodyRowsList) {
+    for (List<String> bodyRow : bodyRowsList) {
       if (bodyRow.size() > maxRowLength) {
         maxRowLength = bodyRow.size();
       }
     }
-
-    // Don't care if lists are same size
-    if (this.headerList.size() == maxRowLength) {
+    // return early if lists are same size
+    if (headerList.size() == maxRowLength) {
       return;
     }
 
     int maxSize = 0;
-    if (this.headerList.size() > maxRowLength) {
-      // headerList is bigger than the bodyList
-      maxSize = this.headerList.size();
-      for (List<String> bodyRowList : this.bodyRowsList) {
+    if (headerList.size() > maxRowLength) {
+      // case: headerList is bigger than the bodyList
+      maxSize = headerList.size();
+      for (List<String> bodyRowList : bodyRowsList) {
         while (bodyRowList.size() < maxSize) {
           bodyRowList.add("");
         }
       }
     } else {
-      // headerList is smaller than the BodyList
+      // case: headerList is smaller than the BodyList
       maxSize = maxRowLength;
-      while (this.headerList.size() < maxSize) {
-        this.headerList.add("");
+      while (headerList.size() < maxSize) {
+        headerList.add("");
       }
     }
   }
