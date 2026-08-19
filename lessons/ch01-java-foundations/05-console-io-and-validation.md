@@ -17,7 +17,7 @@
 
 Start from the completed Lesson 4 state. These shells establish the files and dependency fields Lesson 5 assumes before validation behavior is added; the unfinished `render` method is deliberately visible instead of pretending the table refactor is complete.
 
-- [ ] Create `src/main/java/com/connorjensen/jobtracker/cli/ConsolePrompter.java` with its injected input and output dependencies.
+- [x] Create `src/main/java/com/connorjensen/jobtracker/cli/ConsolePrompter.java` with its injected input and output dependencies.
 
 ```java
 package com.connorjensen.jobtracker.cli;
@@ -36,7 +36,7 @@ public class ConsolePrompter {
 }
 ```
 
-- [ ] Create `src/main/java/com/connorjensen/jobtracker/cli/ConsoleView.java` with its injected output and table dependencies.
+- [x] Create `src/main/java/com/connorjensen/jobtracker/cli/ConsoleView.java` with its injected output and table dependencies.
 
 ```java
 package com.connorjensen.jobtracker.cli;
@@ -54,7 +54,7 @@ public class ConsoleView {
 }
 ```
 
-- [ ] Replace `src/main/java/com/connorjensen/jobtracker/cli/TextTable.java` with the pure table's starting shell.
+- [x] Replace `src/main/java/com/connorjensen/jobtracker/cli/TextTable.java` with the pure table's starting shell.
 
 ```java
 package com.connorjensen.jobtracker.cli;
@@ -71,13 +71,76 @@ public class TextTable {
 }
 ```
 
-- [ ] Update the table call sites in `listApplications(...)` and `filterApplications(...)` inside `src/main/java/com/connorjensen/jobtracker/Main.java` to use the new constructor and method shape. `Main` remains the temporary output owner until Lesson 6 moves that responsibility into `ConsoleView`.
+- [ ] Create `src/main/java/com/connorjensen/jobtracker/cli/ConsoleApplication.java` with the dependencies needed to coordinate the session. `run()` stays empty here because its workflow is part of the assignment.
 
 ```java
-// new TextTable(headerList, bodyRowsList) + toTable() -> render(headerList, bodyRowsList)
-TextTable textTable = new TextTable();
-System.out.print(textTable.render(headerList, bodyRowsList));
+package com.connorjensen.jobtracker.cli;
+
+import com.connorjensen.jobtracker.service.ApplicationService;
+
+public class ConsoleApplication {
+  private final ApplicationService service;
+  private final ConsolePrompter prompter;
+  private final ConsoleView view;
+
+  public ConsoleApplication(
+      ApplicationService service, ConsolePrompter prompter, ConsoleView view) {
+    this.service = service;
+    this.prompter = prompter;
+    this.view = view;
+  }
+
+  public void run() {}
+}
 ```
+
+- [ ] Replace `src/main/java/com/connorjensen/jobtracker/Main.java` with the composition-root shape below. 
+
+```java
+package com.connorjensen.jobtracker;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
+
+import com.connorjensen.jobtracker.cli.ConsoleApplication;
+import com.connorjensen.jobtracker.cli.ConsolePrompter;
+import com.connorjensen.jobtracker.cli.ConsoleView;
+import com.connorjensen.jobtracker.cli.TextTable;
+import com.connorjensen.jobtracker.repository.ApplicationRepository;
+import com.connorjensen.jobtracker.repository.InMemoryApplicationRepository;
+import com.connorjensen.jobtracker.service.ApplicationService;
+
+public final class Main {
+  private Main() {}
+
+  public static void main(String[] args) {
+    ApplicationRepository repository = new InMemoryApplicationRepository();
+    ApplicationService service = new ApplicationService(repository);
+    Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
+    TextTable table = new TextTable();
+    ConsoleView view = new ConsoleView(System.out, table);
+    ConsolePrompter prompter = new ConsolePrompter(scanner, System.out);
+    ConsoleApplication application = new ConsoleApplication(service, prompter, view);
+
+    // run(scanner, service) -> ConsoleApplication.run()
+    application.run();
+  }
+}
+```
+
+`Main` does not call prompt or view methods directly. It constructs the object graph, hands the collaborators to `ConsoleApplication`, and starts the session.
+
+Use this conversion map when moving the completed Lesson 4 behavior. It names ownership without supplying the new implementations:
+
+| Existing `Main` content                                                              | New owner                                     |
+|--------------------------------------------------------------------------------------|-----------------------------------------------|
+| `run(...)` loop and `dispatch(...)` workflow                                         | `ConsoleApplication`                          |
+| Menu selection and the input/validation sections of create, filter, edit, and delete | `ConsolePrompter`                             |
+| `menu()`, `exit()`, messages, application details, and table display sections        | `ConsoleView`                                 |
+| `TextTable.render(...)` call                                                         | `ConsoleView`, using its injected `TextTable` |
+| Calls to `ApplicationService` inside each operation                                  | `ConsoleApplication`                          |
+
+Some old methods contain more than one responsibility. Move the sections named above rather than copying an entire mixed method into one class.
 
 ## Step 1 — Inject input and output
 
