@@ -15,7 +15,16 @@
 
 ## Initialization
 
-Start from the completed Lesson 4 state. These shells establish the files and dependency fields Lesson 5 assumes before validation behavior is added; the unfinished `render` method is deliberately visible instead of pretending the table refactor is complete.
+Start from the completed Lesson 4 state. These shells show one valid destination for the methods you already wrote without completing their Lesson 5 behavior. The helper names are suggestions, but the responsibility boundaries are the goal.
+
+Think of each menu operation as three handoffs:
+
+```text
+ConsoleApplication → ConsolePrompter → ConsoleApplication → ApplicationService
+ConsoleApplication → ConsoleView → TextTable when table formatting is needed
+```
+
+Do not copy an entire mixed `Main` method into one new class. Keep the operation method in `ConsoleApplication`, then move only its reading and validation sections to `ConsolePrompter` and only its printing sections to `ConsoleView`.
 
 - [x] Create `src/main/java/com/connorjensen/jobtracker/cli/ConsolePrompter.java` with its injected input and output dependencies.
 
@@ -23,7 +32,11 @@ Start from the completed Lesson 4 state. These shells establish the files and de
 package com.connorjensen.jobtracker.cli;
 
 import java.io.PrintStream;
+import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Scanner;
+
+import com.connorjensen.jobtracker.model.Status;
 
 public class ConsolePrompter {
   private final Scanner promptScanner;
@@ -33,8 +46,25 @@ public class ConsolePrompter {
     this.promptScanner = promptScanner;
     this.promptStream = promptStream;
   }
+
+  Optional<Integer> promptMenuSelection() {
+    throw new UnsupportedOperationException("TODO");
+  }
+
+  Optional<String> promptRequiredText(String label) {
+    throw new UnsupportedOperationException("TODO");
+  }
+
+  // Follow the same read, validate, and local-retry shape for:
+  // promptDate(String label) -> Optional<LocalDate>
+  // promptStatus(String label) -> Optional<Status>
+  // promptPositiveId(String label) -> Optional<Long>
+  // promptOptionalText(String label) -> Optional<String>
+  // promptUrl(String label) -> Optional<String>
 }
 ```
+
+`ConsolePrompter` owns reads, parsing, normalization, and retry loops. It does not call `ApplicationService`, render tables, or decide which menu operation runs. `Optional.empty()` is one possible explicit EOF signal; `Optional.of("")` can still represent a real blank line.
 
 - [x] Create `src/main/java/com/connorjensen/jobtracker/cli/ConsoleView.java` with its injected output and table dependencies.
 
@@ -42,6 +72,10 @@ public class ConsolePrompter {
 package com.connorjensen.jobtracker.cli;
 
 import java.io.PrintStream;
+import java.util.List;
+
+import com.connorjensen.jobtracker.model.Application;
+import com.connorjensen.jobtracker.model.Status;
 
 public class ConsoleView {
   private final PrintStream consoleStream;
@@ -51,8 +85,20 @@ public class ConsoleView {
     this.consoleStream = consoleStream;
     this.textTable = textTable;
   }
+
+  void showMenu() {}
+
+  void showApplications(List<Application> applications) {}
+
+  void showNoApplicationsForStatus(Status status) {}
+
+  void showGoodbye() {}
+
+  // Use the same output-only shape for created, missing, updated, and deleted messages.
 }
 ```
+
+`ConsoleView` owns user-facing text and converts applications into table rows before calling `textTable.render(...)`. It does not read input, call the service, or choose the next operation.
 
 - [x] Replace `src/main/java/com/connorjensen/jobtracker/cli/TextTable.java` with the pure table's starting shell.
 
@@ -68,6 +114,8 @@ public class TextTable {
     // toTable() -> render(): return text so ConsoleView owns printing.
     throw new UnsupportedOperationException("TODO");
   }
+
+  // Keep width, border, cell-normalization, and centering helpers private.
 }
 ```
 
@@ -91,10 +139,37 @@ public class ConsoleApplication {
   }
 
   public void run() {}
+
+  private boolean dispatch(int selection) {
+    throw new UnsupportedOperationException("TODO");
+  }
+
+  private boolean createApplication() {
+    // Ask the prompter for validated values, call service.create(...), then tell the view.
+    throw new UnsupportedOperationException("TODO");
+  }
+
+  private boolean listApplications() {
+    throw new UnsupportedOperationException("TODO");
+  }
+
+  private boolean filterApplications() {
+    throw new UnsupportedOperationException("TODO");
+  }
+
+  private boolean editApplication() {
+    throw new UnsupportedOperationException("TODO");
+  }
+
+  private boolean deleteApplication() {
+    throw new UnsupportedOperationException("TODO");
+  }
 }
 ```
 
-- [x] Replace `src/main/java/com/connorjensen/jobtracker/Main.java` with the composition-root shape below. 
+The familiar operation names stay in `ConsoleApplication` because they coordinate other objects. They no longer need `Scanner` or `ApplicationService` parameters because those collaborators are already available through the injected fields.
+
+- [x] Replace `src/main/java/com/connorjensen/jobtracker/Main.java` with the composition-root shape below.
 
 ```java
 package com.connorjensen.jobtracker;
@@ -130,24 +205,34 @@ public final class Main {
 
 `Main` does not call prompt or view methods directly. It constructs the object graph, hands the collaborators to `ConsoleApplication`, and starts the session.
 
-Use this conversion map when moving the completed Lesson 4 behavior. It names ownership without supplying the new implementations:
+Use this conversion map when moving the completed Lesson 4 behavior. Suggested helper names make the destination concrete without requiring those exact private names:
 
-| Existing `Main` content                                                              | New owner                                     |
-|--------------------------------------------------------------------------------------|-----------------------------------------------|
-| `run(...)` loop and `dispatch(...)` workflow                                         | `ConsoleApplication`                          |
-| Menu selection and the input/validation sections of create, filter, edit, and delete | `ConsolePrompter`                             |
-| `menu()`, `exit()`, messages, application details, and table display sections        | `ConsoleView`                                 |
-| `TextTable.render(...)` call                                                         | `ConsoleView`, using its injected `TextTable` |
-| Calls to `ApplicationService` inside each operation                                  | `ConsoleApplication`                          |
+| Existing `Main` method or section                       | Suggested destination                                                                                         |
+|---------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| `run(...)` session loop                                 | `ConsoleApplication.run()`; ask `view.showMenu()`, then `prompter.promptMenuSelection()`, then dispatch       |
+| `input(...)` parsing and range retry                    | `ConsolePrompter.promptMenuSelection()`                                                                       |
+| `menu()` printing                                       | `ConsoleView.showMenu()`                                                                                      |
+| `dispatch(...)` switch                                  | `ConsoleApplication.dispatch(int)`                                                                            |
+| `createApplication(...)` field reads                    | `ConsolePrompter.promptRequiredText(...)`, `promptDate(...)`, `promptOptionalText(...)`, and `promptUrl(...)` |
+| `createApplication(...)` service call                   | `ConsoleApplication.createApplication()`                                                                      |
+| Created message                                         | A small `ConsoleView` output method such as `showCreated(...)`                                                |
+| `listApplications(...)` service call                    | `ConsoleApplication.listApplications()`                                                                       |
+| Empty-list decision, row conversion, and table printing | `ConsoleView.showApplications(...)`, using `textTable.render(...)`                                            |
+| `filterApplications(...)` status read and normalization | `ConsolePrompter.promptStatus(...)`                                                                           |
+| `filterApplications(...)` service call                  | `ConsoleApplication.filterApplications()`                                                                     |
 
-Some old methods contain more than one responsibility. Move the sections named above rather than copying an entire mixed method into one class.
+| Filtered rows or no-match message | `ConsoleView.showApplications(...)` or `showNoApplicationsForStatus(...)` |
+| `editApplication(...)` and `deleteApplication(...)` operation coordination | Keep these methods in `ConsoleApplication`; send ID and field reads to `ConsolePrompter` as you implement them |
+| `exit()` printing | `ConsoleView.showGoodbye()`; `ConsoleApplication.run()` decides when to call it |
+
+For example, `createApplication()` does not move intact. Its prompts become calls to `ConsolePrompter`, its `service.create(...)` call stays in `ConsoleApplication`, and its success text becomes a `ConsoleView` call. Apply that same split to filter, edit, and delete.
 
 ## Step 1 — Inject input and output
 
 `System.in` and `System.out` are process-wide mutable state. They are appropriate dependencies for `Main` to choose, but not for every CLI class to reach for directly.
 
-- [ ] Use `promptScanner` and `promptStream` for input behavior instead of reaching for global streams inside `ConsolePrompter`.
-- [ ] Use `consoleStream` and `textTable` for display behavior instead of reaching for global output inside `ConsoleView`.
+- [ ] Use `ConsolePrompter`'s `promptScanner` and `promptStream` for input behavior instead of reaching for global streams.
+- [ ] Use `ConsoleView`'s `consoleStream` and `textTable` for display behavior instead of reaching for global output.
 - [ ] Keep the injected collaborators in private final fields so every instance has a complete dependency set after construction.
 
 `Main` remains the only place that chooses the real process streams. Tests can choose byte arrays without replacing global state.

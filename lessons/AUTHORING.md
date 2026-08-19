@@ -2,7 +2,9 @@
 
 *How chapters in this repo get built. **This file is meant to be edited** — when something works badly, change the rule here rather than quietly doing it differently next chapter.*
 
-Last revised: 2026-08-19 (added a pre-step Initialization section that establishes each lesson's file paths and compilable working shells from the previous recorded state).
+Last revised: 2026-08-19 (required method-level refactor destinations and inherited method inventories in minimal Initialization shells).
+
+Previously: 2026-08-19 (added a pre-step Initialization section that establishes each lesson's file paths and compilable working shells from the previous recorded state).
 
 Previously: 2026-08-18 (made unwrapped prose a repository-wide Markdown rule and clarified which Java fences are complete files, edit excerpts, API signatures, or standalone demonstrations).
 
@@ -64,9 +66,11 @@ Every sub-lesson begins with `## Initialization` after the goal, prerequisite, P
 - Include only new assumptions and setup deltas needed for this lesson. Do not restate unchanged files or repeat the previous lesson's finished implementation.
 - Name every created or edited file at least once with its full repository-relative path, such as `src/main/java/com/example/Thing.java`.
 - For a new Java file, provide a complete compilable shell: package, imports, enclosing type, dependency fields, constructor initialization, and only the method stubs needed to establish the lesson's starting shape.
+- A minimal shell may omit repeated implementations, but it must not erase work established by earlier lessons. Name every inherited operation that still exists after the refactor and show its new owning class, using stubs for coordinating methods and a concise comment inventory for repetitive helper families.
 - For an existing class whose API or role changes, show the new assumption and include a transition comment in the code, such as `// toTable() -> render(): return text instead of printing it.` The optional reason should explain ownership or behavior, not narrate syntax.
 - Keep the initialization dependency-closed: every new collaborator must be constructed or received somewhere, every changed constructor or method must have its callers accounted for, and the entry point must show the complete new object graph. Do not leave shells disconnected and make the learner guess how they are used.
-- When responsibilities move between existing classes, include a conversion map from each old method or method section to its new owner. Split mixed methods by responsibility instead of pretending the entire old method moves intact.
+- When responsibilities move between existing classes, include a conversion map from each old method or method section to a concrete method-level destination. Use suggested helper names or signatures instead of labels such as "input flow" or "output flow," and split mixed methods by responsibility instead of pretending the entire old method moves intact.
+- Include one end-to-end flow sketch for a representative mixed operation. Show where prompting, service calls, and display handoffs occur without supplying the learner's implementation.
 - Preserve the assignment: constructors may initialize fields, `void` method bodies stay empty, and non-void stubs only signal unfinished work. For a repetitive method family, show the first structural example and then add a comment naming the remaining methods the learner must complete instead of supplying repeated implementations.
 - Keep incomplete behavior honest. A non-void stub may throw `UnsupportedOperationException("TODO")`; do not return a plausible value that could hide unfinished work.
 - Use inline action checkboxes for setup the learner performs, but do not add Initialization to the top Progress list and do not add a learner-facing Verify block. The author still validates every shell against a throwaway copy of the stated prior state before publishing the lesson.
