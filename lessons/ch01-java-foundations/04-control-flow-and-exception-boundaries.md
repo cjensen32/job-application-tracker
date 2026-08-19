@@ -6,10 +6,10 @@
 
 **Progress**
 
-- [ ] Map one iteration of the application loop
-- [ ] Separate dispatch from input recovery
-- [ ] Make EOF a normal exit path
-- [ ] Complete the self-check
+- [x] Map one iteration of the application loop
+- [x] Separate dispatch from input recovery
+- [x] Make EOF a normal exit path
+- [x] Complete the self-check
 
 ---
 
@@ -21,14 +21,14 @@ The central rule is simple: catch an exception only where you can translate it i
 
 ## Step 1 — Map one iteration of the application loop
 
-- [ ] Write the loop as four responsibilities before touching code.
+- [x] Write the loop as four responsibilities before touching code.
 
 ```text
 show menu → read valid selection → dispatch one operation → repeat
 ```
 
-- [ ] Mark option `5` and EOF as the two normal exit paths.
-- [ ] Mark invalid selection as a retry of only the selection prompt.
+- [x] Mark option `5` and EOF as the two normal exit paths.
+- [x] Mark invalid selection as a retry of only the selection prompt.
 
 A guard clause handles exceptional state early. It keeps the valid path flat:
 
@@ -41,7 +41,7 @@ public class selectionTest {
   }
 
   public static boolean testNumber() {
-    if (this.selection==5) {
+    if (this.selection == 5) {
       return false;
     } else {
       return true;
@@ -54,7 +54,7 @@ The guard is not automatically better than a loop condition. Use whichever makes
 
 ### Verify
 
-- [ ] Confirm the current production sources still compile before the structural refactor.
+- [x] Confirm the current production sources still compile before the structural refactor.
 
 ```bash
 mvn -q -Dcheckstyle.skip -DskipTests compile && echo "compile: ok"
@@ -68,8 +68,8 @@ If compilation fails here, fix that existing failure before changing the control
 
 ## Step 2 — Separate dispatch from input recovery
 
-- [ ] Keep parsing and retry logic near the prompt that owns it.
-- [ ] Keep the dispatch block concerned only with which operation runs.
+- [x] Keep parsing and retry logic near the prompt that owns it.
+- [x] Keep the dispatch block concerned only with which operation runs.
 
 ```java
 public class selectionTest {
@@ -118,7 +118,7 @@ Do not wrap the entire session in `catch (Exception)`. That converts programming
 
 ### Verify
 
-- [ ] Compile after the dispatch refactor.
+- [x] Compile after the dispatch refactor.
 
 ```bash
 mvn -q -Dcheckstyle.skip -DskipTests compile && echo "dispatch: ok"
@@ -134,9 +134,9 @@ If a switch branch cannot call its operation, check package visibility and const
 
 `Scanner.nextLine()` throws when no line exists. Interactive users rarely notice, but redirected input, tests, and closed terminals reach EOF routinely.
 
-- [ ] Check `hasNextLine()` before every line read.
-- [ ] Return an explicit absence signal to the session coordinator.
-- [ ] Let the coordinator print `Goodbye.` once and return from `run()`.
+- [x] Check `hasNextLine()` before every line read.
+- [x] Return an explicit absence signal to the session coordinator.
+- [x] Let the coordinator print `Goodbye.` once and return from `run()`.
 
 An empty line and EOF are different:
 
@@ -145,7 +145,7 @@ An empty line and EOF are different:
 
 ### Verify
 
-- [ ] Run the program with an empty input stream after the capstone refactor.
+- [x] Run the program with an empty input stream after the capstone refactor.
 
 ```bash
 java -cp target/classes com.connorjensen.jobtracker.Main < /dev/null
