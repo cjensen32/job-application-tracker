@@ -1,6 +1,8 @@
 package com.connorjensen.jobtracker.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Application {
   private Long id;
@@ -11,11 +13,23 @@ public class Application {
   private String notes;
   private String jobUrl;
 
+  public Application(
+      String company, String role, LocalDate appliedDate, String notes, String jobUrl) {
+    this.company = company;
+    this.role = role;
+    this.appliedDate = appliedDate;
+    this.status = Status.APPLIED;
+    this.notes = notes;
+    this.jobUrl = jobUrl;
+  }
+
   public Application(String company, String role, LocalDate appliedDate) {
     this.company = company;
     this.role = role;
     this.appliedDate = appliedDate;
     this.status = Status.APPLIED;
+    this.notes = "";
+    this.jobUrl = "";
   }
 
   public Long getId() {
@@ -50,8 +64,16 @@ public class Application {
     this.id = id;
   }
 
+  public void setCompany(String company) {
+    this.company = company;
+  }
+
   public void setRole(String role) {
     this.role = role;
+  }
+
+  public void setAppliedDate(LocalDate appliedDate) {
+    this.appliedDate = appliedDate;
   }
 
   public void setStatus(Status status) {
@@ -66,7 +88,23 @@ public class Application {
     this.jobUrl = jobUrl;
   }
 
-  public String summary() {
-    return company + " - " + role;
+  @Override
+  public String toString() {
+    return company + " - " + role + " [" + status + "] ";
+  }
+
+  public List<String> toValuesList() {
+    return new ArrayList<>(
+        List.of(
+            String.valueOf(this.id),
+            this.company,
+            this.role,
+            String.valueOf(this.appliedDate),
+            this.status.getLabel(),
+            this.jobUrl));
+  }
+
+  public static List<String> toLabelsList() {
+    return new ArrayList<>(List.of("ID", "Company", "Role", "Applied Date", "Status", "URL"));
   }
 }
