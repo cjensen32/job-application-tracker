@@ -2,7 +2,9 @@
 
 *How chapters in this repo get built. **This file is meant to be edited** — when something works badly, change the rule here rather than quietly doing it differently next chapter.*
 
-Last revised: 2026-08-18 (made unwrapped prose a repository-wide Markdown rule and clarified which Java fences are complete files, edit excerpts, API signatures, or standalone demonstrations).
+Last revised: 2026-08-19 (added a pre-step Initialization section that establishes each lesson's file paths and compilable working shells from the previous recorded state).
+
+Previously: 2026-08-18 (made unwrapped prose a repository-wide Markdown rule and clarified which Java fences are complete files, edit excerpts, API signatures, or standalone demonstrations).
 
 Previously: 2026-08-17 (added concise-bullet and sentence-wrapping rules during the Chapter 1 capstone recalibration).
 
@@ -54,11 +56,23 @@ lessons/chNN-slug/
   - Sequence steps so each one's failure is observed in isolation. If three edits are needed, don't list all three and then compile — compile after the edit that actually breaks the build, so the error message maps to one cause.
   - When a mechanism is easier to see by contrast, give the command that succeeds in one state and fails in the other, and put it in a `<details>` block so it stays optional.
 
+## Lesson initialization
+
+Every sub-lesson begins with `## Initialization` after the goal, prerequisite, Progress list, and first divider, but before `## Step 1`. This is a pre-step that establishes the common working zone; it is not part of the lesson's assessed progress.
+
+- Start from the last recorded state: normally the completed previous lesson, or the named chapter/commit baseline when no previous lesson changed the relevant code.
+- Include only new assumptions and setup deltas needed for this lesson. Do not restate unchanged files or repeat the previous lesson's finished implementation.
+- Name every created or edited file at least once with its full repository-relative path, such as `src/main/java/com/example/Thing.java`.
+- For a new Java file, provide a complete compilable shell: package, imports, enclosing type, dependency fields, constructor initialization, and only the method stubs needed to establish the lesson's starting shape.
+- For an existing class whose API or role changes, show the new assumption and include a transition comment in the code, such as `// toTable() -> render(): return text instead of printing it.` The optional reason should explain ownership or behavior, not narrate syntax.
+- Keep incomplete behavior honest. A non-void stub may throw `UnsupportedOperationException("TODO")`; do not return a plausible value that could hide unfinished work.
+- Use inline action checkboxes for setup the learner performs, but do not add Initialization to the top Progress list and do not add a learner-facing Verify block. The author still validates every shell against a throwaway copy of the stated prior state before publishing the lesson.
+
 ## Java code fences
 
 Introduce every `java` fence according to what the reader should do with it. Do not present a fragment as though it were a complete file.
 
-- **Whole file:** Name the destination path and include the package, imports, enclosing type, and complete braces. Its Verify block must compile it.
+- **Whole file:** Name the destination path and include the package, imports, enclosing type, and complete braces. Outside Initialization, its Verify block must compile it; Initialization shells are author-validated under the rule above.
 - **Edit excerpt:** Name the existing file and insertion point. Show the real enclosing type when placement would otherwise be ambiguous, and use a legal comment such as `// ... existing fields ...` for omitted code.
 - **API signature:** A constructor or method signature may remain a fragment when the lesson is specifying shape rather than asking the reader to compile it independently. Label it as a contract.
 - **Standalone demonstration:** Include all imports and a runnable type that needs only the JDK. Verify it in the scratchpad and show actual output.

@@ -13,13 +13,79 @@
 
 ---
 
+## Initialization
+
+Start from the completed Lesson 4 state. These shells establish the files and dependency fields Lesson 5 assumes before validation behavior is added; the unfinished `render` method is deliberately visible instead of pretending the table refactor is complete.
+
+- [ ] Create `src/main/java/com/connorjensen/jobtracker/cli/ConsolePrompter.java` with its injected input and output dependencies.
+
+```java
+package com.connorjensen.jobtracker.cli;
+
+import java.io.PrintStream;
+import java.util.Scanner;
+
+public class ConsolePrompter {
+  private final Scanner promptScanner;
+  private final PrintStream promptStream;
+
+  public ConsolePrompter(Scanner promptScanner, PrintStream promptStream) {
+    this.promptScanner = promptScanner;
+    this.promptStream = promptStream;
+  }
+}
+```
+
+- [ ] Create `src/main/java/com/connorjensen/jobtracker/cli/ConsoleView.java` with its injected output and table dependencies.
+
+```java
+package com.connorjensen.jobtracker.cli;
+
+import java.io.PrintStream;
+
+public class ConsoleView {
+  private final PrintStream consoleStream;
+  private final TextTable textTable;
+
+  public ConsoleView(PrintStream consoleStream, TextTable textTable) {
+    this.consoleStream = consoleStream;
+    this.textTable = textTable;
+  }
+}
+```
+
+- [ ] Replace `src/main/java/com/connorjensen/jobtracker/cli/TextTable.java` with the pure table's starting shell.
+
+```java
+package com.connorjensen.jobtracker.cli;
+
+import java.util.List;
+
+public class TextTable {
+  public TextTable() {}
+
+  public String render(List<String> header, List<List<String>> rows) {
+    // toTable() -> render(): return text so ConsoleView owns printing.
+    throw new UnsupportedOperationException("TODO");
+  }
+}
+```
+
+- [ ] Update the table call sites in `listApplications(...)` and `filterApplications(...)` inside `src/main/java/com/connorjensen/jobtracker/Main.java` to use the new constructor and method shape. `Main` remains the temporary output owner until Lesson 6 moves that responsibility into `ConsoleView`.
+
+```java
+// new TextTable(headerList, bodyRowsList) + toTable() -> render(headerList, bodyRowsList)
+TextTable textTable = new TextTable();
+System.out.print(textTable.render(headerList, bodyRowsList));
+```
+
 ## Step 1 — Inject input and output
 
 `System.in` and `System.out` are process-wide mutable state. They are appropriate dependencies for `Main` to choose, but not for every CLI class to reach for directly.
 
-- [ ] Give `ConsolePrompter` a `Scanner` and `PrintStream` constructor.
-- [ ] Give `ConsoleView` a `PrintStream` and `TextTable` constructor.
-- [ ] Store each collaborator in a private final field.
+- [ ] Use `promptScanner` and `promptStream` for input behavior instead of reaching for global streams inside `ConsolePrompter`.
+- [ ] Use `consoleStream` and `textTable` for display behavior instead of reaching for global output inside `ConsoleView`.
+- [ ] Keep the injected collaborators in private final fields so every instance has a complete dependency set after construction.
 
 `Main` remains the only place that chooses the real process streams. Tests can choose byte arrays without replacing global state.
 
