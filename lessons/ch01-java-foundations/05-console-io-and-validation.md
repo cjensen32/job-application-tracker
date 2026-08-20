@@ -119,7 +119,7 @@ public class TextTable {
 }
 ```
 
-- [ ] Create `src/main/java/com/connorjensen/jobtracker/cli/ConsoleApplication.java` with the dependencies needed to coordinate the session. `run()` stays empty here because its workflow is part of the assignment.
+- [x] Create `src/main/java/com/connorjensen/jobtracker/cli/ConsoleApplication.java` with the dependencies needed to coordinate the session. `run()` stays empty here because its workflow is part of the assignment.
 
 ```java
 package com.connorjensen.jobtracker.cli;
@@ -188,7 +188,7 @@ import com.connorjensen.jobtracker.service.ApplicationService;
 public final class Main {
   private Main() {}
 
-  public static void main(String[] args) {
+  static void main(String[] args) {
     ApplicationRepository repository = new InMemoryApplicationRepository();
     ApplicationService service = new ApplicationService(repository);
     Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
@@ -231,9 +231,9 @@ For example, `createApplication()` does not move intact. Its prompts become call
 
 `System.in` and `System.out` are process-wide mutable state. They are appropriate dependencies for `Main` to choose, but not for every CLI class to reach for directly.
 
-- [ ] Use `ConsolePrompter`'s `promptScanner` and `promptStream` for input behavior instead of reaching for global streams.
-- [ ] Use `ConsoleView`'s `consoleStream` and `textTable` for display behavior instead of reaching for global output.
-- [ ] Keep the injected collaborators in private final fields so every instance has a complete dependency set after construction.
+- [x] Use `ConsolePrompter`'s `promptScanner` and `promptStream` for input behavior instead of reaching for global streams.
+- [x] Use `ConsoleView`'s `consoleStream` and `textTable` for display behavior instead of reaching for global output.
+- [x] Keep the injected collaborators in private final fields so every instance has a complete dependency set after construction.
 
 `Main` remains the only place that chooses the real process streams. Tests can choose byte arrays without replacing global state.
 
@@ -321,6 +321,66 @@ Created application 1.
 ```
 
 The full output contains menus and the table; if `Café` or `Développeur` is corrupted, find the byte/string conversion that omitted UTF-8.
+
+## Asked Questions
+
+> Questions came up while working through this lesson. “Resolved” means an explanation or design decision exists;
+
+### Did the initial `ConsolePrompter` and `ConsoleView` setup match the lesson?
+
+**Resolution:** `ConsolePrompter` must receive both `Scanner` and `PrintStream`:
+- `ConsoleView` must receive `PrintStream` and `TextTable`. Injected collaborators belong in `private final` fields. 
+- A later review confirmed the prompter and view constructor wiring was correct, although `ConsoleApplication` still needed `final` collaborator fields.
+
+### Why use separate `ConsolePrompter` and `ConsoleView` classes?
+
+**Resolution:** They handle opposite directions of the console boundary. `ConsolePrompter` converts text into validated Java values; `ConsoleView` converts Java values into displayed text. This keeps validation and presentation independently changeable and testable. `ConsoleApplication` coordinates them.
+
+### Where do the methods previously stored in `Main` belong?
+
+**Resolution:**
+
+- `Main` constructs the object graph and calls `ConsoleApplication.run()`.
+- `ConsoleApplication` owns the loop, dispatch, service calls, and workflow decisions.
+- `ConsolePrompter` owns reading, parsing, validation, retry loops, and EOF signalling.
+- `ConsoleView` owns menus, messages, details, and displayed tables.
+- `TextTable` only converts table data into a string.
+
+Mixed methods should be split by responsibility rather than moved intact.
+
+### How much code should the lesson’s Initialization section provide?
+
+**Resolution:** Initialization should provide repository-relative paths, compilable class shells, constructors, essential method signatures, caller wiring, and a method-migration map. `void` methods remain empty; unfinished non-void methods may throw `UnsupportedOperationException("TODO")`. Repetitive methods can be named in comments. Validation and workflow implementation remain the assignment.
+
+### Why does `new TextTable()` produce “Instantiation of utility class”?
+
+**Resolution:** The warning appears when `TextTable` still exposes static behavior, making an object unnecessary. The Chapter 1 destination uses an injected `TextTable` instance whose `render(...)` and helper methods are non-static. Completing that refactor removes the warning. Making the constructor private would preserve the wrong utility-class shape.
+
+### Why do several prompt methods accept a parameter named `label`?
+
+**Resolution:** `label` is reusable prompt text, such as `"Company: "` or `"Role: "`. It was a design suggestion, not a consequence of the learner’s notes. `promptText` may be clearer, and a method with one permanently fixed prompt may need no parameter.
+
+### Is the retry loop inside `promptMenuSelection()` too much responsibility?
+
+**Resolution:** No. Its single responsibility is to keep reading until it obtains one valid menu selection or reaches EOF. It should not display the full menu or dispatch the selection. `ConsoleApplication` coordinates those responsibilities.
+
+### How should menu EOF be handled?
+
+**Resolution:** Check `hasNextLine()` before calling `nextLine()`. EOF should return `Optional.empty()`, while a real quit selection returns `Optional.of(5)`. Converting EOF into a fake `"5"` loses information. `ConsoleApplication` should interpret the empty result as a clean end to the session.
+
+### What unresolved problems did the implementation review find?
+
+**Status:** Open as of the Claude review; no later local chat proves these were fixed and re-verified.
+
+- Menu EOF caused an exception instead of a clean exit.
+- Required company and role text was not trimmed, rejected when blank, or retried.
+- URL validation accepted relative values such as `notes`; nonblank URLs must be absolute HTTP or HTTPS URIs.
+- Status normalization handled spaces but not hyphens such as `phone-screen`.
+- Successful creation did not print `Created application N.`
+- An empty filtered result used the generic “No applications to list” message instead of a status-specific message.
+- Two `ConsoleView` paths used `System.out` instead of the injected `PrintStream`.
+
+Additional advisories covered `final` collaborator fields, private dispatch, prompt-before-read ordering, retry prompts, private `TextTable` helpers, and avoiding mutation of lists passed into `render(...)`.
 
 ## Self-check
 

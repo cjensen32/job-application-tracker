@@ -1,6 +1,7 @@
 package com.connorjensen.jobtracker;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import com.connorjensen.jobtracker.cli.ConsoleApplication;
@@ -14,7 +15,7 @@ import com.connorjensen.jobtracker.service.ApplicationService;
 public class Main {
   private Main() {}
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     ApplicationRepository repository = new InMemoryApplicationRepository();
     ApplicationService service = new ApplicationService(repository);
     Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
@@ -22,8 +23,12 @@ public class Main {
     ConsoleView view = new ConsoleView(System.out, table);
     ConsolePrompter prompter = new ConsolePrompter(scanner, System.out);
     ConsoleApplication application = new ConsoleApplication(service, prompter, view);
-
-    application.run();
+    try {
+      application.run();
+    } catch (Exception e) {
+      System.err.print("Error found, exiting here: " + e.getMessage() + "\n");
+      System.err.print(Arrays.toString(e.getStackTrace()));
+    }
     /*
         // 1. Show Menu (header)
         System.out.println("Job Application Tracker");
@@ -43,24 +48,6 @@ public class Main {
         exit();
       }
 
-      private static void menu() {
-        // Options as list
-        List<String> options =
-            new ArrayList<>(
-                List.of(
-                    "0 Create application",
-                    "1 List applications",
-                    "2 Filter applications by status",
-                    "3 Edit application",
-                    "4 Delete application",
-                    "5 Quit"));
-
-        // Print options, with trailing entry line and space
-        for (String option : options) {
-          System.out.println(option);
-        }
-        System.out.print("> ");
-      }
 
       public static Integer input(Scanner scanner) {
         int selection = 6;
@@ -82,17 +69,6 @@ public class Main {
         return selection;
       }
 
-      public static boolean dispatch(Scanner scanner, ApplicationService service, int selection) {
-        return switch (selection) {
-          case 0 -> createApplication(scanner, service);
-          case 1 -> listApplications(service);
-          case 2 -> filterApplications(scanner, service);
-          case 3 -> editApplication(scanner, service); // TODO: Need to complete
-          case 4 -> deleteApplication(scanner, service); // TODO: Need to complete
-          case 5 -> false;
-          default -> throw new IllegalStateException("validated selection escaped its boundary");
-        };
-      }
 
       // Case 0 - DONE
       public static boolean createApplication(Scanner scanner, ApplicationService service) {

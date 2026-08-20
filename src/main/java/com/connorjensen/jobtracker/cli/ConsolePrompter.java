@@ -1,15 +1,14 @@
 package com.connorjensen.jobtracker.cli;
 
 import java.io.PrintStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
-import com.connorjensen.jobtracker.model.Application;
 import com.connorjensen.jobtracker.model.Status;
-import com.connorjensen.jobtracker.service.ApplicationService;
 
 public class ConsolePrompter {
   private final Scanner promptScanner;
@@ -20,16 +19,15 @@ public class ConsolePrompter {
     this.promptStream = promptStream;
   }
 
-  public Integer input() {
+  public Optional<Integer> promptMenuSelection() {
     int selection = 6;
     String selectionString;
 
     while (selection > 5 || selection < 0) {
-      ConsoleView.menu();
       if (this.promptScanner.hasNextLine()) {
         selectionString = this.promptScanner.nextLine();
       } else {
-        selectionString = "5";
+        return Optional.empty();
       }
       try {
         selection = Integer.parseInt(selectionString);
@@ -37,53 +35,33 @@ public class ConsolePrompter {
         continue;
       }
     }
-    return selection;
+    return Optional.of(selection);
   }
 
-  public boolean dispatch(Scanner scanner, ApplicationService service, int selection) {
-    return switch (selection) {
-      case 0 -> createApplication(scanner, service);
-      case 1 -> listApplications(service);
-      case 2 -> filterApplications(scanner, service);
-      case 3 -> editApplication(scanner, service); // TODO: Need to complete
-      case 4 -> deleteApplication(scanner, service); // TODO: Need to complete
-      case 5 -> false;
-      default -> throw new IllegalStateException("validated selection escaped its boundary");
-    };
-  }
-
-  // Case 0 - DONE
-  public static boolean createApplication(Scanner scanner, ApplicationService service) {
-    String company;
-    String role;
-    LocalDate appliedDate = null;
-    String notes;
-    String jobUrl;
-
-    // a. Get company, append a newline to end.
-    System.out.print("Company: ");
-    if (scanner.hasNextLine()) {
-      company = scanner.nextLine();
-    } else {
-      return false;
-    }
-
-    // b. Get role
-    System.out.print("Role: ");
-    if (scanner.hasNextLine()) {
-      role = scanner.nextLine();
-    } else {
-      return false;
-    }
-
-    // c. Get applied date
-    while (appliedDate == null) {
-      System.out.print("Applied date (YYYY-MM-DD): ");
-      String stringDate = null;
-      if (scanner.hasNextLine()) {
-        stringDate = scanner.nextLine();
+  public Optional<String> promptFormEntry(String formLabel) {
+    while (true) {
+      this.promptStream.print(formLabel);
+      if (this.promptScanner.hasNextLine()) {
+        String testLine = this.promptScanner.nextLine().strip();
+        if (!testLine.isEmpty()) {
+          return Optional.of(testLine);
+        }
       } else {
-        return false;
+        return Optional.empty();
+      }
+    }
+  }
+
+  public Optional<LocalDate> promptDate(String dateLabel) {
+    LocalDate appliedDate = null;
+
+    while (appliedDate == null) {
+      this.promptStream.print(dateLabel);
+      String stringDate = null;
+      if (this.promptScanner.hasNextLine()) {
+        stringDate = this.promptScanner.nextLine();
+      } else {
+        return Optional.empty();
       }
 
       // Validate is actual date
@@ -93,60 +71,18 @@ public class ConsolePrompter {
         continue;
       }
     }
-
-    // d. <Optional> Notes
-    System.out.print("Notes (optional): ");
-    if (scanner.hasNextLine()) {
-      notes = scanner.nextLine();
-    } else {
-      return false;
-    }
-
-    // e. <Optional> jobUrl
-    System.out.print("Job URL (optional): ");
-    if (scanner.hasNextLine()) {
-      jobUrl = scanner.nextLine();
-    } else {
-      return false;
-    }
-
-    if (company != null && role != null) {
-      service.create(company, role, appliedDate, notes, jobUrl);
-      return true;
-    }
-    return false;
+    return Optional.of(appliedDate);
   }
 
-  // Case 1 - DONE
-  public static boolean listApplications(ApplicationService service) {
-    List<Application> allApplications = service.listAll();
-    List<String> headerList = service.getLabels();
-    List<List<String>> bodyRowsList = new ArrayList<>();
-
-    if (allApplications.isEmpty()) {
-      System.out.println("No applications to list");
-    } else {
-      for (Application application : allApplications) {
-        bodyRowsList.add(application.toValuesList());
-      }
-      String textTable = TextTable.render(headerList, bodyRowsList);
-      System.out.print(textTable);
-    }
-    return true;
-  }
-
-  // Case 2 - DONE
-  public static boolean filterApplications(Scanner scanner, ApplicationService service) {
-
-    // a. get status to filter by
+  public Optional<Status> promptStatus(String statusLabel) {
     Status status = null;
     while (status == null) {
-      System.out.print("Status: ");
-      String statusEntry = null;
-      if (scanner.hasNextLine()) {
-        statusEntry = scanner.nextLine();
+      this.promptStream.print(statusLabel);
+      String statusEntry;
+      if (this.promptScanner.hasNextLine()) {
+        statusEntry = this.promptScanner.nextLine();
       } else {
-        return false;
+        return Optional.empty();
       }
       String statusLookup = statusEntry.strip().replace(" ", "_").toUpperCase();
       try {
@@ -155,38 +91,52 @@ public class ConsolePrompter {
         continue;
       }
     }
-    // Lookup in service
-    List<Application> statusApplications = service.listByStatus(status);
+    return Optional.of(status);
+  }
 
-    if (statusApplications.isEmpty()) {
-      System.out.println("No applications found for status " + status);
-      return true;
+  public Optional<Long> promptPositiveId(String idLabel) {
+    long id = 0L;
+    String idString;
+
+    while (id < 1) {
+      if (this.promptScanner.hasNextLine()) {
+        this.promptStream.print(idLabel);
+        idString = this.promptScanner.nextLine();
+      } else {
+        return Optional.empty();
+      }
+      try {
+        id = Long.parseLong(idString);
+      } catch (NumberFormatException ignored) {
+        continue;
+      }
     }
-    List<String> headerList = service.getLabels();
-    List<List<String>> bodyRowsList = new ArrayList<>();
-    for (Application application : statusApplications) {
-      bodyRowsList.add(application.toValuesList());
+    return Optional.of(id);
+  }
+
+  public Optional<String> promptNotesEntry(String notesLabel) {
+    this.promptStream.print(notesLabel);
+    if (this.promptScanner.hasNextLine()) {
+      return Optional.of(this.promptScanner.nextLine());
+    } else {
+      return Optional.empty();
     }
-    String textTable = TextTable.render(headerList, bodyRowsList);
-    System.out.print(textTable);
-    return true;
   }
 
-  // Case 3 - DONE
-  public static boolean editApplication(Scanner scanner, ApplicationService service) {
-    System.out.println("TODO: Complete implementation");
-    return true;
+  public Optional<URI> promptUrl(String urlLabel) {
+    this.promptStream.print(urlLabel);
+    URI jobUri = null;
+    while (jobUri == null) {
+      if (this.promptScanner.hasNextLine()) {
+        try {
+          jobUri = new URI(this.promptScanner.nextLine());
+        } catch (URISyntaxException e) {
+          continue;
+        }
+      } else {
+        return Optional.empty();
+      }
+    }
+    return Optional.of(jobUri);
   }
-
-  // Case 4 - TODO
-  public static boolean deleteApplication(Scanner scanner, ApplicationService service) {
-    System.out.println("TODO: Complete implementation");
-    return true;
-  }
-
-  // Exit / EOF / END - TODO
-  public static void exit() {
-    System.out.println("Goodbye.");
-  }
-}
 }
