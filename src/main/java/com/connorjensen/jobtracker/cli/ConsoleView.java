@@ -56,4 +56,8 @@ public class ConsoleView {
   void showGoodbye() {
     this.consoleStream.println("Goodbye.");
   }
+
+  public void showCompletion(String completionNote) {
+    this.consoleStream.println(completionNote);
+  }
 }

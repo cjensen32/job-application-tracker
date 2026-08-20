@@ -49,7 +49,7 @@ public class TextTable {
     return tableBuilder.toString();
   }
 
-  public List<Integer> getColumnWidths(List<String> headerList, List<List<String>> bodyRowsList) {
+  private List<Integer> getColumnWidths(List<String> headerList, List<List<String>> bodyRowsList) {
     // Put all initial column widths in List
     List<Integer> columnWidthsList = new ArrayList<>();
     for (int i = 0; i < headerList.size(); i++) {
@@ -82,7 +82,7 @@ public class TextTable {
     return columnWidthsList;
   }
 
-  public String buildBorder(List<Integer> columnWidthsList) {
+  private String buildBorder(List<Integer> columnWidthsList) {
     StringBuilder borderBuilder = new StringBuilder();
     int width;
 

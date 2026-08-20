@@ -51,8 +51,4 @@ public class ApplicationService {
   public boolean delete(Long id) {
     return this.repository.deleteById(id);
   }
-
-  public List<String> getLabels() {
-    return Application.toLabelsList();
-  }
 }

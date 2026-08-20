@@ -20,10 +20,15 @@ public class ConsolePrompter {
   }
 
   public Optional<Integer> promptMenuSelection() {
+    boolean help = false;
     int selection = 6;
     String selectionString;
 
     while (selection > 5 || selection < 0) {
+      if (help) {
+        this.promptStream.println("Enter a number between 0 and 5.");
+        this.promptStream.print("> ");
+      }
       if (this.promptScanner.hasNextLine()) {
         selectionString = this.promptScanner.nextLine();
       } else {
@@ -32,8 +37,10 @@ public class ConsolePrompter {
       try {
         selection = Integer.parseInt(selectionString);
       } catch (NumberFormatException ignored) {
+        help = true;
         continue;
       }
+      help = true;
     }
     return Optional.of(selection);
   }
@@ -57,7 +64,7 @@ public class ConsolePrompter {
 
     while (appliedDate == null) {
       this.promptStream.print(dateLabel);
-      String stringDate = null;
+      String stringDate;
       if (this.promptScanner.hasNextLine()) {
         stringDate = this.promptScanner.nextLine();
       } else {
@@ -84,7 +91,7 @@ public class ConsolePrompter {
       } else {
         return Optional.empty();
       }
-      String statusLookup = statusEntry.strip().replace(" ", "_").toUpperCase();
+      String statusLookup = statusEntry.strip().replace(" ", "_").replace("-", "_").toUpperCase();
       try {
         status = Status.valueOf(statusLookup);
       } catch (IllegalArgumentException ignored) {

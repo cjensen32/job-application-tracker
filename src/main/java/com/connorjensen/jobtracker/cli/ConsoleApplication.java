@@ -1,5 +1,6 @@
 package com.connorjensen.jobtracker.cli;
 
+import com.connorjensen.jobtracker.model.Application;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -49,7 +50,7 @@ public class ConsoleApplication {
   private boolean createApplication() {
     Optional<String> company = this.prompter.promptFormEntry("Company: ");
     Optional<String> role = this.prompter.promptFormEntry("Role: ");
-    Optional<LocalDate> appliedDate = this.prompter.promptDate("Applied date (YYYY-MM-DD)");
+    Optional<LocalDate> appliedDate = this.prompter.promptDate("Applied date (YYYY-MM-DD): ");
     Optional<String> notes = this.prompter.promptNotesEntry("Notes (optional): ");
     Optional<URI> jobUrl = this.prompter.promptUrl("Job URL (optional): ");
 
@@ -58,8 +59,9 @@ public class ConsoleApplication {
         && appliedDate.isPresent()
         && notes.isPresent()
         && jobUrl.isPresent()) {
-      service.create(
+      Application newApp = service.create(
           company.get(), role.get(), appliedDate.get(), notes.get(), String.valueOf(jobUrl.get()));
+      this.view.showCompletion("Created application " + newApp.getId() + ".");
       return true;
     }
     return false;
