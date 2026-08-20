@@ -6,7 +6,7 @@
 
 **Progress**
 
-- [ ] Inject input and output instead of owning global streams
+- [x] Inject input and output instead of owning global streams
 - [ ] Define required, date, status, ID, and URL validation
 - [ ] Make text and charset behavior deterministic
 - [ ] Complete the self-check
@@ -241,7 +241,7 @@ Use line-oriented reads for every prompt. Mixing `nextInt()` with `nextLine()` l
 
 ### Verify
 
-- [ ] Compile the new constructor graph.
+- [x] Compile the new constructor graph.
 
 ```bash
 mvn -q -Dcheckstyle.skip -DskipTests compile && echo "streams: injected"
@@ -255,11 +255,11 @@ If a test still calls `System.setOut`, first check whether output can be passed 
 
 ## Step 2 — Define one rule per input type
 
-- [ ] Trim company and role, reject blank values, and retry the same field.
-- [ ] Parse dates with `LocalDate.parse`, which accepts ISO `YYYY-MM-DD` input.
-- [ ] Parse IDs with `Long.parseLong`, then reject zero and negative values.
-- [ ] Normalize status text with trim, uppercase, and replacement of spaces or hyphens by underscores.
-- [ ] Accept a blank URL or require an absolute URI whose scheme is `http` or `https`, case-insensitively.
+- [x] Trim company and role, reject blank values, and retry the same field.
+- [x] Parse dates with `LocalDate.parse`, which accepts ISO `YYYY-MM-DD` input.
+- [x] Parse IDs with `Long.parseLong`, then reject zero and negative values.
+- [x] Normalize status text with trim, uppercase, and replacement of spaces or hyphens by underscores.
+- [x] Accept a blank URL or require an absolute URI whose scheme is `http` or `https`, case-insensitively.
 
 Status examples:
 
@@ -280,7 +280,7 @@ Edit mode adds context-sensitive rules:
 
 ### Verify
 
-- [ ] Run the focused capstone validation group after installing the grader.
+- [x] Run the focused capstone validation group after installing the grader.
 
 ```bash
 mvn -q -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ConsoleValidationTests#invalidInputRetriesLocally' test && echo "validation: ok"
@@ -296,9 +296,9 @@ If the entire form restarts, the retry loop is outside the individual prompt bou
 
 Text blocks keep stable multiline messages readable. They do not remove whitespace from the contract: indentation and the final newline remain observable.
 
-- [ ] Use `StandardCharsets.UTF_8` whenever tests convert bytes to strings or create byte-backed streams.
-- [ ] Keep prompts in `ConsolePrompter` and display blocks in `ConsoleView`.
-- [ ] Keep `TextTable` pure by returning a string instead of printing it.
+- [x] Use `StandardCharsets.UTF_8` whenever tests convert bytes to strings or create byte-backed streams.
+- [x] Keep prompts in `ConsolePrompter` and display blocks in `ConsoleView`.
+- [x] Keep `TextTable` pure by returning a string instead of printing it.
 
 The six list columns are fixed:
 

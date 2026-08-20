@@ -1,10 +1,9 @@
 package com.connorjensen.jobtracker.cli;
 
-import com.connorjensen.jobtracker.model.Application;
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import com.connorjensen.jobtracker.model.Application;
 import com.connorjensen.jobtracker.model.Status;
 import com.connorjensen.jobtracker.service.ApplicationService;
 
@@ -52,15 +51,20 @@ public class ConsoleApplication {
     Optional<String> role = this.prompter.promptFormEntry("Role: ");
     Optional<LocalDate> appliedDate = this.prompter.promptDate("Applied date (YYYY-MM-DD): ");
     Optional<String> notes = this.prompter.promptNotesEntry("Notes (optional): ");
-    Optional<URI> jobUrl = this.prompter.promptUrl("Job URL (optional): ");
+    Optional<String> jobUrl = this.prompter.promptUrl("Job URL (optional): ");
 
     if (company.isPresent()
         && role.isPresent()
         && appliedDate.isPresent()
         && notes.isPresent()
         && jobUrl.isPresent()) {
-      Application newApp = service.create(
-          company.get(), role.get(), appliedDate.get(), notes.get(), String.valueOf(jobUrl.get()));
+      Application newApp =
+          service.create(
+              company.get(),
+              role.get(),
+              appliedDate.get(),
+              notes.get(),
+              jobUrl.get());
       this.view.showCompletion("Created application " + newApp.getId() + ".");
       return true;
     }
@@ -68,14 +72,14 @@ public class ConsoleApplication {
   }
 
   private boolean listApplications() {
-    this.view.showApplications(service.listAll());
+    this.view.showApplications(service.listAll(), Optional.empty());
     return true;
   }
 
   private boolean filterApplications() {
     Optional<Status> statusOptional = this.prompter.promptStatus("Status: ");
     statusOptional.ifPresent(
-        status -> this.view.showApplications(this.service.listByStatus(status)));
+        status -> this.view.showApplications(this.service.listByStatus(status), statusOptional));
     return true;
   }
 

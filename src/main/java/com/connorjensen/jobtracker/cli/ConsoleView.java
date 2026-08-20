@@ -3,8 +3,10 @@ package com.connorjensen.jobtracker.cli;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.connorjensen.jobtracker.model.Application;
+import com.connorjensen.jobtracker.model.Status;
 
 public class ConsoleView {
   private final PrintStream consoleStream;
@@ -38,9 +40,11 @@ public class ConsoleView {
     this.consoleStream.print("> ");
   }
 
-  void showApplications(List<Application> applications) {
-    if (applications.isEmpty()) {
+  void showApplications(List<Application> applications, Optional<Status> status) {
+    if (applications.isEmpty() && status.isEmpty()) {
       this.consoleStream.println("No applications to list");
+    } else if (applications.isEmpty()) {
+      showFoundNoStatusMatches(status.get());
     } else {
       List<String> headerList = Application.toLabelsList();
       List<List<String>> bodyRowsList = new ArrayList<>();
@@ -59,5 +63,9 @@ public class ConsoleView {
 
   public void showCompletion(String completionNote) {
     this.consoleStream.println(completionNote);
+  }
+
+  public void showFoundNoStatusMatches(Status status) {
+    this.consoleStream.println("No Applications found for status: " + status.getLabel());
   }
 }

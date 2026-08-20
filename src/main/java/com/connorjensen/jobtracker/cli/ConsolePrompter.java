@@ -130,20 +130,32 @@ public class ConsolePrompter {
     }
   }
 
-  public Optional<URI> promptUrl(String urlLabel) {
-    this.promptStream.print(urlLabel);
-    URI jobUri = null;
-    while (jobUri == null) {
+  public Optional<String> promptUrl(String urlLabel) {
+    while (true) {
+      this.promptStream.print(urlLabel);
       if (this.promptScanner.hasNextLine()) {
-        try {
-          jobUri = new URI(this.promptScanner.nextLine());
-        } catch (URISyntaxException e) {
-          continue;
+        String urlString = this.promptScanner.nextLine();
+        if (urlString.isEmpty()) {
+          return Optional.of(urlString);
+        } else {
+          try {
+            URI uri = new URI(urlString);
+            if (uri.isAbsolute()
+                && (uri.getScheme().equalsIgnoreCase("http")
+                    || uri.getScheme().equalsIgnoreCase("https"))
+                && uri.getHost() != null) {
+              return Optional.of(uri.toString());
+            } else {
+              throw new URISyntaxException(uri.toString(), " Failed validation test");
+            }
+          } catch (URISyntaxException e) {
+            this.promptStream.println("Incorrect URL/URI syntax, enter again.");
+            continue;
+          }
         }
       } else {
         return Optional.empty();
       }
     }
-    return Optional.of(jobUri);
   }
 }
