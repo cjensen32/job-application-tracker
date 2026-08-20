@@ -36,10 +36,7 @@ public class InMemoryApplicationRepository implements ApplicationRepository {
 
   @Override
   public List<Application> findByStatus(Status status) {
-    List<Application> found =
-        storage.values().stream().filter(app -> app.getStatus() == status).toList();
-
-    return found;
+    return storage.values().stream().filter(app -> app.getStatus() == status).toList();
   }
 
   @Override

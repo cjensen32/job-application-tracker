@@ -1,6 +1,7 @@
 package com.connorjensen.jobtracker.cli;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import com.connorjensen.jobtracker.model.Application;
@@ -72,14 +73,19 @@ public class ConsoleApplication {
   }
 
   private boolean listApplications() {
-    this.view.showApplications(service.listAll(), Optional.empty());
+    this.view.showApplications(service.listAll());
     return true;
   }
 
   private boolean filterApplications() {
     Optional<Status> statusOptional = this.prompter.promptStatus("Status: ");
-    statusOptional.ifPresent(
-        status -> this.view.showApplications(this.service.listByStatus(status), statusOptional));
+    if (statusOptional.isPresent()) {
+      List<Application> statusApplications = this.service.listByStatus(statusOptional.get());
+      if (statusApplications.isEmpty()) {
+        this.view.showFoundNoStatusMatches(statusOptional.get());
+      }
+      this.view.showApplications(statusApplications);
+    }
     return true;
   }
 

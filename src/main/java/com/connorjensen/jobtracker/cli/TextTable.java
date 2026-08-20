@@ -108,7 +108,7 @@ public class TextTable {
       return;
     }
 
-    int maxSize = 0;
+    int maxSize;
     if (headerList.size() > maxRowLength) {
       // case: headerList is bigger than the bodyList
       maxSize = headerList.size();
