@@ -88,23 +88,11 @@ public class Application {
     this.jobUrl = jobUrl;
   }
 
-  @Override
-  public String toString() {
-    return company + " - " + role + " [" + status + "] ";
-  }
-
   public List<String> toValuesList() {
-    return new ArrayList<>(
-        List.of(
-            String.valueOf(this.id),
-            this.company,
-            this.role,
-            String.valueOf(this.appliedDate),
-            this.status.getLabel(),
-            this.jobUrl));
+    return new ArrayList<>(ApplicationDetails.getAllValues(this));
   }
 
   public static List<String> toLabelsList() {
-    return new ArrayList<>(List.of("ID", "Company", "Role", "Applied Date", "Status", "URL"));
+    return new ArrayList<>(ApplicationDetails.getAllLabels());
   }
 }

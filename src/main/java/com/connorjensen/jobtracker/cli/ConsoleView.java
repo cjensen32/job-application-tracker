@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.connorjensen.jobtracker.model.Application;
+import com.connorjensen.jobtracker.model.ApplicationDetails;
 import com.connorjensen.jobtracker.model.Status;
 
 public class ConsoleView {
@@ -40,29 +41,41 @@ public class ConsoleView {
   }
 
   void showApplications(List<Application> applications) {
-    if (applications.isEmpty()) {
-      this.consoleStream.println("No applications to list");
-    } else {
-      List<String> headerList = Application.toLabelsList();
-      List<List<String>> bodyRowsList = new ArrayList<>();
+    List<String> headerList = Application.toLabelsList();
+    List<List<String>> bodyRowsList = new ArrayList<>();
 
-      for (Application application : applications) {
-        bodyRowsList.add(application.toValuesList());
-      }
-      String textTable = this.textTable.render(headerList, bodyRowsList);
-      this.consoleStream.print(textTable);
+    for (Application application : applications) {
+      bodyRowsList.add(application.toValuesList());
     }
+    String textTable = this.textTable.render(headerList, bodyRowsList);
+    this.consoleStream.print(textTable);
+  }
+
+  void showApplicationDetails(Application application) {
+    this.consoleStream.println("Current application");
+    for (ApplicationDetails detail : ApplicationDetails.values()) {
+      this.consoleStream.println(detail.getLabel() + ": " + detail.getValue(application));
+    }
+  }
+
+  // result and error messages
+  void showCompletion(String completionType, Long id) {
+    this.consoleStream.println(completionType + " application " + id.toString() + ".");
+  }
+
+  void showFoundNoStatusMatches(Status status) {
+    this.consoleStream.println("No Applications found for status: " + status.getLabel());
+  }
+
+  void showNoIdMatches(Long applicationID) {
+    this.consoleStream.println("No application found with ID: " + applicationID);
   }
 
   void showGoodbye() {
     this.consoleStream.println("Goodbye.");
   }
 
-  public void showCompletion(String completionNote) {
-    this.consoleStream.println(completionNote);
-  }
-
-  public void showFoundNoStatusMatches(Status status) {
-    this.consoleStream.println("No Applications found for status: " + status.getLabel());
+  public void showNoApplicationEntries(String modificationType) {
+    this.consoleStream.println("No applications exist to " + modificationType + "!");
   }
 }

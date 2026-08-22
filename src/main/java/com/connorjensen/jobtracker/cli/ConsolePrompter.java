@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -45,6 +46,28 @@ public class ConsolePrompter {
     return Optional.of(selection);
   }
 
+  public Optional<Long> promptPositiveId() {
+    String idString;
+
+    while (true) {
+      this.promptStream.print("Application ID: ");
+      if (this.promptScanner.hasNextLine()) {
+        idString = this.promptScanner.nextLine();
+        try {
+          long id = Long.parseLong(idString);
+          if (id >= 1) {
+            return Optional.of(id);
+          }
+          this.promptStream.println("Enter a positive application ID.");
+        } catch (NumberFormatException ignored) {
+          continue;
+        }
+      } else {
+        return Optional.empty();
+      }
+    }
+  }
+
   public Optional<String> promptFormEntry(String formLabel) {
     while (true) {
       this.promptStream.print(formLabel);
@@ -59,11 +82,25 @@ public class ConsolePrompter {
     }
   }
 
-  public Optional<LocalDate> promptDate(String dateLabel) {
+  public Optional<String> promptFormUpdate(String formLabel, String previous) {
+    this.promptStream.print(formLabel + " [" + previous + "]: ");
+    if (this.promptScanner.hasNextLine()) {
+      String testLine = this.promptScanner.nextLine().strip();
+      if (testLine.isEmpty()) {
+        return Optional.of(previous);
+      } else {
+        return Optional.of(testLine);
+      }
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  public Optional<LocalDate> promptDate() {
     LocalDate appliedDate = null;
 
     while (appliedDate == null) {
-      this.promptStream.print(dateLabel);
+      this.promptStream.print("Applied date (YYYY-MM-DD): ");
       String stringDate;
       if (this.promptScanner.hasNextLine()) {
         stringDate = this.promptScanner.nextLine();
@@ -71,7 +108,12 @@ public class ConsolePrompter {
         return Optional.empty();
       }
 
-      // Validate is actual date
+      // Return current date on empty
+      if (stringDate.isEmpty()) {
+        return Optional.of(LocalDate.now());
+      }
+
+      // Validate entry as actual date
       try {
         appliedDate = LocalDate.parse(stringDate);
       } catch (DateTimeParseException ignored) {
@@ -81,10 +123,37 @@ public class ConsolePrompter {
     return Optional.of(appliedDate);
   }
 
-  public Optional<Status> promptStatus(String statusLabel) {
+  public Optional<LocalDate> promptDateUpdate(LocalDate previousDate) {
+    LocalDate appliedDate = null;
+
+    while (appliedDate == null) {
+      this.promptStream.print("Applied date [" + previousDate.toString() + "]: ");
+      String stringDate;
+      if (this.promptScanner.hasNextLine()) {
+        stringDate = this.promptScanner.nextLine();
+      } else {
+        return Optional.empty();
+      }
+
+      // Return previous date on empty
+      if (stringDate.isEmpty()) {
+        return Optional.of(previousDate);
+      }
+
+      // Validate entry as actual date
+      try {
+        appliedDate = LocalDate.parse(stringDate);
+      } catch (DateTimeParseException ignored) {
+        continue;
+      }
+    }
+    return Optional.of(appliedDate);
+  }
+
+  public Optional<Status> promptStatus() {
     Status status = null;
     while (status == null) {
-      this.promptStream.print(statusLabel);
+      this.promptStream.print("Status: ");
       String statusEntry;
       if (this.promptScanner.hasNextLine()) {
         statusEntry = this.promptScanner.nextLine();
@@ -101,28 +170,31 @@ public class ConsolePrompter {
     return Optional.of(status);
   }
 
-  public Optional<Long> promptPositiveId(String idLabel) {
-    long id = 0L;
-    String idString;
-
-    while (id < 1) {
+  public Optional<Status> promptStatusUpdate(Status previousStatus) {
+    Status status = null;
+    while (status == null) {
+      this.promptStream.print("Status [" + previousStatus.toString() + "]: ");
+      String statusEntry;
       if (this.promptScanner.hasNextLine()) {
-        this.promptStream.print(idLabel);
-        idString = this.promptScanner.nextLine();
+        statusEntry = this.promptScanner.nextLine();
+        if (statusEntry.isEmpty()) {
+          return Optional.of(previousStatus);
+        }
       } else {
         return Optional.empty();
       }
+      String statusLookup = statusEntry.strip().replace(" ", "_").replace("-", "_").toUpperCase();
       try {
-        id = Long.parseLong(idString);
-      } catch (NumberFormatException ignored) {
+        status = Status.valueOf(statusLookup);
+      } catch (IllegalArgumentException ignored) {
         continue;
       }
     }
-    return Optional.of(id);
+    return Optional.of(status);
   }
 
-  public Optional<String> promptNotesEntry(String notesLabel) {
-    this.promptStream.print(notesLabel);
+  public Optional<String> promptNotesEntry() {
+    this.promptStream.print("Notes (optional): ");
     if (this.promptScanner.hasNextLine()) {
       return Optional.of(this.promptScanner.nextLine());
     } else {
@@ -130,32 +202,74 @@ public class ConsolePrompter {
     }
   }
 
-  public Optional<String> promptUrl(String urlLabel) {
+  public Optional<String> promptNotesUpdate(String notes) {
+    this.promptStream.print("Notes [" + notes + "] ('-' clears): ");
+    if (this.promptScanner.hasNextLine()) {
+      String notesString = this.promptScanner.nextLine();
+      if (Objects.equals(notesString, "-")) {
+        return Optional.of("");
+      } else if (notesString.isEmpty()) {
+        return Optional.of(notes);
+      } else {
+        return Optional.of(notesString);
+      }
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  public Optional<String> promptUrl() {
     while (true) {
-      this.promptStream.print(urlLabel);
+      this.promptStream.print("Job URL (optional): ");
       if (this.promptScanner.hasNextLine()) {
         String urlString = this.promptScanner.nextLine();
         if (urlString.isEmpty()) {
-          return Optional.of(urlString);
+          return Optional.of("");
         } else {
-          try {
-            URI uri = new URI(urlString);
-            if (uri.isAbsolute()
-                && (uri.getScheme().equalsIgnoreCase("http")
-                    || uri.getScheme().equalsIgnoreCase("https"))
-                && uri.getHost() != null) {
-              return Optional.of(uri.toString());
-            } else {
-              throw new URISyntaxException(uri.toString(), " Failed validation test");
-            }
-          } catch (URISyntaxException e) {
-            this.promptStream.println("Incorrect URL/URI syntax, enter again.");
-            continue;
+          if (validateUriString(urlString)) {
+            return Optional.of(urlString);
           }
         }
       } else {
         return Optional.empty();
       }
     }
+  }
+
+  public Optional<String> promptUrlUpdate(String jobUrl) {
+    while (true) {
+      this.promptStream.print("Job URL [" + jobUrl + "] ('-' clears): ");
+      if (this.promptScanner.hasNextLine()) {
+        String urlString = this.promptScanner.nextLine();
+        if (urlString.isEmpty()) {
+          return Optional.of(jobUrl);
+        } else if (urlString.equals("-")) {
+          return Optional.of("");
+        } else {
+          if (validateUriString(urlString)) {
+            return Optional.of(urlString);
+          }
+        }
+      } else {
+        return Optional.empty();
+      }
+    }
+  }
+
+  // Helper refactor content for URL prompter
+  private boolean validateUriString(String urlString) {
+    try {
+      URI uri = new URI(urlString);
+      if (uri.isAbsolute()
+          && (uri.getScheme().equalsIgnoreCase("http") || uri.getScheme().equalsIgnoreCase("https"))
+          && uri.getHost() != null) {
+        return true;
+      } else {
+        throw new URISyntaxException(uri.toString(), " Failed validation test");
+      }
+    } catch (URISyntaxException e) {
+      this.promptStream.println("Incorrect URL/URI syntax, enter again.");
+    }
+    return false;
   }
 }

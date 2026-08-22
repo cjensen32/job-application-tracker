@@ -28,11 +28,15 @@ public class ConsoleApplication {
     while (running) {
       this.view.showMenu();
       selection = this.prompter.promptMenuSelection();
-      if (selection.isPresent()) {
+      if (selection.isEmpty()) {
+        this.view.showGoodbye();
+        return;
+      } else {
         running = dispatch(selection.get());
       }
     }
     this.view.showGoodbye();
+    return;
   }
 
   private boolean dispatch(int selection) {
@@ -40,8 +44,8 @@ public class ConsoleApplication {
       case 0 -> createApplication();
       case 1 -> listApplications();
       case 2 -> filterApplications();
-      case 3 -> editApplication(); // TODO: Need to complete
-      case 4 -> deleteApplication(); // TODO: Need to complete
+      case 3 -> editApplication();
+      case 4 -> deleteApplication();
       case 5 -> false;
       default -> throw new IllegalStateException("validated selection escaped its boundary");
     };
@@ -49,51 +53,122 @@ public class ConsoleApplication {
 
   private boolean createApplication() {
     Optional<String> company = this.prompter.promptFormEntry("Company: ");
-    Optional<String> role = this.prompter.promptFormEntry("Role: ");
-    Optional<LocalDate> appliedDate = this.prompter.promptDate("Applied date (YYYY-MM-DD): ");
-    Optional<String> notes = this.prompter.promptNotesEntry("Notes (optional): ");
-    Optional<String> jobUrl = this.prompter.promptUrl("Job URL (optional): ");
-
-    if (company.isPresent()
-        && role.isPresent()
-        && appliedDate.isPresent()
-        && notes.isPresent()
-        && jobUrl.isPresent()) {
-      Application newApp =
-          service.create(
-              company.get(),
-              role.get(),
-              appliedDate.get(),
-              notes.get(),
-              jobUrl.get());
-      this.view.showCompletion("Created application " + newApp.getId() + ".");
-      return true;
+    if (company.isEmpty()) {
+      return false;
     }
-    return false;
+    Optional<String> role = this.prompter.promptFormEntry("Role: ");
+    if (role.isEmpty()) {
+      return false;
+    }
+    Optional<LocalDate> appliedDate = this.prompter.promptDate();
+    if (appliedDate.isEmpty()) {
+      return false;
+    }
+    Optional<String> notes = this.prompter.promptNotesEntry();
+    if (notes.isEmpty()) {
+      return false;
+    }
+    Optional<String> jobUrl = this.prompter.promptUrl();
+    if (jobUrl.isEmpty()) {
+      return false;
+    }
+
+    Application newApp =
+        service.create(company.get(), role.get(), appliedDate.get(), notes.get(), jobUrl.get());
+    this.view.showCompletion("Created", newApp.getId());
+    return true;
   }
 
   private boolean listApplications() {
-    this.view.showApplications(service.listAll());
+    if (!service.listAll().isEmpty()) {
+      this.view.showApplications(service.listAll());
+    } else {
+      this.view.showNoApplicationEntries("list");
+    }
     return true;
   }
 
   private boolean filterApplications() {
-    Optional<Status> statusOptional = this.prompter.promptStatus("Status: ");
-    if (statusOptional.isPresent()) {
-      List<Application> statusApplications = this.service.listByStatus(statusOptional.get());
-      if (statusApplications.isEmpty()) {
-        this.view.showFoundNoStatusMatches(statusOptional.get());
+    if (this.service.listAll().isEmpty()) {
+      this.view.showNoApplicationEntries("filter & list");
+      return true;
+    } else {
+      Optional<Status> statusOptional = this.prompter.promptStatus();
+      if (statusOptional.isEmpty()) {
+        return false;
+      } else {
+        List<Application> statusApplications = this.service.listByStatus(statusOptional.get());
+        if (statusApplications.isEmpty()) {
+          this.view.showFoundNoStatusMatches(statusOptional.get());
+          return true;
+        }
+        this.view.showApplications(statusApplications);
+        return true;
       }
-      this.view.showApplications(statusApplications);
     }
-    return true;
   }
 
   private boolean editApplication() {
-    throw new UnsupportedOperationException("TODO");
+    if (!this.service.listAll().isEmpty()) {
+      Optional<Long> idOptional = this.prompter.promptPositiveId();
+      if (idOptional.isPresent()) {
+        Long id = idOptional.get();
+        Optional<Application> applicationOptional = service.findById(id);
+        if (applicationOptional.isPresent()) {
+          Application applicationEdit = applicationOptional.get();
+          this.view.showApplicationDetails(applicationEdit);
+          Optional<String> newCompany =
+              this.prompter.promptFormUpdate("Company", applicationEdit.getCompany());
+          Optional<String> newRole =
+              this.prompter.promptFormUpdate("Role", applicationEdit.getRole());
+          Optional<LocalDate> newDate =
+              this.prompter.promptDateUpdate(applicationEdit.getAppliedDate());
+          Optional<Status> newStatus =
+              this.prompter.promptStatusUpdate(applicationEdit.getStatus());
+          Optional<String> newNotes = this.prompter.promptNotesUpdate(applicationEdit.getNotes());
+          Optional<String> newURL = this.prompter.promptUrlUpdate(applicationEdit.getJobUrl());
+          // Apply edits to update application if all come back as non EOF signals
+          if (newCompany.isPresent()
+              && newRole.isPresent()
+              && newDate.isPresent()
+              && newStatus.isPresent()
+              && newNotes.isPresent()
+              && newURL.isPresent()) {
+            applicationEdit.setCompany(newCompany.get());
+            applicationEdit.setRole(newRole.get());
+            applicationEdit.setAppliedDate(newDate.get());
+            applicationEdit.setStatus(newStatus.get());
+            applicationEdit.setNotes(newNotes.get());
+            applicationEdit.setJobUrl(newURL.get());
+            this.view.showCompletion("Updated", applicationEdit.getId());
+            return true;
+          }
+          return false;
+        } else {
+          this.view.showNoIdMatches(id);
+        }
+      }
+    }
+    this.view.showNoApplicationEntries("edit");
+    return true;
   }
 
   private boolean deleteApplication() {
-    throw new UnsupportedOperationException("TODO");
+    if (!this.service.listAll().isEmpty()) {
+      Optional<Long> idOptional = this.prompter.promptPositiveId();
+      if (idOptional.isPresent()) {
+        Long id = idOptional.get();
+        boolean result = this.service.delete(id);
+        if (result) {
+          this.view.showCompletion("Deleted", id);
+        } else {
+          this.view.showNoIdMatches(id);
+        }
+        return true;
+      }
+      return false;
+    }
+    this.view.showNoApplicationEntries("delete");
+    return true;
   }
 }
