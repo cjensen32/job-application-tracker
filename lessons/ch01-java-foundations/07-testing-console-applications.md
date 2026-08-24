@@ -9,7 +9,7 @@ The test shape introduced here follows the reusable [test-writing conventions](.
 **Progress**
 
 - [x] Build a deterministic session fixture
-- [ ] Test the pure renderer exactly, and fix what that exposes
+- [x] Test the pure renderer exactly, and fix what that exposes
 - [ ] Use a subprocess for the real Main lifecycle
 - [ ] Interpret coverage as evidence
 - [ ] Complete the self-check
@@ -20,7 +20,7 @@ The test shape introduced here follows the reusable [test-writing conventions](.
 
 Start from the end of Lesson 6. The capstone grader now compiles, so the whole suite runs for the first time since you installed it.
 
-- [ ] See where you actually stand.
+- [x] See where you actually stand.
 
 ```bash
 mvn -Dcheckstyle.skip -Dtest=Chapter01CapstoneTest test 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$'
@@ -119,17 +119,17 @@ Four defects, and none of them are reachable through the app. `showApplications`
 
 The last one is the interesting one. `render` looks pure — `List` in, `String` out — but it edits its arguments on the way through. Today the app gets away with it because `Application.toLabelsList()` handed back a fresh list every call; Lesson 6 replaced that with a shared `COLUMNS` constant, so the same bug would now corrupt the constant if you had not copied it at the call site.
 
-- [ ] Copy the header and every row into new lists before touching them.
-- [ ] Strip each cell once, up front, and treat `null` and a missing ragged cell identically as `""`.
-- [ ] Take the column count from the widest of the header and all rows, and pad every row to it.
-- [ ] Return `""` when there are no columns at all.
-- [ ] Measure widths from the stripped values, so measuring and rendering agree.
+- [x] Copy the header and every row into new lists before touching them.
+- [x] Strip each cell once, up front, and treat `null` and a missing ragged cell identically as `""`.
+- [x] Take the column count from the widest of the header and all rows, and pad every row to it.
+- [x] Return `""` when there are no columns at all.
+- [x] Measure widths from the stripped values, so measuring and rendering agree.
 
 Doing all five at once is easier than patching, because they are the same idea: normalize the input into a rectangle of stripped strings first, then render. The old code interleaved normalizing, measuring, and printing, which is why one method could hold four bugs.
 
 ### Verify
 
-- [ ] Run the table group again.
+- [x] Run the table group again.
 
 ```bash
 mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$TextTableTests' test 2>&1 | rg 'Tests run:.*Skipped|BUILD'

@@ -120,7 +120,6 @@ public class ConsoleSessionTest {
             "> Goodbye.");
 
     Session returnedSession = run(testScript);
-
     assertEquals(textExpected, returnedSession.output());
   }
 }
