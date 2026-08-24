@@ -62,7 +62,7 @@ print prompt → EOF? stop → read line → valid? return → explain and retry
 `Optional.empty()` means EOF only. Invalid input stays inside the prompt loop.
 
 - [x] Required text: `strip()`, reject blank, and retry.
-- [ ] Date: require nonblank ISO `YYYY-MM-DD` text and parse it with `LocalDate.parse(...)`.
+- [x] Date: require nonblank ISO `YYYY-MM-DD` text and parse it with `LocalDate.parse(...)`.
 - [x] ID: parse with `Long.parseLong(...)` and require a value of at least `1`.
 - [x] Status: `strip()`, replace spaces or hyphens with underscores, call `toUpperCase(Locale.ROOT)`, then use `Status.valueOf(...)`.
 - [x] URL: trim it; accept blank or require an absolute `http` or `https` URI, case-insensitively.
@@ -100,7 +100,7 @@ If either prompt appears once, its invalid value escaped instead of retrying loc
 
 ## Step 3 — Make text and charset behavior deterministic
 
-- [ ] In `src/main/java/com/connorjensen/jobtracker/Main.java`, replace the menu-building loop with this class field. Its final newline is part of the value.
+- [x] In `src/main/java/com/connorjensen/jobtracker/Main.java`, replace the menu-building loop with this class field. Its final newline is part of the value.
 
 ```java
 private static final String MENU = """
