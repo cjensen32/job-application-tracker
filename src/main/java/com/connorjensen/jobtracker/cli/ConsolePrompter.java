@@ -20,7 +20,7 @@ public class ConsolePrompter {
     this.promptStream = promptStream;
   }
 
-  public Optional<Integer> promptMenuSelection() {
+  Optional<Integer> promptMenuSelection() {
     boolean help = false;
     int selection = 6;
     String selectionString;
@@ -46,7 +46,7 @@ public class ConsolePrompter {
     return Optional.of(selection);
   }
 
-  public Optional<Long> promptPositiveId() {
+  Optional<Long> promptPositiveId() {
     String idString;
 
     while (true) {
@@ -68,7 +68,7 @@ public class ConsolePrompter {
     }
   }
 
-  public Optional<String> promptFormEntry(String formLabel) {
+  Optional<String> promptFormEntry(String formLabel) {
     while (true) {
       this.promptStream.print(formLabel);
       if (this.promptScanner.hasNextLine()) {
@@ -82,7 +82,7 @@ public class ConsolePrompter {
     }
   }
 
-  public Optional<String> promptFormUpdate(String formLabel, String previous) {
+  Optional<String> promptFormUpdate(String formLabel, String previous) {
     this.promptStream.print(formLabel + " [" + previous + "]: ");
     if (this.promptScanner.hasNextLine()) {
       String testLine = this.promptScanner.nextLine().strip();
@@ -96,7 +96,7 @@ public class ConsolePrompter {
     }
   }
 
-  public Optional<LocalDate> promptDate() {
+  Optional<LocalDate> promptDate() {
     LocalDate appliedDate = null;
 
     while (appliedDate == null) {
@@ -123,7 +123,7 @@ public class ConsolePrompter {
     return Optional.of(appliedDate);
   }
 
-  public Optional<LocalDate> promptDateUpdate(LocalDate previousDate) {
+  Optional<LocalDate> promptDateUpdate(LocalDate previousDate) {
     LocalDate appliedDate = null;
 
     while (appliedDate == null) {
@@ -150,7 +150,7 @@ public class ConsolePrompter {
     return Optional.of(appliedDate);
   }
 
-  public Optional<Status> promptStatus() {
+  Optional<Status> promptStatus() {
     Status status = null;
     while (status == null) {
       this.promptStream.print("Status: ");
@@ -170,7 +170,7 @@ public class ConsolePrompter {
     return Optional.of(status);
   }
 
-  public Optional<Status> promptStatusUpdate(Status previousStatus) {
+  Optional<Status> promptStatusUpdate(Status previousStatus) {
     Status status = null;
     while (status == null) {
       this.promptStream.print("Status [" + previousStatus.toString() + "]: ");
@@ -193,7 +193,7 @@ public class ConsolePrompter {
     return Optional.of(status);
   }
 
-  public Optional<String> promptNotesEntry() {
+  Optional<String> promptNotesEntry() {
     this.promptStream.print("Notes (optional): ");
     if (this.promptScanner.hasNextLine()) {
       return Optional.of(this.promptScanner.nextLine());
@@ -202,7 +202,7 @@ public class ConsolePrompter {
     }
   }
 
-  public Optional<String> promptNotesUpdate(String notes) {
+  Optional<String> promptNotesUpdate(String notes) {
     this.promptStream.print("Notes [" + notes + "] ('-' clears): ");
     if (this.promptScanner.hasNextLine()) {
       String notesString = this.promptScanner.nextLine();
@@ -218,7 +218,7 @@ public class ConsolePrompter {
     }
   }
 
-  public Optional<String> promptUrl() {
+  Optional<String> promptUrl() {
     while (true) {
       this.promptStream.print("Job URL (optional): ");
       if (this.promptScanner.hasNextLine()) {
@@ -236,7 +236,7 @@ public class ConsolePrompter {
     }
   }
 
-  public Optional<String> promptUrlUpdate(String jobUrl) {
+  Optional<String> promptUrlUpdate(String jobUrl) {
     while (true) {
       this.promptStream.print("Job URL [" + jobUrl + "] ('-' clears): ");
       if (this.promptScanner.hasNextLine()) {

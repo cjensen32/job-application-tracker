@@ -11,7 +11,7 @@ import com.connorjensen.jobtracker.repository.ApplicationRepository;
 import com.connorjensen.jobtracker.repository.InMemoryApplicationRepository;
 import com.connorjensen.jobtracker.service.ApplicationService;
 
-public class Main {
+public final class Main {
   private Main() {}
 
   public static void main(String[] args) {

@@ -1,8 +1,6 @@
 package com.connorjensen.jobtracker.model;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Application {
   private Long id;
@@ -12,6 +10,21 @@ public class Application {
   private Status status;
   private String notes;
   private String jobUrl;
+
+  public Application(
+      String company,
+      String role,
+      LocalDate appliedDate,
+      Status status,
+      String notes,
+      String jobUrl) {
+    this.company = company;
+    this.role = role;
+    this.appliedDate = appliedDate;
+    this.status = status;
+    this.notes = notes;
+    this.jobUrl = jobUrl;
+  }
 
   public Application(
       String company, String role, LocalDate appliedDate, String notes, String jobUrl) {
@@ -86,13 +99,5 @@ public class Application {
 
   public void setJobUrl(String jobUrl) {
     this.jobUrl = jobUrl;
-  }
-
-  public List<String> toValuesList() {
-    return new ArrayList<>(ApplicationDetails.getAllValues(this));
-  }
-
-  public static List<String> toLabelsList() {
-    return new ArrayList<>(ApplicationDetails.getAllLabels());
   }
 }

@@ -6,10 +6,10 @@
 
 **Progress**
 
-- [ ] Finish the CLI split and retire the `util` drawer
-- [ ] Move presentation labels out of the model
-- [ ] Introduce request records and service operations
-- [ ] Reduce visibility and keep Main as the composition root
+- [x] Finish the CLI split and retire the `util` drawer
+- [x] Move presentation labels out of the model
+- [x] Introduce request records and service operations
+- [x] Reduce visibility and keep Main as the composition root
 - [ ] Complete the self-check
 
 ---
@@ -76,13 +76,13 @@ The split you already made follows cohesion, and it is the right one:
 
 `Centering` does not get a row in that table, and that is the tell. Centering a string inside a column is not a general-purpose utility that many packages need — it is one rule inside the rendering algorithm, and it changes for exactly the same reason `TextTable` changes. A `public static` method in `util` also invites any future class to depend on it, which quietly widens the surface you have to keep working.
 
-- [ ] Move `Centering.center(...)` into `TextTable` as a `private static` helper.
-- [ ] Delete `src/main/java/com/connorjensen/jobtracker/util/Centering.java` and the now-empty `util` package.
-- [ ] Remove the `import com.connorjensen.jobtracker.util.Centering;` line from `TextTable`.
+- [x] Move `Centering.center(...)` into `TextTable` as a `private static` helper.
+- [x] Delete `src/main/java/com/connorjensen/jobtracker/util/Centering.java` and the now-empty `util` package.
+- [x] Remove the `import com.connorjensen.jobtracker.util.Centering;` line from `TextTable`.
 
 ### Verify
 
-- [ ] Confirm no production code mentions the old CLI utilities, then compile.
+- [x] Confirm no production code mentions the old CLI utilities, then compile.
 
 ```bash
 if rg -n 'ConsoleExperience|ApplicationTextTable|Centering' src/main/java; then exit 1; else echo "old CLI utilities: removed"; fi && mvn -q -Dcheckstyle.skip -DskipTests compile && echo "compile: ok"
@@ -97,16 +97,16 @@ Before the move the same command prints five matches and exits `1`; `TextTable.j
 
 ## Step 2 — Move presentation labels out of the model
 
-`ApplicationDetails` was a good instinct: one place that pairs each field with a label and a way to read it, instead of six hand-written lines in two different methods. The problem is where it lives.
+`ApplicationDetails` was a good instinct: one place that pairs each field with a label and a way to read it, instead of six handwritten lines in two different methods. The problem is where it lives.
 
 Today `ApplicationDetails.getAllLabels()` filters out `NOTES` — so a type in `model` is deciding that the *list table* has six columns while the *detail view* has seven. That is a presentation decision, and it changes whenever the console's layout changes, not when a job application changes. It also means `getAllLabels()` no longer means "all labels", which is how the name and the body drifted apart.
 
 Ask the ownership question: if Chapter 2 replaces the console with a JSON controller, does this code follow the model or follow the view? Column order, column names, and "notes is too wide for a table" all follow the view.
 
-- [ ] Give `ConsoleView` the six column names and a private method that turns one `Application` into one row.
-- [ ] Give `ConsoleView` the detail-view lines directly, so the two layouts stop sharing one enum.
-- [ ] Delete `Application.toLabelsList()` and `Application.toValuesList()`.
-- [ ] Delete `model/ApplicationDetails.java`.
+- [x] Give `ConsoleView` the six column names and a private method that turns one `Application` into one row.
+- [x] Give `ConsoleView` the detail-view lines directly, so the two layouts stop sharing one enum.
+- [x] Delete `Application.toLabelsList()` and `Application.toValuesList()`.
+- [x] Delete `model/ApplicationDetails.java`.
 
 The column contract is fixed by [CAPSTONE.md](CAPSTONE.md) — exactly `ID`, `Company`, `Role`, `Applied Date`, `Status`, `URL`, with the status rendered as the enum name. Two spellings in your current code do not match it: the header reads `Applied date`, and both the table and the detail view print `Status.getLabel()` (`Applied`) where the contract wants `Status.name()` (`APPLIED`). `getLabel()` keeps earning its place on `Status` for a future UI; the console is simply not that UI.
 
@@ -131,7 +131,7 @@ public class ConsoleView {
 
 ### Verify
 
-- [ ] Compile, then create one application and list it.
+- [x] Compile, then create one application and list it.
 
 ```bash
 mvn -q -Dcheckstyle.skip -DskipTests compile &&
@@ -150,11 +150,11 @@ If the header still reads `Applied date` or the status column reads `Applied`, `
 
 A service method with six scalar parameters is easy to call in the wrong order and painful to extend. A request record <sup>[J16](NOTES.md#records)</sup> gives the operation one named, typed input.
 
-- [ ] Add `CreateApplicationRequest` to the service package.
-- [ ] Add `UpdateApplicationRequest` to the service package.
-- [ ] Add `create(CreateApplicationRequest)` and `update(Long, UpdateApplicationRequest)` to `ApplicationService`.
-- [ ] Make `update(...)` throw `IllegalArgumentException` for an unknown id, the same way `updateStatus` already does.
-- [ ] Keep the existing `create` overloads and `updateStatus`; the grader asserts the old operations still work.
+- [x] Add `CreateApplicationRequest` to the service package.
+- [x] Add `UpdateApplicationRequest` to the service package.
+- [x] Add `create(CreateApplicationRequest)` and `update(Long, UpdateApplicationRequest)` to `ApplicationService`.
+- [x] Make `update(...)` throw `IllegalArgumentException` for an unknown id, the same way `updateStatus` already does.
+- [x] Keep the existing `create` overloads and `updateStatus`; the grader asserts the old operations still work.
 
 ```java
 // src/main/java/com/connorjensen/jobtracker/service/CreateApplicationRequest.java
@@ -174,7 +174,7 @@ Note the seam: `IllegalArgumentException` for a missing id becomes `ApplicationN
 
 ### Verify
 
-- [ ] Run the service group of the grader. This is also the moment the test suite compiles again.
+- [x] Run the service group of the grader. This is also the moment the test suite compiles again.
 
 ```bash
 mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ServiceTests' test 2>&1 | rg 'Tests run:.*Skipped|BUILD'
@@ -194,11 +194,11 @@ If `requestRecordsHaveThePublishedComponentsAndValueEquality` fails, check the c
 
 `ConsoleApplication`, `ConsolePrompter`, `ConsoleView`, and `TextTable` all live in `com.connorjensen.jobtracker.cli`, so they can call each other's package-private methods freely. Nothing outside that package ever calls a prompt method or a `show...` method — only `Main` reaches in, and only for the constructors and `run()`.
 
-- [ ] Keep only the four constructors, `ConsoleApplication.run()`, and `TextTable.render(...)` public.
-- [ ] Drop `public` from all twelve `ConsolePrompter` prompt methods.
-- [ ] Drop `public` from `ConsoleView.showNoApplicationEntries(...)`.
-- [ ] Declare `Main` `final`; it already has the private constructor that stops instantiation.
-- [ ] Confirm `Main.main` builds repository, service, scanner, table, view, prompter, and application, then calls `run()` and nothing else.
+- [x] Keep only the four constructors, `ConsoleApplication.run()`, and `TextTable.render(...)` public.
+- [x] Drop `public` from all twelve `ConsolePrompter` prompt methods.
+- [x] Drop `public` from `ConsoleView.showNoApplicationEntries(...)`.
+- [x] Declare `Main` `final`; it already has the private constructor that stops instantiation.
+- [x] Confirm `Main.main` builds repository, service, scanner, table, view, prompter, and application, then calls `run()` and nothing else.
 
 Your `Main` already matches the intended dependency direction:
 
@@ -212,7 +212,7 @@ This is a course architecture convention, not a restriction of the Java compiler
 
 ### Verify
 
-- [ ] Run the architecture group.
+- [x] Run the architecture group.
 
 ```bash
 mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ArchitectureTests' test 2>&1 | rg 'Tests run:.*Skipped|BUILD'

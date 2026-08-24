@@ -16,6 +16,17 @@ public class ApplicationService {
     this.repository = repository;
   }
 
+  public Application create(CreateApplicationRequest createApplicationRequest) {
+    return this.repository.save(
+        new Application(
+            createApplicationRequest.company(),
+            createApplicationRequest.role(),
+            createApplicationRequest.appliedDate(),
+            Status.APPLIED,
+            createApplicationRequest.notes(),
+            createApplicationRequest.jobUrl()));
+  }
+
   public Application create(String company, String role, LocalDate appliedDate) {
     return this.repository.save(new Application(company, role, appliedDate));
   }
@@ -23,6 +34,23 @@ public class ApplicationService {
   public Application create(
       String company, String role, LocalDate appliedDate, String notes, String jobUrl) {
     return this.repository.save(new Application(company, role, appliedDate, notes, jobUrl));
+  }
+
+  public Application update(Long id, UpdateApplicationRequest updateApplicationRequest) {
+    Application app =
+        this.repository
+            .findById(id)
+            .orElseThrow(
+                () -> (new IllegalArgumentException("No Application found with ID: " + id)));
+
+    app.setCompany(updateApplicationRequest.company());
+    app.setRole(updateApplicationRequest.role());
+    app.setAppliedDate(updateApplicationRequest.appliedDate());
+    app.setStatus(updateApplicationRequest.status());
+    app.setNotes(updateApplicationRequest.notes());
+    app.setJobUrl(updateApplicationRequest.jobUrl());
+
+    return this.repository.save(app);
   }
 
   public List<Application> listAll() {

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.connorjensen.jobtracker.model.Application;
-import com.connorjensen.jobtracker.model.ApplicationDetails;
 import com.connorjensen.jobtracker.model.Status;
 
 public class ConsoleView {
@@ -16,6 +15,9 @@ public class ConsoleView {
     this.consoleStream = viewStream;
     this.textTable = textTable;
   }
+
+  private static final List<String> COLUMNS =
+      List.of("ID", "Company", "Role", "Applied Date", "Status", "URL");
 
   void showHeader() {
     this.consoleStream.println("Job Application Tracker");
@@ -41,20 +43,20 @@ public class ConsoleView {
   }
 
   void showApplications(List<Application> applications) {
-    List<String> headerList = Application.toLabelsList();
     List<List<String>> bodyRowsList = new ArrayList<>();
 
     for (Application application : applications) {
-      bodyRowsList.add(application.toValuesList());
+      bodyRowsList.add(applicationToRow(application));
     }
-    String textTable = this.textTable.render(headerList, bodyRowsList);
+    String textTable = this.textTable.render(COLUMNS, bodyRowsList);
     this.consoleStream.print(textTable);
   }
 
   void showApplicationDetails(Application application) {
     this.consoleStream.println("Current application");
-    for (ApplicationDetails detail : ApplicationDetails.values()) {
-      this.consoleStream.println(detail.getLabel() + ": " + detail.getValue(application));
+    List<String> applicationDetails = applicationToRow(application);
+    for (int i = 0; i < COLUMNS.size() - 1; i++) {
+      this.consoleStream.println(COLUMNS.get(i) + ": " + applicationDetails.get(i));
     }
   }
 
@@ -75,7 +77,19 @@ public class ConsoleView {
     this.consoleStream.println("Goodbye.");
   }
 
-  public void showNoApplicationEntries(String modificationType) {
+  void showNoApplicationEntries(String modificationType) {
     this.consoleStream.println("No applications exist to " + modificationType + "!");
+  }
+
+  // Helper for turning into a table row
+  private List<String> applicationToRow(Application application) {
+
+    return List.of(
+        application.getId().toString(),
+        application.getCompany(),
+        application.getRole(),
+        application.getAppliedDate().toString(),
+        application.getStatus().name(),
+        application.getJobUrl());
   }
 }

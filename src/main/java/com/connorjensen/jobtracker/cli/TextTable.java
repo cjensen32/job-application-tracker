@@ -3,8 +3,6 @@ package com.connorjensen.jobtracker.cli;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.connorjensen.jobtracker.util.Centering;
-
 public class TextTable {
 
   public TextTable() {}
@@ -22,7 +20,7 @@ public class TextTable {
     tableBuilder.append("|");
     for (int i = 0; i < columnCount; i++) {
       String header = headerList.get(i);
-      tableBuilder.append(Centering.center(header, columnWidthsList.get(i) + 2));
+      tableBuilder.append(centerText(header, columnWidthsList.get(i) + 2));
       tableBuilder.append("|");
     }
     tableBuilder.append("\n");
@@ -39,7 +37,7 @@ public class TextTable {
 
       for (int k = 0; k < strings.size(); k++) {
         String cellValue = strings.get(k);
-        String centeredValue = Centering.center(cellValue, columnWidthsList.get(k) + 2);
+        String centeredValue = centerText(cellValue, columnWidthsList.get(k) + 2);
         tableBuilder.append(centeredValue).append("|");
       }
       tableBuilder.append("\n");
@@ -124,5 +122,21 @@ public class TextTable {
         headerList.add("");
       }
     }
+  }
+
+  private static String centerText(String text, int width) {
+    if (text == null) {
+      text = "";
+    } else {
+      text = text.strip();
+    }
+
+    int padding = width - text.length();
+    if (padding <= 0) {
+      return text;
+    }
+
+    int left = padding / 2;
+    return " ".repeat(left) + text + " ".repeat(padding - left);
   }
 }
