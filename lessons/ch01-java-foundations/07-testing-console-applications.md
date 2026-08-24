@@ -8,7 +8,7 @@ The test shape introduced here follows the reusable [test-writing conventions](.
 
 **Progress**
 
-- [ ] Build a deterministic session fixture
+- [x] Build a deterministic session fixture
 - [ ] Test the pure renderer exactly, and fix what that exposes
 - [ ] Use a subprocess for the real Main lifecycle
 - [ ] Interpret coverage as evidence
@@ -32,10 +32,10 @@ mvn -Dcheckstyle.skip -Dtest=Chapter01CapstoneTest test 2>&1 | rg 'Tests run: \d
 
 Eleven red out of thirty-eight is the normal shape at this point, not a problem with your Lesson 6 work. They fall into two groups, and this lesson only owns one of them:
 
-| Failing group                                                          | Count | Owner    | What it is                                                        |
-|------------------------------------------------------------------------|-------|----------|-------------------------------------------------------------------|
-| `TextTableTests`                                                       | 4     | Lesson 7 | Real defects in `render(...)` that only exact assertions expose    |
-| `ConsoleReadTests`, `ConsoleWriteTests`, `ConsoleValidationTests`      | 7     | Capstone | Prompt wording, edit and delete control flow, and message strings  |
+| Failing group                                                     | Count | Owner    | What it is                                                        |
+|-------------------------------------------------------------------|-------|----------|-------------------------------------------------------------------|
+| `TextTableTests`                                                  | 4     | Lesson 7 | Real defects in `render(...)` that only exact assertions expose   |
+| `ConsoleReadTests`, `ConsoleWriteTests`, `ConsoleValidationTests` | 7     | Capstone | Prompt wording, edit and delete control flow, and message strings |
 
 You will write your own tests in a new file, `src/test/java/com/connorjensen/jobtracker/cli/ConsoleSessionTest.java`. Putting it in the `cli` package is deliberate: Lesson 6 made those classes package-private, and a test in the same package can still construct and drive them without reopening the API.
 
@@ -54,18 +54,23 @@ Scanner scanner = new Scanner(input, StandardCharsets.UTF_8);
 
 This is why Lesson 5 made you inject the `Scanner` and `PrintStream` instead of reaching for `System.in` and `System.out`. The payoff is here: nothing has to be saved and restored, tests can run in parallel, and a failing assertion cannot leave the JVM's globals broken for the next test.
 
-- [ ] Create `ConsoleSessionTest` with a private helper that assembles repository, service, table, view, prompter, and application, runs one session, and returns both the captured output and the service.
-- [ ] Return the service, not just the text — presentation and saved state are two different assertions, and a test that only reads output cannot tell you whether anything was stored.
-- [ ] Assert the quit-only session's output exactly, using a text block.
-- [ ] Assert that an empty script saves nothing.
+- [x] Create `ConsoleSessionTest` with a private helper that assembles repository, service, table, view, prompter, and application, runs one session, and returns both the captured output and the service.
+- [x] Return the service, not just the text — presentation and saved state are two different assertions, and a test that only reads output cannot tell you whether anything was stored.
+- [x] Assert the quit-only session's output exactly, using a text block.
+- [x] Assert that an empty script saves nothing.
 
 ```java
 // src/test/java/com/connorjensen/jobtracker/cli/ConsoleSessionTest.java — edit excerpt
-private record Session(String output, ApplicationService service) {}
+public class ConsoleSessionTest {
+  private record Session(
+      String output,
+      ApplicationService service) {
+  }
 
-private static Session run(String script) {
-  // build the streams above, wire the four cli classes, call run(), return both
-  throw new UnsupportedOperationException("TODO");
+  private static Session run(String script) {
+    // build the streams above, wire the four cli classes, call run(), return both
+    throw new UnsupportedOperationException("TODO");
+  }
 }
 ```
 
@@ -73,7 +78,7 @@ If a test ever *must* replace `System.in` or `System.out`, save the original and
 
 ### Verify
 
-- [ ] Run only your own test class.
+- [x] Run only your own test class.
 
 ```bash
 mvn -Dcheckstyle.skip -Dtest=ConsoleSessionTest test 2>&1 | rg 'Tests run:.*Skipped|BUILD'
@@ -93,7 +98,7 @@ If the run never finishes, the script ended while a prompt was still looping; if
 
 **Checkpoint.** Before reading the next paragraph, run the grader's table group and look at the four diffs.
 
-- [ ] Run the table group.
+- [x] Run the table group.
 
 ```bash
 mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$TextTableTests' test 2>&1 | rg 'Tests run: \d+, Fail'
@@ -105,12 +110,12 @@ mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$TextTableTests' test 2>&1 | 
 
 Four defects, and none of them are reachable through the app. `showApplications` always hands over six headers and six-cell rows, so every input that breaks the renderer is an input the console never produces. That is the whole argument for testing a pure function directly instead of only through its caller.
 
-| Failing test                            | What `render(...)` does now                                    | Why                                                                    |
-|-----------------------------------------|-----------------------------------------------------------------|-------------------------------------------------------------------------|
-| `completelyEmptyInputReturnsEmptyString` | Returns a three-line `+` / `\|` / `+` skeleton for no cells at all                        | `buildBorder` appends its closing `+\n` even with zero columns           |
-| `nullEmptyAndWhitespaceCellsAreNormalized` | Measures `" A "` as 3 wide, then renders it as `A`             | Widths come from the raw string; `center(...)` strips it afterwards      |
-| `raggedRowsRemainRectangular`            | Renders a one-cell row against a three-column border             | `standardizeValues` pads rows only when the header is the longer side    |
-| `renderDoesNotMutateCallerCollections`   | Turns the caller's `[ A , null]` into `[ A , null, ]`            | `standardizeValues` calls `add("")` on the list it was handed            |
+| Failing test                               | What `render(...)` does now                                        | Why                                                                   |
+|--------------------------------------------|--------------------------------------------------------------------|-----------------------------------------------------------------------|
+| `completelyEmptyInputReturnsEmptyString`   | Returns a three-line `+` / `\|` / `+` skeleton for no cells at all | `buildBorder` appends its closing `+\n` even with zero columns        |
+| `nullEmptyAndWhitespaceCellsAreNormalized` | Measures `" A "` as 3 wide, then renders it as `A`                 | Widths come from the raw string; `center(...)` strips it afterwards   |
+| `raggedRowsRemainRectangular`              | Renders a one-cell row against a three-column border               | `standardizeValues` pads rows only when the header is the longer side |
+| `renderDoesNotMutateCallerCollections`     | Turns the caller's `[ A , null]` into `[ A , null, ]`              | `standardizeValues` calls `add("")` on the list it was handed         |
 
 The last one is the interesting one. `render` looks pure — `List` in, `String` out — but it edits its arguments on the way through. Today the app gets away with it because `Application.toLabelsList()` handed back a fresh list every call; Lesson 6 replaced that with a shared `COLUMNS` constant, so the same bug would now corrupt the constant if you had not copied it at the call site.
 
