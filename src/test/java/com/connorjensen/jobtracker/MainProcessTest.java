@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -23,14 +22,12 @@ public class MainProcessTest {
             .redirectErrorStream(true)
             .start();
 
-    try (OutputStream input = process.getOutputStream()) {
-      input.close();
-    }
+    process.getOutputStream().close();
 
     long timeWait = 5;
     if (!process.waitFor(timeWait, TimeUnit.SECONDS)) {
       process.destroyForcibly();
-      fail("Main didn't exit in " + String.valueOf(timeWait) + " seconds after EOF");
+      fail("Main didn't exit in " + timeWait + " seconds after EOF");
     }
 
     String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
