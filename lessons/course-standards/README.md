@@ -41,10 +41,10 @@ These are course conventions for this repository, not universal rules imposed by
 
 ## Quality gates
 
-- Run `mvn verify` for tests, Checkstyle, and the JaCoCo report.
+- Run `mvn verify` for Checkstyle, Spotless, tests, and the JaCoCo report.
 - Treat compiler warnings as review work even when they are not build-blocking.
 - Checkstyle enforces two-space indentation, 100-column Java lines, names, imports, braces, whitespace, one statement per line, safe switch flow, `equals`/`hashCode` pairing, and utility-class construction.
-- Checkstyle reports violations deterministically; this course does not require an automatic formatter.
+- Checkstyle reports violations deterministically and never edits files. Spotless holds formatting to `google-java-format` (GOOGLE style) and runs as `spotless:check` in the build, so files are rewritten only when you run `mvn spotless:apply` yourself.
 - Run `mvn compile` and the real application after verification because unit tests do not prove the composition root works.
 
 ## Framework boundary

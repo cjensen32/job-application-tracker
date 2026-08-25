@@ -16,6 +16,7 @@ Use this as the fast re-entry point for Lessons 0–8.
 | Surefire    | Maven plugin that runs JUnit tests; this project pins a JUnit 5-capable version.                       |
 | JaCoCo      | Coverage agent and report generator; its CLI missed-method check is non-blocking.                      |
 | Checkstyle  | Deterministic source-rule checker; it reports style and structural violations without formatting code. |
+| Spotless    | Format gate running `google-java-format`; `check` fails on drift and `apply` rewrites the files.       |
 
 ## Language and data
 

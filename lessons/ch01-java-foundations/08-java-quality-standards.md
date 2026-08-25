@@ -7,7 +7,7 @@
 **Progress**
 
 - [x] Distinguish Java rules from Maven course conventions
-- [x] Read and fix Checkstyle categories
+- [x] Read and fix Checkstyle and Spotless findings
 - [x] Use compiler warnings and a review checklist
 - [x] Complete the self-check
 
@@ -39,7 +39,7 @@ layout: recognized
 
 If Maven reports no sources, check the source path before changing the POM.
 
-## Step 2 — Read and fix Checkstyle categories
+## Step 2 — Read and fix Checkstyle and Spotless findings
 
 The repository pins Maven Checkstyle Plugin 3.6.0 and Checkstyle 13.9.0. Checkstyle 13.x requires JDK 21 and understands Java 21 syntax. The check runs in `validate`, includes test sources, and uses `config/checkstyle/checkstyle.xml`.
 
@@ -56,9 +56,16 @@ It enforces:
 
 Checkstyle reports deterministic violations. It does not automatically rewrite code and cannot judge whether a class has a good responsibility.
 
+The repository also pins Spotless 3.10.0, configured to run `google-java-format` in the GOOGLE style. Both plugins bind to `validate`, and Checkstyle runs first because the POM declares it first. The two tools answer different questions:
+
+- Checkstyle asks *does this file violate a listed rule?* and reports line and module. It never edits a file.
+- Spotless asks *is this file byte-identical to its formatted form?* It knows the one correct layout rather than a list of rules.
+
+The distinction that matters is goal, not plugin. The build runs `spotless:check`, which only compares and fails with a diff. Rewriting is the separate `spotless:apply` command that you run deliberately. So the build refuses code that is not already formatted, but nothing reformats your work behind your back.
+
 ### Verify
 
-- [x] Run the style gate by itself after the capstone refactor.
+- [x] Run each style gate by itself after the capstone refactor.
 
 ```bash
 mvn -q checkstyle:check && echo "checkstyle: ok"
@@ -68,7 +75,15 @@ mvn -q checkstyle:check && echo "checkstyle: ok"
 checkstyle: ok
 ```
 
-If a message names a line and module, fix that category first and rerun before mixing in behavior changes.
+```bash
+mvn -q spotless:check && echo "spotless: ok"
+```
+
+```text
+spotless: ok
+```
+
+If a Checkstyle message names a line and module, fix that category first and rerun before mixing in behavior changes. If Spotless fails, read the printed diff before reaching for `mvn spotless:apply`, so the formatter teaches you the layout instead of hiding it.
 
 ## Step 3 — Use compiler warnings and a review checklist
 
@@ -102,7 +117,7 @@ The unfiltered command is the capstone's completion gate, not this lesson's:
 mvn verify
 ```
 
-Run it now anyway and read the failure. Checkstyle passes in `validate`, compilation passes, and every failure lands in the test phase from console behavior the capstone has not built yet. That ordering is the point of the gate.
+Run it now anyway and read the failure. Checkstyle and Spotless pass in `validate`, compilation passes, and every failure lands in the test phase from console behavior the capstone has not built yet. That ordering is the point of the gate.
 
 If `verify` fails, work from the first lifecycle failure: validation before compilation, compilation before tests, and tests before reports.
 
@@ -118,7 +133,7 @@ If `verify` fails, work from the first lifecycle failure: validation before comp
 
 1. Every developer and CI run gets the same gate before later build phases.
 2. Java tools accept explicit source and class paths; Maven supplies predictable defaults.
-3. A formatter rewrites layout, while Checkstyle reports configured violations deterministically.
+3. A formatter knows one correct layout and can rewrite files; Checkstyle only reports configured violations. This build runs both in `validate`, but both as checks — `spotless:apply` is the only command that rewrites.
 4. A warning may signal a bug or maintainability issue even when compilation can continue.
 
 </details>

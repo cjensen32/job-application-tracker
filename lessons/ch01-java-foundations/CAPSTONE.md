@@ -18,7 +18,8 @@ This capstone is intentionally contract-first and challenging. Choose your own p
 ## Constraints
 
 - Use Java 21 and the standard library for production code.
-- Do not add Spring, a database, a runtime dependency, or an automatic formatter.
+- Do not add Spring, a database, or a runtime dependency.
+- Keep the configured build plugins as they are; Checkstyle and Spotless are part of the gate, not settings to swap or disable.
 - Follow the [course standards](../course-standards/README.md) and `config/checkstyle/checkstyle.xml`.
 - Treat `Main` as the composition root only.
 - Keep public CLI API limited to the exact constructors and methods listed below.
