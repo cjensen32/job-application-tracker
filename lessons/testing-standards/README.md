@@ -57,6 +57,40 @@ This is the course-wide reference for readable Java tests. Chapter 1 applies the
 - Do not catch an assertion failure to keep a test passing.
 - Treat coverage as evidence of exercised code, not as proof that assertions are meaningful.
 
+## Diagnosing a failure
+
+Two different events fail a test, and they carry different information.
+
+- **An exception.** Something threw. The JVM recorded the live method chain, so the stack trace names *your* files.
+- **An assertion failure.** Nothing threw. The code ran to completion and returned a value the test disliked. JUnit throws at the assert statement, so the only file in the trace is the test.
+
+Most console and API failures are the second kind, and often unavoidably so. A prompt that must re-prompt on bad input catches its own `IllegalArgumentException` one line after `Status.valueOf` throws it — correctly, because the spec requires re-prompting rather than crashing. The exception is born and dies inside the method under test. A stack frame pointing into that method would appear only if the program crashed, which would mean the spec was failed.
+
+So the failures worth diagnosing are, by construction, the ones that cannot produce a useful stack trace. Write tests that supply the missing information rather than hoping for a trace:
+
+- Name the responsible production method in the assertion message or failure report.
+- Show the input that produced the failure alongside the output that resulted.
+- Show a narrow window of the output around the divergence, not a boolean and not a full dump.
+- Guard preconditions before destructuring. `service.listAll().getFirst()` on an empty list throws `NoSuchElementException` from the *test's* bookkeeping and buries the real defect; `assertEquals(1, saved.size(), "create must persist one application")` names it.
+- Prefer one ordered assertion over a bag of independent `contains` checks. Ordered matching carries a cursor that says how far the output was correct; `assertAll` over unlabeled booleans reports `Multiple Failures (n failures)` and tells you nothing about which.
+
+### Surfacing swallowed exceptions on demand
+
+A `catch (SomeException ignored)` is correct when the contract says recover, but it destroys the origin. Log it behind a flag rather than deleting the information:
+
+```console
+$ mvn -Dtracker.debug=true test
+[debug] ConsolePrompter.promptStatus:166 caught IllegalArgumentException for input "unknown", re-prompting
+```
+
+Production behavior is unchanged; the origin is available when you need it.
+
+## Who writes which tests
+
+From Chapter 2, each chapter's lessons walk you through building that chapter's test harness, and the capstone grader imports it. You write the plumbing and the single-fact assertions. The grader brings ordered scenario composition, structural reflection checks, adversarial inputs, and the shared failure reporter. You never write the hard layer, but you can read it, because every primitive underneath is one you typed.
+
+A harness is chapter-local. Chapter 1's console harness does not survive the move to HTTP; Chapter 2 builds its own. The report format and the ownership split carry between chapters; the harness code does not.
+
 ## Reference examples
 
 - `lessons/ch01-java-foundations/capstone/Chapter01CapstoneTest.java` is the installable behavior contract.
