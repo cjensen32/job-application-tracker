@@ -15,6 +15,19 @@ This capstone is intentionally contract-first and challenging. Choose your own p
 - [ ] Pass every completion command
 - [ ] Complete the chapter quiz
 
+Every marker below owns one `##` section, and every section ends with a `### Verify` command that passes only when that marker is genuinely done. The commands are cumulative: a later one does not re-prove an earlier one, so a green marker stays green only if you keep re-running it.
+
+| Progress marker                                                      | Verify command                                                                                                       | Green looks like |
+|----------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|------------------|
+| Install the synchronized capstone grader                             | `mvn -Dcheckstyle.skip -Dmaven.test.failure.ignore=true -Dtest=Chapter01CapstoneTest test`                           | `Tests run: 38`  |
+| Preserve the model and repository contract                           | `mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ExistingContractTests' test`                                    | 5 run, 0 failed  |
+| Add request records and full service updates                         | `mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ServiceTests' test`                                             | 6 run, 0 failed  |
+| Refactor the CLI into four focused classes                           | `mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ArchitectureTests' test`                                        | 3 run, 0 failed  |
+| Implement create, list, filter, edit, delete, quit, and EOF behavior | `mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ConsoleReadTests,Chapter01CapstoneTest$ConsoleWriteTests' test` | 9 run, 0 failed  |
+| Pass table, validation, session, API-shape, and composition tests    | `mvn -Dcheckstyle.skip -Dtest=Chapter01CapstoneTest,ConsoleSessionTest,MainProcessTest test`                         | 42 run, 0 failed |
+| Pass every completion command                                        | `mvn verify`                                                                                                         | `BUILD SUCCESS`  |
+| Complete the chapter quiz                                            | `/code-sensei:quiz`                                                                                                  | —                |
+
 ## Constraints
 
 - Use Java 21 and the standard library for production code.
@@ -25,23 +38,48 @@ This capstone is intentionally contract-first and challenging. Choose your own p
 - Keep public CLI API limited to the exact constructors and methods listed below.
 - Keep helper names private or package-private; the grader does not prescribe them.
 
-## Install the grader
+## Install the synchronized capstone grader
 
-- [ ] Copy the hidden grader into the normal test tree and confirm both copies match.
+- [x] Copy the hidden grader into the normal test tree.
 
 ```bash
 mkdir -p src/test/java/com/connorjensen/jobtracker/capstone
 cp lessons/ch01-java-foundations/capstone/Chapter01CapstoneTest.java src/test/java/com/connorjensen/jobtracker/capstone/
-cmp lessons/ch01-java-foundations/capstone/Chapter01CapstoneTest.java src/test/java/com/connorjensen/jobtracker/capstone/Chapter01CapstoneTest.java
 ```
+
+- [x] Confirm both copies are the same test, ignoring formatting.
+
+```bash
+diff <(tr -d '[:space:]' < lessons/ch01-java-foundations/capstone/Chapter01CapstoneTest.java) \
+     <(tr -d '[:space:]' < src/test/java/com/connorjensen/jobtracker/capstone/Chapter01CapstoneTest.java) \
+  && echo "grader copies match (ignoring formatting): ok"
+```
+
+```text
+grader copies match (ignoring formatting): ok
+```
+
+A plain `cmp` no longer succeeds here, and that is expected: Lesson 8 put Spotless in the build, so `mvn spotless:apply` reformats the *installed* copy under `src/` while the hidden source file keeps its original line breaks. Stripping whitespace compares the two as programs rather than as byte streams. A difference that survives that strip means the installed copy is genuinely a different test — recopy it.
 
 The repository already carries the synchronized installed copy for this recalibration. Do not read the grader while solving; every assertion is specified here.
 
 While types are missing, use `mvn -Dcheckstyle.skip test` to see compiler and test feedback. Final completion uses the full quality gate.
 
-## Required production types
+### Verify
 
-### Existing model and repository types
+Installation is proved by *discovery*, not by passing: all 38 grader tests must compile and run. Failures at this point are the work ahead, so this one command ignores them.
+
+```bash
+mvn -Dcheckstyle.skip -Dmaven.test.failure.ignore=true -Dtest=Chapter01CapstoneTest test 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$'
+```
+
+```text
+[ERROR] Tests run: 38, Failures: 8, Errors: 1, Skipped: 0
+```
+
+Any count other than 38 means the grader is missing, stale, or not compiling. A compilation error instead of a count means production types are still absent — that is Lesson 6's work, not a bad install.
+
+## Preserve the model and repository contract
 
 Preserve these public types and behavior:
 
@@ -52,6 +90,19 @@ Preserve these public types and behavior:
 - `com.connorjensen.jobtracker.repository.InMemoryApplicationRepository` assigns sequential ids from 1, updates existing ids, never returns null collections or Optional values, filters by status, and reports delete success.
 
 Move table labels and row conversion out of the model when the view can own them.
+
+### Verify
+
+```bash
+mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ExistingContractTests' test 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$|BUILD'
+```
+
+```text
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+## Add request records and full service updates
 
 ### Request records
 
@@ -102,6 +153,21 @@ Required behavior:
 - Update and `updateStatus` throw `IllegalArgumentException` for an unknown id.
 - Every repository operation uses the repository passed to the constructor; the service never constructs storage.
 
+### Verify
+
+```bash
+mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ServiceTests' test 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$|BUILD'
+```
+
+```text
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+These six cover component order and value equality on both records, request-based create, full update, missing-id exceptions, the older compatibility overloads, and — through a recording repository — the proof that the service really uses its injected dependency.
+
+## Refactor the CLI into four focused classes
+
 ### CLI types and exact public API
 
 Delete `util.ConsoleExperience`, `util.ApplicationTextTable`, and `util.Centering` after replacing their callers.
@@ -146,7 +212,22 @@ Only those constructors, `ConsoleApplication.run()`, and `TextTable.render(...)`
 
 Do not put menu dispatch, parsing, CRUD behavior, or table rendering in `Main`.
 
-## Stable CLI text
+### Verify
+
+```bash
+mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ArchitectureTests' test 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$|BUILD'
+```
+
+```text
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+The three assertions are the minimal public API, the exact constructor signatures, and the absence of the three deleted `util` classes. This marker is about shape only — behavior is the next section.
+
+## Implement create, list, filter, edit, delete, quit, and EOF behavior
+
+### Stable CLI text
 
 Print this header once:
 
@@ -224,9 +305,9 @@ Goodbye.
 
 Every message ends with a newline. Substitute the actual id or normalized filter status where a sample value appears.
 
-## Menu behavior
+### Menu behavior
 
-### 0 Create application
+#### 0 Create application
 
 - Trim company and role; reject blank values with `Value is required.` and retry only that prompt.
 - Require an ISO local date and retry only the date prompt after failure.
@@ -237,21 +318,21 @@ Every message ends with a newline. Substitute the actual id or normalized filter
 - Print the created id.
 - If EOF occurs before completion, save nothing and exit cleanly.
 
-### 1 List applications
+#### 1 List applications
 
 - Print `No applications found.` when empty.
 - Otherwise render all applications using exactly six columns in this order: `ID`, `Company`, `Role`, `Applied Date`, `Status`, `URL`.
 - Render status using the enum name such as `PHONE_SCREEN`.
 - Keep notes out of the table.
 
-### 2 Filter applications by status
+#### 2 Filter applications by status
 
 - Normalize trimmed input case-insensitively and replace one or more spaces or hyphens with underscores.
 - Retry the same status prompt after an unknown value.
 - Render matching applications with the same six-column table.
 - Print `No applications found for status STATUS.` when there are no matches.
 
-### 3 Edit application
+#### 3 Edit application
 
 - Require a positive numeric id and retry only the id prompt after invalid text, zero, or a negative value.
 - Print the missing-id message and return to the menu when no application exists.
@@ -263,20 +344,47 @@ Every message ends with a newline. Substitute the actual id or normalized filter
 - Save through `UpdateApplicationRequest` and print the updated id.
 - If EOF occurs before completion, save no partial edit and exit cleanly.
 
-### 4 Delete application
+#### 4 Delete application
 
 - Use the same positive-id parsing and retry behavior as edit.
 - Print the missing-id message when deletion returns false.
 - Print the deleted-id message when deletion returns true.
 - Repeating the same deletion therefore succeeds once and reports missing once.
 
-### 5 Quit and EOF
+#### 5 Quit and EOF
 
 - Print `Goodbye.` exactly once and return from `run()`.
 - EOF at the menu or any prompt follows the same clean exit path.
 - Do not print a stack trace or exception name.
 
-## Pure TextTable contract
+### Verify
+
+`ConsoleReadTests` owns create, list, and filter; `ConsoleWriteTests` owns edit and delete. Quit and EOF are asserted by `ConsoleValidationTests` in the next section, because they share the lifecycle assertions there.
+
+```bash
+mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ConsoleReadTests,Chapter01CapstoneTest$ConsoleWriteTests' test 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$|BUILD'
+```
+
+```text
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+To work one behavior at a time, append `#methodName` to a nested class, for example `-Dtest='Chapter01CapstoneTest$ConsoleWriteTests#deleteSucceedsOnceAndThenReportsMissing'`.
+
+## Pass table, validation, session, API-shape, and composition tests
+
+This marker is the whole grader plus your own Lesson 7 tests, so it names the five groups that must all be green at once.
+
+| Group        | Where it lives                                            | What it proves                                                    |
+|--------------|-----------------------------------------------------------|--------------------------------------------------------------------|
+| Table        | `Chapter01CapstoneTest$TextTableTests` (9)                | The pure renderer contract below                                   |
+| Validation   | `Chapter01CapstoneTest$ConsoleValidationTests` (6)        | Local retries, clean quit, EOF, and real `Main` in a subprocess     |
+| Session      | `ConsoleSessionTest` (3)                                  | Your own byte-stream session fixture from Lesson 7                  |
+| API shape    | `Chapter01CapstoneTest$ArchitectureTests` (3)             | Minimal public CLI API and constructor signatures                   |
+| Composition  | `MainProcessTest` (1)                                     | The real composition root starts and exits without a stack trace    |
+
+### Pure TextTable contract
 
 `TextTable.render(header, rows)` must:
 
@@ -309,7 +417,7 @@ Required examples:
 +-----+-----+-------+
 ```
 
-## Executable acceptance checklist
+### Executable acceptance checklist
 
 The grader covers:
 
@@ -330,7 +438,26 @@ The grader covers:
 - Clean quit and EOF without replacing the test JVM's global streams.
 - Real `Main` startup in a subprocess.
 
-## Completion
+### Verify
+
+The five groups at once — 38 grader tests, 3 session tests, and 1 composition test:
+
+```bash
+mvn -Dcheckstyle.skip -Dtest=Chapter01CapstoneTest,ConsoleSessionTest,MainProcessTest test 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$|BUILD'
+```
+
+```text
+[INFO] Tests run: 42, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+To isolate one group while working, run it alone, for example:
+
+```bash
+mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$TextTableTests,Chapter01CapstoneTest$ConsoleValidationTests' test 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$|BUILD'
+```
+
+## Pass every completion command
 
 - [ ] Run the full quality and test lifecycle.
 
@@ -352,6 +479,36 @@ java -cp target/classes com.connorjensen.jobtracker.Main
 
 Chapter 1 is complete only when all three commands succeed and create, list, filter, edit, delete, quit, and EOF work without a crash.
 
+### Verify
+
+No `-Dcheckstyle.skip` here — this is the first command that runs Spotless, Checkstyle, the whole suite, and JaCoCo together:
+
+```bash
+mvn verify 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$|BUILD'
+```
+
+```text
+[INFO] Tests run: 51, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+The total is larger than the previous section's 42 because `mvn verify` also runs `ApplicationTest` and `ProjectLayoutTest`. If the count differs but everything is green, a lesson test was added or removed — confirm that before treating it as a problem. A Spotless or Checkstyle failure here is a real failure of this marker, not a formatting nit to skip.
+
+## Complete the chapter quiz
+
+### Interview questions
+
+- [ ] Why is `Main` a composition root rather than the application itself?
+- [ ] Where should parsing exceptions be caught, and why?
+- [ ] Why use request records while keeping `Application` mutable?
+- [ ] What makes `TextTable` pure, and why does that improve testing?
+- [ ] What does constructor injection buy without any framework?
+- [ ] Which quality failures can Checkstyle find, and which still require review?
+
+### Verify
+
+- [ ] Run `/code-sensei:quiz` after every completion command passes.
+
 ## What later chapters replace
 
 | Chapter 1                                 | Later replacement                                        |
@@ -362,16 +519,5 @@ Chapter 1 is complete only when all three commands succeed and create, list, fil
 | In-memory repository                      | Spring Data and Postgres in Lesson 12                    |
 | `IllegalArgumentException` for missing id | `ApplicationNotFoundException` and HTTP 404 in Lesson 15 |
 | Injected stream and subprocess tests      | Mockito and Spring test slices in Lessons 16–17          |
-
-## Interview questions
-
-- [ ] Why is `Main` a composition root rather than the application itself?
-- [ ] Where should parsing exceptions be caught, and why?
-- [ ] Why use request records while keeping `Application` mutable?
-- [ ] What makes `TextTable` pure, and why does that improve testing?
-- [ ] What does constructor injection buy without any framework?
-- [ ] Which quality failures can Checkstyle find, and which still require review?
-
-- [ ] Run `/code-sensei:quiz` after every completion command passes.
 
 **Chapter:** [README](README.md) · **Glossary:** [GLOSSARY.md](GLOSSARY.md) · **Version history:** [NOTES.md](NOTES.md) · **Standards:** [course standards](../course-standards/README.md)
