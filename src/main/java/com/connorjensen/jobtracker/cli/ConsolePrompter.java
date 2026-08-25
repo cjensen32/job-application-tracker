@@ -27,11 +27,11 @@ public class ConsolePrompter {
 
     while (selection > 5 || selection < 0) {
       if (help) {
-        this.promptStream.println("Enter a number between 0 and 5.");
+        this.promptStream.println("Enter a number from 0 to 5.");
         this.promptStream.print("> ");
       }
       if (this.promptScanner.hasNextLine()) {
-        selectionString = this.promptScanner.nextLine();
+        selectionString = this.promptScanner.nextLine().strip();
       } else {
         return Optional.empty();
       }
@@ -47,20 +47,24 @@ public class ConsolePrompter {
   }
 
   Optional<Long> promptPositiveId() {
+    boolean help = false;
     String idString;
 
     while (true) {
+      if (help) {
+        this.promptStream.println("Enter a positive application ID.");
+      }
       this.promptStream.print("Application ID: ");
       if (this.promptScanner.hasNextLine()) {
-        idString = this.promptScanner.nextLine();
+        idString = this.promptScanner.nextLine().strip();
         try {
           long id = Long.parseLong(idString);
           if (id >= 1) {
             return Optional.of(id);
           }
-          this.promptStream.println("Enter a positive application ID.");
+          help = true;
         } catch (NumberFormatException ignored) {
-          continue;
+          help = true;
         }
       } else {
         return Optional.empty();
@@ -68,13 +72,15 @@ public class ConsolePrompter {
     }
   }
 
-  Optional<String> promptFormEntry(String formLabel) {
+  Optional<String> promptRequiredFormEntry(String formLabel) {
     while (true) {
       this.promptStream.print(formLabel);
       if (this.promptScanner.hasNextLine()) {
         String testLine = this.promptScanner.nextLine().strip();
         if (!testLine.isEmpty()) {
           return Optional.of(testLine);
+        } else {
+          this.promptStream.println("Value is required.");
         }
       } else {
         return Optional.empty();
@@ -97,13 +103,17 @@ public class ConsolePrompter {
   }
 
   Optional<LocalDate> promptDate() {
+    boolean help = false;
     LocalDate appliedDate = null;
 
     while (appliedDate == null) {
+      if (help) {
+        this.promptStream.println("Enter a date as YYYY-MM-DD.");
+      }
       this.promptStream.print("Applied date (YYYY-MM-DD): ");
       String stringDate;
       if (this.promptScanner.hasNextLine()) {
-        stringDate = this.promptScanner.nextLine();
+        stringDate = this.promptScanner.nextLine().strip();
       } else {
         return Optional.empty();
       }
@@ -117,20 +127,24 @@ public class ConsolePrompter {
       try {
         appliedDate = LocalDate.parse(stringDate);
       } catch (DateTimeParseException ignored) {
-        continue;
+        help = true;
       }
     }
     return Optional.of(appliedDate);
   }
 
   Optional<LocalDate> promptDateUpdate(LocalDate previousDate) {
+    boolean help = false;
     LocalDate appliedDate = null;
 
     while (appliedDate == null) {
+      if (help) {
+        this.promptStream.println("Enter a date as YYYY-MM-DD.");
+      }
       this.promptStream.print("Applied date [" + previousDate.toString() + "]: ");
       String stringDate;
       if (this.promptScanner.hasNextLine()) {
-        stringDate = this.promptScanner.nextLine();
+        stringDate = this.promptScanner.nextLine().strip();
       } else {
         return Optional.empty();
       }
@@ -144,7 +158,7 @@ public class ConsolePrompter {
       try {
         appliedDate = LocalDate.parse(stringDate);
       } catch (DateTimeParseException ignored) {
-        continue;
+        help = true;
       }
     }
     return Optional.of(appliedDate);
@@ -156,7 +170,7 @@ public class ConsolePrompter {
       this.promptStream.print("Status: ");
       String statusEntry;
       if (this.promptScanner.hasNextLine()) {
-        statusEntry = this.promptScanner.nextLine();
+        statusEntry = this.promptScanner.nextLine().strip();
       } else {
         return Optional.empty();
       }
@@ -164,7 +178,8 @@ public class ConsolePrompter {
       try {
         status = Status.valueOf(statusLookup);
       } catch (IllegalArgumentException ignored) {
-        continue;
+        this.promptStream.println(
+            "Choose one of: APPLIED, PHONE_SCREEN, INTERVIEWING, OFFER, REJECTED.");
       }
     }
     return Optional.of(status);
@@ -176,7 +191,7 @@ public class ConsolePrompter {
       this.promptStream.print("Status [" + previousStatus.toString() + "]: ");
       String statusEntry;
       if (this.promptScanner.hasNextLine()) {
-        statusEntry = this.promptScanner.nextLine();
+        statusEntry = this.promptScanner.nextLine().strip();
         if (statusEntry.isEmpty()) {
           return Optional.of(previousStatus);
         }
@@ -187,7 +202,8 @@ public class ConsolePrompter {
       try {
         status = Status.valueOf(statusLookup);
       } catch (IllegalArgumentException ignored) {
-        continue;
+        this.promptStream.println(
+            "Choose one of: APPLIED, PHONE_SCREEN, INTERVIEWING, OFFER, REJECTED.");
       }
     }
     return Optional.of(status);
@@ -196,7 +212,7 @@ public class ConsolePrompter {
   Optional<String> promptNotesEntry() {
     this.promptStream.print("Notes (optional): ");
     if (this.promptScanner.hasNextLine()) {
-      return Optional.of(this.promptScanner.nextLine());
+      return Optional.of(this.promptScanner.nextLine().strip());
     } else {
       return Optional.empty();
     }
@@ -205,7 +221,7 @@ public class ConsolePrompter {
   Optional<String> promptNotesUpdate(String notes) {
     this.promptStream.print("Notes [" + notes + "] ('-' clears): ");
     if (this.promptScanner.hasNextLine()) {
-      String notesString = this.promptScanner.nextLine();
+      String notesString = this.promptScanner.nextLine().strip();
       if (Objects.equals(notesString, "-")) {
         return Optional.of("");
       } else if (notesString.isEmpty()) {
@@ -222,7 +238,7 @@ public class ConsolePrompter {
     while (true) {
       this.promptStream.print("Job URL (optional): ");
       if (this.promptScanner.hasNextLine()) {
-        String urlString = this.promptScanner.nextLine();
+        String urlString = this.promptScanner.nextLine().strip();
         if (urlString.isEmpty()) {
           return Optional.of("");
         } else {
@@ -240,7 +256,7 @@ public class ConsolePrompter {
     while (true) {
       this.promptStream.print("Job URL [" + jobUrl + "] ('-' clears): ");
       if (this.promptScanner.hasNextLine()) {
-        String urlString = this.promptScanner.nextLine();
+        String urlString = this.promptScanner.nextLine().strip();
         if (urlString.isEmpty()) {
           return Optional.of(jobUrl);
         } else if (urlString.equals("-")) {
@@ -268,7 +284,7 @@ public class ConsolePrompter {
         throw new URISyntaxException(uri.toString(), " Failed validation test");
       }
     } catch (URISyntaxException e) {
-      this.promptStream.println("Incorrect URL/URI syntax, enter again.");
+      this.promptStream.println("Enter a blank value or an absolute HTTP(S) URL.");
     }
     return false;
   }

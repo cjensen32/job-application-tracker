@@ -52,11 +52,11 @@ public class ConsoleApplication {
   }
 
   private boolean createApplication() {
-    Optional<String> company = this.prompter.promptFormEntry("Company: ");
+    Optional<String> company = this.prompter.promptRequiredFormEntry("Company: ");
     if (company.isEmpty()) {
       return false;
     }
-    Optional<String> role = this.prompter.promptFormEntry("Role: ");
+    Optional<String> role = this.prompter.promptRequiredFormEntry("Role: ");
     if (role.isEmpty()) {
       return false;
     }

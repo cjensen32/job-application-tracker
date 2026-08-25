@@ -10,10 +10,10 @@ This capstone is intentionally contract-first and challenging. Choose your own p
 - [x] Preserve the model and repository contract
 - [x] Add request records and full service updates
 - [x] Refactor the CLI into four focused classes
-- [~] Implement create, list, filter, edit, delete, quit, and EOF behavior
-- [ ] Pass table, validation, session, API-shape, and composition tests
-- [ ] Pass every completion command
-- [ ] Complete the chapter quiz
+- [x] Implement create, list, filter, edit, delete, quit, and EOF behavior
+- [x] Pass table, validation, session, API-shape, and composition tests
+- [x] Pass every completion command
+- [x] Complete the chapter quiz
 
 Every marker below owns one `##` section, and every section ends with a `### Verify` command that passes only when that marker is genuinely done. The commands are cumulative: a later one does not re-prove an earlier one, so a green marker stays green only if you keep re-running it.
 
@@ -460,19 +460,19 @@ mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$TextTableTests,Chapter01Caps
 
 ## Pass every completion command
 
-- [ ] Run the full quality and test lifecycle.
+- [x] Run the full quality and test lifecycle.
 
 ```bash
 mvn verify
 ```
 
-- [ ] Compile the production application explicitly.
+- [x] Compile the production application explicitly.
 
 ```bash
 mvn compile
 ```
 
-- [ ] Run and manually exercise the real composition root.
+- [x] Run and manually exercise the real composition root.
 
 ```bash
 java -cp target/classes com.connorjensen.jobtracker.Main
@@ -499,16 +499,16 @@ The total is larger than the previous section's 43 because `mvn verify` also run
 
 ### Interview questions
 
-- [ ] Why is `Main` a composition root rather than the application itself?
-- [ ] Where should parsing exceptions be caught, and why?
-- [ ] Why use request records while keeping `Application` mutable?
-- [ ] What makes `TextTable` pure, and why does that improve testing?
-- [ ] What does constructor injection buy without any framework?
-- [ ] Which quality failures can Checkstyle find, and which still require review?
+- [x] Why is `Main` a composition root rather than the application itself?
+- [x] Where should parsing exceptions be caught, and why?
+- [x] Why use request records while keeping `Application` mutable?
+- [x] What makes `TextTable` pure, and why does that improve testing?
+- [x] What does constructor injection buy without any framework?
+- [x] Which quality failures can Checkstyle find, and which still require review?
 
 ### Verify
 
-- [ ] Run `/code-sensei:quiz` after every completion command passes.
+- [x] Run `/code-sensei:quiz` after every completion command passes.
 
 ## What later chapters replace
 
