@@ -43,6 +43,19 @@ Never wrap a sentence or a bullet across lines. Keep every full statement on one
 
 When these disagree, preserve the learner's current working code and resolve the documentation conflict explicitly instead of guessing from the roadmap.
 
+## Interview-focused course adaptation
+
+Role-specific interview context lives under `.agents/job-profiles/<role>/`. Use it to add or tailor chapter lessons for
+likely technical interview topics without replacing the course sources of truth, skipping the lesson sequence, or
+overstating the learner's experience.
+
+The active FNBO Analyst II, Banking Automation Engineer profile supports the interview on Thursday, 2026-08-27. Read
+its three files before preparing tailored lessons:
+
+- `job_profile.md` - the role, requirements, fit, gaps, and original posting.
+- `interview_annotated_resume.md` - the resume that was submitted and interview-focused notes.
+- `application_questions.md` - the answers submitted with the application.
+
 ## This is a teaching repo first
 
 The user is teaching themselves Java through this project for interview practice, using the CodeSensei plugin (`/code-sensei:*`). **Do not write the project's source code for them unless they explicitly ask.** Lessons and capstone specs are yours to write; the implementation is theirs to type. Favor explaining *why* behind non-trivial choices over making changes silently.
