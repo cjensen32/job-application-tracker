@@ -447,6 +447,23 @@ class Chapter01CapstoneTest {
     }
 
     @Test
+    void blankCreateDateDefaultsToToday() {
+      LocalDate before = LocalDate.now();
+      SessionResult result = session(script("0", "Acme", "Engineer", "", "", "", "5"));
+      LocalDate after = LocalDate.now();
+      Application created = result.service().listAll().getFirst();
+
+      assertAll(
+          () -> assertFalse(created.getAppliedDate().isBefore(before)),
+          () -> assertFalse(created.getAppliedDate().isAfter(after)),
+          () -> assertEquals(Status.APPLIED, created.getStatus()),
+          () -> assertEquals(1, countOccurrences(
+              result.output(), "Applied date (YYYY-MM-DD): ")),
+          () -> assertFalse(result.output().contains("Enter a date as YYYY-MM-DD.")),
+          () -> assertTrue(result.output().contains("Created application 1.\n")));
+    }
+
+    @Test
     void emptyAndPopulatedListsUseExplicitOutput() {
       SessionResult empty = session(script("1", "5"));
       SessionResult populated = session(
@@ -536,8 +553,8 @@ class Chapter01CapstoneTest {
               "Role [Engineer]: ",
               "Applied date [2026-08-01]: ",
               "Status [APPLIED]: ",
-              "Notes [Referral] (blank keeps, - clears): ",
-              "Job URL [https://example.com/jobs/1] (blank keeps, - clears): ",
+              "Notes [Referral] ('-' clears): ",
+              "Job URL [https://example.com/jobs/1] ('-' clears): ",
               "Updated application 1.\n"));
     }
 

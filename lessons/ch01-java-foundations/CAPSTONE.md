@@ -6,11 +6,11 @@ This capstone is intentionally contract-first and challenging. Choose your own p
 
 **Progress**
 
-- [ ] Install the synchronized capstone grader
-- [ ] Preserve the model and repository contract
-- [ ] Add request records and full service updates
-- [ ] Refactor the CLI into four focused classes
-- [ ] Implement create, list, filter, edit, delete, quit, and EOF behavior
+- [x] Install the synchronized capstone grader
+- [x] Preserve the model and repository contract
+- [x] Add request records and full service updates
+- [x] Refactor the CLI into four focused classes
+- [~] Implement create, list, filter, edit, delete, quit, and EOF behavior
 - [ ] Pass table, validation, session, API-shape, and composition tests
 - [ ] Pass every completion command
 - [ ] Complete the chapter quiz
@@ -19,12 +19,12 @@ Every marker below owns one `##` section, and every section ends with a `### Ver
 
 | Progress marker                                                      | Verify command                                                                                                       | Green looks like |
 |----------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|------------------|
-| Install the synchronized capstone grader                             | `mvn -Dcheckstyle.skip -Dmaven.test.failure.ignore=true -Dtest=Chapter01CapstoneTest test`                           | `Tests run: 38`  |
+| Install the synchronized capstone grader                             | `mvn -Dcheckstyle.skip -Dmaven.test.failure.ignore=true -Dtest=Chapter01CapstoneTest test`                           | `Tests run: 39`  |
 | Preserve the model and repository contract                           | `mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ExistingContractTests' test`                                    | 5 run, 0 failed  |
 | Add request records and full service updates                         | `mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ServiceTests' test`                                             | 6 run, 0 failed  |
 | Refactor the CLI into four focused classes                           | `mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ArchitectureTests' test`                                        | 3 run, 0 failed  |
-| Implement create, list, filter, edit, delete, quit, and EOF behavior | `mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ConsoleReadTests,Chapter01CapstoneTest$ConsoleWriteTests' test` | 9 run, 0 failed  |
-| Pass table, validation, session, API-shape, and composition tests    | `mvn -Dcheckstyle.skip -Dtest=Chapter01CapstoneTest,ConsoleSessionTest,MainProcessTest test`                         | 42 run, 0 failed |
+| Implement create, list, filter, edit, delete, quit, and EOF behavior | `mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ConsoleReadTests,Chapter01CapstoneTest$ConsoleWriteTests' test` | 10 run, 0 failed |
+| Pass table, validation, session, API-shape, and composition tests    | `mvn -Dcheckstyle.skip -Dtest=Chapter01CapstoneTest,ConsoleSessionTest,MainProcessTest test`                         | 43 run, 0 failed |
 | Pass every completion command                                        | `mvn verify`                                                                                                         | `BUILD SUCCESS`  |
 | Complete the chapter quiz                                            | `/code-sensei:quiz`                                                                                                  | —                |
 
@@ -67,17 +67,17 @@ While types are missing, use `mvn -Dcheckstyle.skip test` to see compiler and te
 
 ### Verify
 
-Installation is proved by *discovery*, not by passing: all 38 grader tests must compile and run. Failures at this point are the work ahead, so this one command ignores them.
+Installation is proved by *discovery*, not by passing: all 39 grader tests must compile and run. Failures at this point are the work ahead, so this one command ignores them.
 
 ```bash
 mvn -Dcheckstyle.skip -Dmaven.test.failure.ignore=true -Dtest=Chapter01CapstoneTest test 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$'
 ```
 
 ```text
-[ERROR] Tests run: 38, Failures: 8, Errors: 1, Skipped: 0
+[ERROR] Tests run: 39, Failures: 8, Errors: 1, Skipped: 0
 ```
 
-Any count other than 38 means the grader is missing, stale, or not compiling. A compilation error instead of a count means production types are still absent — that is Lesson 6's work, not a bad install.
+Any count other than 39 means the grader is missing, stale, or not compiling. A compilation error instead of a count means production types are still absent — that is Lesson 6's work, not a bad install.
 
 ## Preserve the model and repository contract
 
@@ -281,8 +281,8 @@ Company [Acme]:␠
 Role [Engineer]:␠
 Applied date [2026-08-01]:␠
 Status [APPLIED]:␠
-Notes [referral] (blank keeps, - clears):␠
-Job URL [https://example.com/jobs/1] (blank keeps, - clears):␠
+Notes [referral] ('-' clears):␠
+Job URL [https://example.com/jobs/1] ('-' clears):␠
 ```
 
 Use these exact result and error messages:
@@ -310,7 +310,8 @@ Every message ends with a newline. Substitute the actual id or normalized filter
 #### 0 Create application
 
 - Trim company and role; reject blank values with `Value is required.` and retry only that prompt.
-- Require an ISO local date and retry only the date prompt after failure.
+- Accept a blank date as today's date, since an application is usually recorded the day it is submitted.
+- Otherwise require an ISO local date and retry only the date prompt after failure.
 - Accept notes and URL as optional trimmed text.
 - Accept a blank URL or an absolute `http`/`https` URI, with the scheme checked case-insensitively.
 - Retry only the URL prompt after invalid input.
@@ -338,7 +339,7 @@ Every message ends with a newline. Substitute the actual id or normalized filter
 - Print the missing-id message and return to the menu when no application exists.
 - Show current data, then prompt for company, role, date, status, notes, and URL in that order.
 - Blank input keeps the current value for every field.
-- `-` clears notes or URL to an empty string.
+- `-` clears notes or URL to an empty string; the prompt advertises that with `('-' clears)`.
 - Required fields cannot be cleared; `-` is ordinary invalid content for date and status and a blank company or role keeps the current value.
 - Validate every changed value with the same rules used elsewhere.
 - Save through `UpdateApplicationRequest` and print the updated id.
@@ -366,7 +367,7 @@ mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ConsoleReadTests,Chapter01Ca
 ```
 
 ```text
-[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 ```
 
@@ -376,13 +377,13 @@ To work one behavior at a time, append `#methodName` to a nested class, for exam
 
 This marker is the whole grader plus your own Lesson 7 tests, so it names the five groups that must all be green at once.
 
-| Group        | Where it lives                                            | What it proves                                                    |
-|--------------|-----------------------------------------------------------|--------------------------------------------------------------------|
-| Table        | `Chapter01CapstoneTest$TextTableTests` (9)                | The pure renderer contract below                                   |
-| Validation   | `Chapter01CapstoneTest$ConsoleValidationTests` (6)        | Local retries, clean quit, EOF, and real `Main` in a subprocess     |
-| Session      | `ConsoleSessionTest` (3)                                  | Your own byte-stream session fixture from Lesson 7                  |
-| API shape    | `Chapter01CapstoneTest$ArchitectureTests` (3)             | Minimal public CLI API and constructor signatures                   |
-| Composition  | `MainProcessTest` (1)                                     | The real composition root starts and exits without a stack trace    |
+| Group       | Where it lives                                     | What it proves                                                   |
+|-------------|----------------------------------------------------|------------------------------------------------------------------|
+| Table       | `Chapter01CapstoneTest$TextTableTests` (9)         | The pure renderer contract below                                 |
+| Validation  | `Chapter01CapstoneTest$ConsoleValidationTests` (6) | Local retries, clean quit, EOF, and real `Main` in a subprocess  |
+| Session     | `ConsoleSessionTest` (3)                           | Your own byte-stream session fixture from Lesson 7               |
+| API shape   | `Chapter01CapstoneTest$ArchitectureTests` (3)      | Minimal public CLI API and constructor signatures                |
+| Composition | `MainProcessTest` (1)                              | The real composition root starts and exits without a stack trace |
 
 ### Pure TextTable contract
 
@@ -440,14 +441,14 @@ The grader covers:
 
 ### Verify
 
-The five groups at once — 38 grader tests, 3 session tests, and 1 composition test:
+The five groups at once — 39 grader tests, 3 session tests, and 1 composition test:
 
 ```bash
 mvn -Dcheckstyle.skip -Dtest=Chapter01CapstoneTest,ConsoleSessionTest,MainProcessTest test 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$|BUILD'
 ```
 
 ```text
-[INFO] Tests run: 42, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 43, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 ```
 
@@ -488,11 +489,11 @@ mvn verify 2>&1 | rg 'Tests run: \d+, Fail.*Skipped: \d+$|BUILD'
 ```
 
 ```text
-[INFO] Tests run: 51, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 49, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 ```
 
-The total is larger than the previous section's 42 because `mvn verify` also runs `ApplicationTest` and `ProjectLayoutTest`. If the count differs but everything is green, a lesson test was added or removed — confirm that before treating it as a problem. A Spotless or Checkstyle failure here is a real failure of this marker, not a formatting nit to skip.
+The total is larger than the previous section's 43 because `mvn verify` also runs `ApplicationTest` and `ProjectLayoutTest`. If the count differs but everything is green, a lesson test was added or removed — confirm that before treating it as a problem. A Spotless or Checkstyle failure here is a real failure of this marker, not a formatting nit to skip.
 
 ## Complete the chapter quiz
 
