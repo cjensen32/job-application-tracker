@@ -10,9 +10,9 @@ The test shape introduced here follows the reusable [test-writing conventions](.
 
 - [x] Build a deterministic session fixture
 - [x] Test the pure renderer exactly, and fix what that exposes
-- [ ] Use a subprocess for the real Main lifecycle
-- [ ] Interpret coverage as evidence
-- [ ] Complete the self-check
+- [x] Use a subprocess for the real Main lifecycle
+- [x] Interpret coverage as evidence
+- [x] Complete the self-check
 
 ---
 
@@ -147,17 +147,17 @@ If two tables differ only in spaces, re-read the rule: cells are stripped, padde
 
 A directly constructed session proves the four classes cooperate. It does not prove that `Main` wires them the same way, that the class is on the classpath under the name you think, that the process exits, or that EOF on a real pipe behaves like EOF on a `ByteArrayInputStream`. A subprocess proves all of it.
 
-- [ ] Resolve the Java executable from the `java.home` system property rather than assuming `java` is on `PATH`.
-- [ ] Pass the current test classpath through to `java -cp`.
-- [ ] Close the child's input stream to send EOF.
-- [ ] Bound the wait and destroy the process if it overruns, so a regression fails in seconds instead of hanging the build.
-- [ ] Assert exit code `0` and no exception text in the output.
+- [x] Resolve the Java executable from the `java.home` system property rather than assuming `java` is on `PATH`.
+- [x] Pass the current test classpath through to `java -cp`.
+- [x] Close the child's input stream to send EOF.
+- [x] Bound the wait and destroy the process if it overruns, so a regression fails in seconds instead of hanging the build.
+- [x] Assert exit code `0` and no exception text in the output.
 
 The child owns its own globals, so this is also the one test shape that can safely exercise `System.in` and `System.out` without leaking anything into the test JVM.
 
 ### Verify
 
-- [ ] Run the grader's composition test.
+- [x] Run the grader's composition test.
 
 ```bash
 mvn -Dcheckstyle.skip -Dtest='Chapter01CapstoneTest$ConsoleValidationTests#mainRunsToCleanEof' test 2>&1 | rg 'Tests run:.*Skipped|BUILD'
@@ -175,7 +175,7 @@ If the child times out, find the prompt that calls `nextLine()` without first ch
 
 Coverage tells you which code ran. It does not tell you whether anything was checked. This project makes that unusually easy to see.
 
-- [ ] Generate the report without letting the remaining capstone failures stop the build.
+- [x] Generate the report without letting the remaining capstone failures stop the build.
 
 ```bash
 mvn -q -Dcheckstyle.skip -Dmaven.test.failure.ignore=true verify > /dev/null 2>&1; test -f target/site/jacoco/jacoco.xml && echo "coverage report: ok"
@@ -185,21 +185,23 @@ mvn -q -Dcheckstyle.skip -Dmaven.test.failure.ignore=true verify > /dev/null 2>&
 coverage report: ok
 ```
 
-- [ ] Open `target/site/jacoco/index.html` and look at the four CLI classes.
-
-At this point in the chapter the numbers read like this, with the capstone's session tests still failing:
+- [x] Open `target/site/jacoco/index.html` and look at the four CLI classes.
+- 
+Read the **Missed / Methods** pair of columns, not the instruction or branch bars. With the capstone's session tests still failing, the method counter reads like this:
 
 ```text
-ConsolePrompter      missed 0  covered 14
-TextTable            missed 0  covered 8
-ConsoleView          missed 0  covered 12
-ConsoleApplication   missed 0  covered 8
+ConsolePrompter      methods: missed 0  covered 14
+TextTable            methods: missed 0  covered 5
+ConsoleView          methods: missed 0  covered 12
+ConsoleApplication   methods: missed 0  covered 8
 ```
 
 Zero missed methods across the whole console layer, and seven grader tests still red. Every method executes; several of them print the wrong thing while doing it. That is the entire lesson about coverage in one screen.
 
-- [ ] Treat a *missed* method as a question — which behavior has no test at all?
-- [ ] Do not treat a *covered* method as an answer; add assertions about results, not calls that raise the number.
+The other columns on that same row are *not* zero — instructions and branches still show gaps, largest in `ConsoleApplication`. That is the finer-grained version of the same signal: a missed branch names a path no test takes. It still cannot tell you that a taken path produced the right output.
+
+- [x] Treat a *missed* method as a question — which behavior has no test at all?
+- [x] Do not treat a *covered* method as an answer; add assertions about results, not calls that raise the number.
 
 The configured missed-method check in `pom.xml` runs with `haltOnFailure` set to `false` on purpose. It produces a visible review signal without turning coverage into a number worth gaming.
 
@@ -207,7 +209,7 @@ Once the capstone's session behavior is green, the real gate is the plain `mvn v
 
 ### Verify
 
-- [ ] Confirm the report is regenerated from the current run rather than an old one.
+- [x] Confirm the report is regenerated from the current run rather than an old one.
 
 ```bash
 rm -rf target/site/jacoco && mvn -q -Dcheckstyle.skip -Dmaven.test.failure.ignore=true verify > /dev/null 2>&1; test -f target/site/jacoco/jacoco.xml && echo "coverage report: ok"
