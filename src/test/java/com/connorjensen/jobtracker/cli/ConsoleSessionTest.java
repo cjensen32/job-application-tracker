@@ -78,7 +78,7 @@ public class ConsoleSessionTest {
 
   @Test
   void testTableFormat() {
-    String testScript = script("0", "Apple", "Banana", "", "", "", "1", "5");
+    String testScript = script("0", "Apple", "Banana", "2026-08-24", "", "", "1", "5");
     String textExpected =
         expected(
             "Job Application Tracker",
