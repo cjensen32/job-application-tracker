@@ -82,7 +82,7 @@ Update the progress table at the bottom of LEARNING.md as lessons complete.
 
 [`lessons/testing-standards/README.md`](../lessons/testing-standards/README.md) is the course-wide test reference, including how to diagnose a failure that cannot produce a stack trace.
 
-**Chapter 1's capstone grader is frozen.** It keeps its original assertion shape so the goalposts do not move mid-capstone. The `R-##`/`Owner:`/windowed-output failure report, the one-ordered-assertion rule, and the learner-writes-the-harness split all begin at Chapter 2. See `AUTHORING.md` § Capstone tests.
+**Chapter 1's capstone grader is frozen.** It keeps its original assertion shape so the goalposts do not move mid-capstone. Learner-written `Owner:` / `Expected:` assertion messages begin in Lesson 9; the grader-owned `R-##` tags, windowed-output report, one-ordered-assertion rule, and imported learner harness begin in Chapter 2. See `AUTHORING.md` § Lesson-authored tests and § Capstone tests.
 
 ### End-of-lesson course review
 

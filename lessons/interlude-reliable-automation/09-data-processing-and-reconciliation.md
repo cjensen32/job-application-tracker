@@ -117,7 +117,7 @@ Start with the mechanism you can debug one line at a time. A stream can express 
 - [ ] Add `summarizesMixedStatusesAndIncludesZeros()` to `ApplicationSummaryTest`.
 - [ ] Construct a real `InMemoryApplicationRepository` and inject it into `ApplicationService`.
 - [ ] Create three applications through the service, move two to `INTERVIEWING` with `updateStatus(...)`, and assert `total()` is `3`.
-- [ ] Assert the five counts in one `assertEquals` against a `Map.of(...)`: `APPLIED=1`, `PHONE_SCREEN=0`, `INTERVIEWING=2`, `OFFER=0`, `REJECTED=0`.
+- [ ] Build the five expected counts in an `EnumMap` and compare that whole map in one `assertEquals`: `APPLIED=1`, `PHONE_SCREEN=0`, `INTERVIEWING=2`, `OFFER=0`, `REJECTED=0`.
 - [ ] Give both assertions an `Owner:` / `Expected:` message naming `ApplicationService.summarize()`.
 - [ ] Replace the `UnsupportedOperationException` in `ApplicationService.summarize()` with your own implementation using this algorithm, not copied production code.
 
@@ -129,7 +129,7 @@ Start with the mechanism you can debug one line at a time. A stream can express 
 5. Return ApplicationSummary with the snapshot size and counts.
 ```
 
-Assert the whole map in one `assertEquals` rather than five separate `assertEquals` calls on individual keys. Five independent assertions report only the first key that differs and say nothing about the other four; one map comparison prints both maps side by side. Use `long`/`Long` counts because `ApplicationSummary` declares them.
+Assert the whole map in one `assertEquals` rather than five separate `assertEquals` calls on individual keys. Five independent assertions report only the first key that differs and say nothing about the other four; one map comparison prints both maps side by side. Use an `EnumMap`, not `Map.of(...)`, for the expected value so a failure prints both sides in `Status` declaration order; `Map.of(...)` equality is correct but its iteration order is unspecified. Use `long`/`Long` counts because `ApplicationSummary` declares them.
 
 ### Verify
 
@@ -206,13 +206,13 @@ mvn -Dtest='ApplicationSummaryTest#summarizesMixedStatusesAndIncludesZeros' test
 ```text
 org.opentest4j.AssertionFailedError:
 Owner:    ApplicationService.summarize()
-Expected: one entry per Status, with 0 for statuses no application currently has ==> expected: <{PHONE_SCREEN=0, OFFER=0, INTERVIEWING=2, REJECTED=0, APPLIED=1}> but was: <{APPLIED=1, INTERVIEWING=2}>
+Expected: one entry per Status, with 0 for statuses no application currently has ==> expected: <{APPLIED=1, PHONE_SCREEN=0, INTERVIEWING=2, OFFER=0, REJECTED=0}> but was: <{APPLIED=1, INTERVIEWING=2}>
 	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
 	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
 	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
 	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
 	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
-	at com.connorjensen.jobtracker.service.ApplicationSummaryTest.summarizesMixedStatusesAndIncludesZeros(ApplicationSummaryTest.java:67)
+	at com.connorjensen.jobtracker.service.ApplicationSummaryTest.summarizesMixedStatusesAndIncludesZeros(ApplicationSummaryTest.java:79)
 ```
 
 The bug is in `ApplicationService.summarize()`. **No frame in that stack trace is `ApplicationService.summarize()`.** The only file of yours in it is the test.
@@ -236,7 +236,7 @@ mvn -Dtest='ApplicationSummaryTest#summarizesMixedStatusesAndIncludesZeros' test
 ```text
 java.lang.IllegalStateException: Summary counted 2 of 3 source rows
 	at com.connorjensen.jobtracker.service.ApplicationService.summarize(ApplicationService.java:77)
-	at com.connorjensen.jobtracker.service.ApplicationSummaryTest.summarizesMixedStatusesAndIncludesZeros(ApplicationSummaryTest.java:59)
+	at com.connorjensen.jobtracker.service.ApplicationSummaryTest.summarizesMixedStatusesAndIncludesZeros(ApplicationSummaryTest.java:58)
 ```
 
 `ApplicationService.java:77` — the exact line. Your own line number will differ; what matters is that the file is yours. Surefire also reclassifies the result as `Failures: 0, Errors: 1` instead of `Failures: 1, Errors: 0`. This is the second reason the reconciliation invariant earns its place: it catches dropped rows, and it converts a silently wrong answer into a throw that names its own address.
@@ -245,7 +245,7 @@ java.lang.IllegalStateException: Summary counted 2 of 3 source rows
 
 ### Verify
 
-- [ ] Run the focused tests through the complete Maven lifecycle and quality gates.
+- [ ] Run the focused tests through the complete Maven lifecycle, formatting, and static-analysis gates.
 
 ```bash
 mvn -Dtest='ApplicationSummaryTest' verify
@@ -258,10 +258,11 @@ mvn -Dtest='ApplicationSummaryTest' verify
 [INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.031 s -- in application summary
 [INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Analyzed bundle 'job-application-tracker' with 13 classes
+[WARNING] Coverage checks have not been met. See log for details.
 [INFO] BUILD SUCCESS
 ```
 
-If Spotless rejects the multi-line assertion messages, run `mvn spotless:apply`; text blocks are reformatted, not forbidden. If you used the fast track before finishing the Chapter 1 capstone, this focused command isolates the new feature while existing capstone failures remain. Before marking the interlude complete, return to the capstone and pass its plain `mvn verify` completion gate.
+The coverage warning is expected in this focused run: `-Dtest='ApplicationSummaryTest'` deliberately excludes the console tests while `pom.xml` still reports missed console methods, and that reporting rule has `haltOnFailure` disabled. The four summary tests, Checkstyle, and Spotless must still pass. If Spotless rejects the multi-line assertion messages, run `mvn spotless:apply`; text blocks are reformatted, not forbidden. If you used the fast track before finishing the Chapter 1 capstone, this focused command isolates the new feature while existing capstone failures remain. Before marking the interlude complete, return to the capstone and pass its plain `mvn verify` completion gate.
 
 ## Self-check
 
