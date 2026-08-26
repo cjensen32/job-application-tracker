@@ -68,11 +68,12 @@ Most console and API failures are the second kind, and often unavoidably so. A p
 
 So the failures worth diagnosing are, by construction, the ones that cannot produce a useful stack trace. Write tests that supply the missing information rather than hoping for a trace:
 
-- Name the responsible production method in the assertion message or failure report.
+- From Lesson 9 onward, give every learner-written assertion a message whose first line is `Owner:` naming the responsible production method and whose second line is `Expected:` stating the requirement in words rather than implementation detail.
 - Show the input that produced the failure alongside the output that resulted.
-- Show a narrow window of the output around the divergence, not a boolean and not a full dump.
+- In post-Chapter-1 grader reports, show a narrow window of the output around the divergence, not a boolean and not a full dump.
 - Guard preconditions before destructuring. `service.listAll().getFirst()` on an empty list throws `NoSuchElementException` from the *test's* bookkeeping and buries the real defect; `assertEquals(1, saved.size(), "create must persist one application")` names it.
-- Prefer one ordered assertion over a bag of independent `contains` checks. Ordered matching carries a cursor that says how far the output was correct; `assertAll` over unlabeled booleans reports `Multiple Failures (n failures)` and tells you nothing about which.
+- Prefer one comparison over a whole structured value and one ordered assertion over a bag of independent `contains` checks. Ordered matching carries a cursor that says how far the output was correct; `assertAll` over unlabeled booleans reports `Multiple Failures (n failures)` and tells you nothing about which.
+- Add an in-method invariant that throws when a real one exists, such as reconciling a count against its source size. A throw restores a genuine production frame that no assertion message can imitate.
 
 ### Surfacing swallowed exceptions on demand
 
@@ -87,9 +88,17 @@ Production behavior is unchanged; the origin is available when you need it.
 
 ## Who writes which tests
 
-From Chapter 2, each chapter's lessons walk you through building that chapter's test harness, and the capstone grader imports it. You write the plumbing and the single-fact assertions. The grader brings ordered scenario composition, structural reflection checks, adversarial inputs, and the shared failure reporter. You never write the hard layer, but you can read it, because every primitive underneath is one you typed.
+Chapter 1's grader is frozen and predates this convention. Beginning with Lesson 9 after the Chapter 1 capstone, lessons have the learner write tests with `Owner:` and `Expected:` messages. Beginning with Chapter 2, every capstone grader imports that chapter's learner-written harness and adds `R-##` requirement tags, ordered scenario composition, structural reflection checks, adversarial inputs, and windowed output reports.
 
-A harness is chapter-local. Chapter 1's console harness does not survive the move to HTTP; Chapter 2 builds its own. The report format and the ownership split carry between chapters; the harness code does not.
+| Layer      | Learner writes in lessons                                | Capstone grader brings                            |
+|------------|----------------------------------------------------------|---------------------------------------------------|
+| Plumbing   | build the fixture, call the operation, capture the value | —                                                 |
+| Assertions | one fact per assertion                                   | ordered multi-step scenario composition           |
+| Reporting  | `Owner:` and `Expected:` on the assertion message        | those fields plus `R-##` and a windowed transcript |
+| Structure  | —                                                        | reflection checks on class and method shape       |
+| Inputs     | happy path plus one edge case                            | EOF, malformed input, unknown ids, retries        |
+
+A harness is chapter-local. Chapter 1's console harness does not survive the move to HTTP; Chapter 2 builds its own. The post-Chapter-1 report format and ownership split carry between chapters; the harness code does not.
 
 ## Reference examples
 

@@ -56,12 +56,12 @@ The Maven layout is a [course convention](../course-standards/README.md), not a 
 | Chapter 1 mechanism            | Later replacement                                   |
 |--------------------------------|-----------------------------------------------------|
 | Hand-written POM and classpath | Spring Boot dependency management and plugin        |
-| Request records                | HTTP request DTOs in Lesson 11                      |
-| `Scanner` validation and retry | Spring binding and Bean Validation in Lessons 10–11 |
-| Repository interface           | Spring Data repository in Lesson 12                 |
-| Manual constructor wiring      | Spring container in Lesson 9                        |
-| Console view                   | Controller plus JSON in Lesson 10                   |
-| In-memory repository           | Postgres in Lesson 12                               |
-| Injected stream tests          | MockMvc and test slices in Lesson 17                |
+| Request records                | HTTP request DTOs in Lesson 13                      |
+| `Scanner` validation and retry | Spring binding and Bean Validation in Lessons 12–13 |
+| Repository interface           | Spring Data repository in Lesson 14                 |
+| Manual constructor wiring      | Spring container in Lesson 11                       |
+| Console view                   | Controller plus JSON in Lesson 12                   |
+| In-memory repository           | Postgres in Lesson 14                               |
+| Injected stream tests          | MockMvc and test slices in Lesson 19                |
 
-**Next chapter:** Spring Boot and the HTTP layer, beginning with Lesson 9.
+**Next:** the standalone [Reliable Automation interlude](../interlude-reliable-automation/README.md), followed by Spring Boot and the HTTP layer at Lesson 11.

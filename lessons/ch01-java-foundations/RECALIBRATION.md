@@ -104,3 +104,9 @@ The live learner checkout intentionally remains red because production was not i
 - Validate-phase Checkstyle currently reports 78 violations in the pre-refactor production sources.
 - `mvn -Dcheckstyle.skip test` currently reports 38 compilation errors for the six documented missing target types: four `cli` classes and two request records.
 - `git diff -- src/main/java` remains empty; no learner-owned production source was changed.
+
+## 2026-08-25 standalone interlude decision
+
+The FNBO interview-preparation addition sits after the Chapter 1 capstone rather than expanding Chapter 1 or beginning the Spring chapter. Lessons 9–10 form the standalone [Reliable Automation interlude](../interlude-reliable-automation/README.md): Lesson 9 adds a durable counts-by-status summary and reconciliation practice, while Lesson 10 produces an implementation-ready stale-reminder workflow design. The interlude has no capstone, hidden grader, or separate XP award; the completed Chapter 1 capstone remains its boundary.
+
+Continuous lesson numbering remains the course convention, so Spring begins at Lesson 11 and the later roadmap ends at Lesson 24. This preserves a stable learning order without treating the material as temporary or implying that Java practice creates hands-on AWS, Snowflake, or Blue Prism experience. The historical 2026-08-17 inventory above remains accurate for that recalibration; this section records the later superseding roadmap change.

@@ -514,11 +514,11 @@ The total is larger than the previous section's 43 because `mvn verify` also run
 
 | Chapter 1                                 | Later replacement                                        |
 |-------------------------------------------|----------------------------------------------------------|
-| Manual object graph in `Main`             | Spring application context in Lesson 9                   |
-| Console input and view                    | HTTP controller, binding, and JSON in Lessons 10–11      |
-| Request records                           | HTTP request DTOs with Bean Validation in Lesson 11      |
-| In-memory repository                      | Spring Data and Postgres in Lesson 12                    |
-| `IllegalArgumentException` for missing id | `ApplicationNotFoundException` and HTTP 404 in Lesson 15 |
-| Injected stream and subprocess tests      | Mockito and Spring test slices in Lessons 16–17          |
+| Manual object graph in `Main`             | Spring application context in Lesson 11                  |
+| Console input and view                    | HTTP controller, binding, and JSON in Lessons 12–13      |
+| Request records                           | HTTP request DTOs with Bean Validation in Lesson 13      |
+| In-memory repository                      | Spring Data and Postgres in Lesson 14                    |
+| `IllegalArgumentException` for missing id | `ApplicationNotFoundException` and HTTP 404 in Lesson 17 |
+| Injected stream and subprocess tests      | Mockito and Spring test slices in Lessons 18–19          |
 
 **Chapter:** [README](README.md) · **Glossary:** [GLOSSARY.md](GLOSSARY.md) · **Version history:** [NOTES.md](NOTES.md) · **Standards:** [course standards](../course-standards/README.md)
