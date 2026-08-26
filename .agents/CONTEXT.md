@@ -80,6 +80,10 @@ Update the progress table at the bottom of LEARNING.md as lessons complete.
 
 **Writing or revising a chapter?** [`lessons/AUTHORING.md`](../lessons/AUTHORING.md) is the spec — read it before writing one, and revise it rather than silently deviating. The `authoring-lessons` skill carries the rules that are easiest to get wrong.
 
+[`lessons/testing-standards/README.md`](../lessons/testing-standards/README.md) is the course-wide test reference, including how to diagnose a failure that cannot produce a stack trace.
+
+**Chapter 1's capstone grader is frozen.** It keeps its original assertion shape so the goalposts do not move mid-capstone. The `R-##`/`Owner:`/windowed-output failure report, the one-ordered-assertion rule, and the learner-writes-the-harness split all begin at Chapter 2. See `AUTHORING.md` § Capstone tests.
+
 ### End-of-lesson course review
 
 When the learner finishes a lesson, asks to close it out, or explicitly requests a lesson retrospective, read [`.agents/skills/course-author-review/SKILL.md`](skills/course-author-review/SKILL.md) completely and follow it before marking the lesson complete or closing the retrospective. Run this review as `Course Author <noreply@teacher.ai>`; search lesson-related `.agents/notes/` and available project chat history, improve and simplify the course only where the evidence supports it, store the retrospective locally, and ask the learner for feedback. When the learner later answers those feedback questions, run the skill again and update the same retrospective. Do not run this closeout for ordinary mid-lesson implementation coaching.

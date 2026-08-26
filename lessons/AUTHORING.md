@@ -151,6 +151,52 @@ Chapter 1 is the reference example.
 - Include at least one test that can only pass if the *concept* was understood, not just the API — Chapter 1 injects a foreign repository implementation to prove the service doesn't build its own.
 - **Always validate before handing it over:** write a throwaway reference implementation in the scratchpad, run it, confirm green, delete it.
 
+### Failure reports (Chapter 2 onward)
+
+A grader failure must name the learner's method, not just the assertion line. Chapter 1's grader is frozen and keeps its original shape; every grader from Chapter 2 on uses this format.
+
+```text
+R-14 FAILED — statusFilteringNormalizesSpacesAndReportsNoMatches
+Owner:    ConsoleApplication.filterApplications()
+Expected: "No applications found for status OFFER.\n"
+
+Matched through char 214, then diverged. Transcript ±3 lines:
+     5 | 3 Edit application
+     6 | 4 Delete application
+     7 | 5 Quit
+  ▸  8 | > No applications exist to filter & list!
+     9 | 0 Create application
+```
+
+- **`R-##` tag** ties the failure to a numbered requirement in `CAPSTONE.md`, so the failure reads as a checklist item.
+- **`Owner:`** names the production method responsible. This is a deliberate partial spoiler, accepted because the alternative is unnavigable.
+- **`Expected:`** states the literal expectation and nothing else. No prose restating the contract — `CAPSTONE.md` already carries that.
+- **A narrow window, never a full dump.** Show a few units of context either side of the divergence.
+- The reporter is **course-owned infrastructure**, identical across chapters. Learners never write it.
+
+Two constraints follow from the window:
+
+- **One ordered assertion per test.** A window needs an anchor, and for a *missing* string the only honest anchor is the cursor from an ordered match — "everything before here matched, this was expected next." Independent `assertTrue(output.contains(x))` lambdas inside `assertAll` carry no cursor, cannot be windowed, and report as unlabeled `Multiple Failures (n failures)`. Collapse output checks into a single ordered assertion; keep state assertions over persisted objects separate, so tests read as two deliberate phases.
+- **Anchor on character offsets, render lines.** Console prompts omit their trailing newline, so `> ` shares a physical line with whatever prints next. A line-based window is silently off by one at exactly the prompts that matter most.
+
+### What the learner writes versus what the grader brings
+
+From Chapter 2, lessons walk the learner through building that chapter's test harness, and the grader imports it. The capstone stays one standard beyond what the lessons required.
+
+| Layer | Learner writes (lessons) | Capstone brings |
+|-------|--------------------------|-----------------|
+| Plumbing | build fixture, send input, capture output | — |
+| Assertions | single-fact (`assertStatus`, `assertJsonField`) | ordered multi-step scenario composition |
+| Reporting | plain JUnit messages | `R-##` / `Owner:` / windowed output |
+| Structure | — | reflection checks on class and method shape |
+| Inputs | happy path plus one edge | EOF, malformed, unknown ids, retries, adversarial |
+
+The learner never writes the hard layer but can read it, because every primitive underneath is one they typed.
+
+**A harness is chapter-local.** Chapter 1's console harness (`script`, `session`, `assertAppearsInOrder`) does not survive the move to Spring and HTTP; Chapter 2 builds its own from scratch. What carries between chapters is the report format and this ownership split, never the harness code. Do not contrive continuity by keeping a dead harness alive.
+
+**Because the grader now imports learner code, `CAPSTONE.md` must publish the exact `TestSupport` signatures it calls,** and a lesson step must verify them. A missing method makes the grader fail to *compile* rather than fail a test, which is a worse experience than no ownership split at all. Publishing the contract that consumers depend on is itself the lesson.
+
 ## Moving the goalposts
 
 If the user solves a capstone in a different but valid direction, or it lands too easy or too hard, **rewrite the test and instructions to match.** The target is a working project, not a particular solution. Record any recalibration in this file's revision note.
