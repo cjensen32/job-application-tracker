@@ -8,7 +8,7 @@ A lesson track that builds [PROJECT.md](PROJECT.md) one concept at a time.
 - **Explain before automating:** Use the manual Java mechanism before the framework feature that replaces it.
 - **Revisit, do not restart:** Apply each concept to the same tracker instead of building disposable exercises.
 - **No throwaway work:** Every capstone builds a real project layer; temporary adapters have named replacements.
-- **Course conventions:** [`lessons/course-standards/README.md`](lessons/course-standards/README.md) defines project layout, dependency direction, tests, and quality gates.
+- **Course conventions:** [`lessons/ch00-course-standards/README.md`](lessons/ch00-course-standards/README.md) defines project layout, dependency direction, tests, and quality gates.
 
 Each chapter contains lessons, a glossary, optional version notes, a capstone contract, and an installable grader. A standalone interlude may extend the project between chapter capstones without adding another capstone or XP gate. [`lessons/AUTHORING.md`](lessons/AUTHORING.md) defines how those artifacts are written.
 
@@ -40,14 +40,14 @@ Tests begin in Chapter 1. Chapter 4 is the dedicated test-writing and robustness
 
 ## Interlude — Reliable Automation *(after the Chapter 1 capstone)*
 
-📁 [`lessons/interlude-reliable-automation/`](lessons/interlude-reliable-automation/README.md)
+📁 [`lessons/ch01_02-interlude-reliable-automation/`](lessons/ch01_02-interlude-reliable-automation/README.md)
 
 *Goal: extend the plain-Java tracker with trustworthy data aggregation, then design an auditable scheduled workflow before choosing Spring or cloud infrastructure.*
 
 | #  | Lesson                                                                                                    | Concepts                                                                                 |
 |----|-----------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
-| 9  | [Data processing and reconciliation](lessons/interlude-reliable-automation/09-data-processing-and-reconciliation.md) | grouping, aggregation, zero categories, reconciliation, defensive copies, SQL translation, learner-written tests |
-| 10 | [Designing reliable automation workflows](lessons/interlude-reliable-automation/10-reliable-automation-workflows.md) | intake, failure models, retries, idempotency, auditability, AWS and RPA decision boundaries |
+| 9  | [Data processing and reconciliation](lessons/ch01_02-interlude-reliable-automation/09-data-processing-and-reconciliation.md) | grouping, aggregation, zero categories, reconciliation, defensive copies, SQL translation, learner-written tests |
+| 10 | [Designing reliable automation workflows](lessons/ch01_02-interlude-reliable-automation/10-reliable-automation-workflows.md) | intake, failure models, retries, idempotency, auditability, AWS and RPA decision boundaries |
 
 There is no interlude capstone or separate XP award. Lesson 9 produces a tested dashboard summary seam; Lesson 10 produces the design for the stale-application reminder stretch goal.
 
@@ -120,8 +120,8 @@ There is no interlude capstone or separate XP award. Lesson 9 produces a tested 
 | 1  | 7  | [Testing console applications](lessons/ch01-java-foundations/07-testing-console-applications.md)                   | 7         | ☐     |
 | 1  | 8  | [Java quality standards](lessons/ch01-java-foundations/08-java-quality-standards.md)                               | —         | ☐     |
 | 1  | ★ | [**Capstone — The Tracker Core**](lessons/ch01-java-foundations/CAPSTONE.md)                                       | —         | ☐     |
-| I  | 9  | [Data processing and reconciliation](lessons/interlude-reliable-automation/09-data-processing-and-reconciliation.md) | —         | ☐     |
-| I  | 10 | [Designing reliable automation workflows](lessons/interlude-reliable-automation/10-reliable-automation-workflows.md) | —         | ☐     |
+| I  | 9  | [Data processing and reconciliation](lessons/ch01_02-interlude-reliable-automation/09-data-processing-and-reconciliation.md) | —         | ☐     |
+| I  | 10 | [Designing reliable automation workflows](lessons/ch01_02-interlude-reliable-automation/10-reliable-automation-workflows.md) | —         | ☐     |
 | 2  | 11 | Annotations and the Spring container                                                                               | 1         | ☐     |
 | 2  | 12 | The HTTP layer                                                                                                     | 2         | ☐     |
 | 2  | 13 | DTOs and validation                                                                                                | 2         | ☐     |

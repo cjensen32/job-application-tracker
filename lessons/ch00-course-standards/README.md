@@ -31,7 +31,7 @@ These are course conventions for this repository, not universal rules imposed by
 
 ## Tests
 
-- Follow the reusable [test-writing conventions](../testing-standards/README.md); Chapter 4 expands them into a full test-writing curriculum.
+- Follow the reusable [test-writing conventions](../ch00-testing-standards/README.md); Chapter 4 expands them into a full test-writing curriculum.
 - Test observable behavior at the narrowest useful boundary.
 - Inject `Scanner` and `PrintStream` for deterministic console tests.
 - Use a subprocess when testing the real `Main` process or EOF lifecycle.

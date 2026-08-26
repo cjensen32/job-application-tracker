@@ -33,7 +33,7 @@ Every marker below owns one `##` section, and every section ends with a `### Ver
 - Use Java 21 and the standard library for production code.
 - Do not add Spring, a database, or a runtime dependency.
 - Keep the configured build plugins as they are; Checkstyle and Spotless are part of the gate, not settings to swap or disable.
-- Follow the [course standards](../course-standards/README.md) and `config/checkstyle/checkstyle.xml`.
+- Follow the [course standards](../ch00-course-standards/README.md) and `config/checkstyle/checkstyle.xml`.
 - Treat `Main` as the composition root only.
 - Keep public CLI API limited to the exact constructors and methods listed below.
 - Keep helper names private or package-private; the grader does not prescribe them.
@@ -521,4 +521,4 @@ The total is larger than the previous section's 43 because `mvn verify` also run
 | `IllegalArgumentException` for missing id | `ApplicationNotFoundException` and HTTP 404 in Lesson 17 |
 | Injected stream and subprocess tests      | Mockito and Spring test slices in Lessons 18–19          |
 
-**Chapter:** [README](README.md) · **Glossary:** [GLOSSARY.md](GLOSSARY.md) · **Version history:** [NOTES.md](NOTES.md) · **Standards:** [course standards](../course-standards/README.md)
+**Chapter:** [README](README.md) · **Glossary:** [GLOSSARY.md](GLOSSARY.md) · **Version history:** [NOTES.md](NOTES.md) · **Standards:** [course standards](../ch00-course-standards/README.md)

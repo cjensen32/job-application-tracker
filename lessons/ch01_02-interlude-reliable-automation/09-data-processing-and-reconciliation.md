@@ -64,7 +64,7 @@ The service already owns the repository boundary, so `summarize()` belongs besid
 
 ### Who writes which tests
 
-You wrote no tests during the Chapter 1 capstone — the grader arrived finished, and its failures pointed only at itself. From this lesson forward the course splits that work, and you own the near half. The [test-writing conventions](../testing-standards/README.md) carry the full rule.
+You wrote no tests during the Chapter 1 capstone — the grader arrived finished, and its failures pointed only at itself. From this lesson forward the course splits that work, and you own the near half. The [test-writing conventions](../ch00-testing-standards/README.md) carry the full rule.
 
 | Layer      | You write in lessons                                     | A capstone grader brings                          |
 |------------|----------------------------------------------------------|---------------------------------------------------|

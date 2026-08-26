@@ -21,7 +21,7 @@ The chapter ends with a complete console CRUD application whose boundaries resem
 | 8  | [Java quality standards](08-java-quality-standards.md)                               | Use Maven conventions and interpret quality-gate failures | ☐     |
 | ★ | [**Capstone — The Tracker Core**](CAPSTONE.md)                                       | Defend the whole design using code you wrote              | ☐     |
 
-Use [GLOSSARY.md](GLOSSARY.md) for quick recall, [NOTES.md](NOTES.md) for Java version history, [course standards](../course-standards/README.md) for repository-wide conventions, and [RECALIBRATION.md](RECALIBRATION.md) for the rationale and review history behind this expansion.
+Use [GLOSSARY.md](GLOSSARY.md) for quick recall, [NOTES.md](NOTES.md) for Java version history, [course standards](../ch00-course-standards/README.md) for repository-wide conventions, and [RECALIBRATION.md](RECALIBRATION.md) for the rationale and review history behind this expansion.
 
 XP is banked once after the capstone quiz, not once per lesson.
 
@@ -49,7 +49,7 @@ src/main/java/com/connorjensen/jobtracker/
 
 `Main` is only the composition root. `ConsoleApplication` coordinates a session, `ConsolePrompter` owns input and local retries, `ConsoleView` owns output, and `TextTable` is a pure renderer.
 
-The Maven layout is a [course convention](../course-standards/README.md), not a rule of the Java language.
+The Maven layout is a [course convention](../ch00-course-standards/README.md), not a rule of the Java language.
 
 ## Through-line
 
@@ -64,4 +64,4 @@ The Maven layout is a [course convention](../course-standards/README.md), not a 
 | In-memory repository           | Postgres in Lesson 14                               |
 | Injected stream tests          | MockMvc and test slices in Lesson 19                |
 
-**Next:** the standalone [Reliable Automation interlude](../interlude-reliable-automation/README.md), followed by Spring Boot and the HTTP layer at Lesson 11.
+**Next:** the standalone [Reliable Automation interlude](../ch01_02-interlude-reliable-automation/README.md), followed by Spring Boot and the HTTP layer at Lesson 11.

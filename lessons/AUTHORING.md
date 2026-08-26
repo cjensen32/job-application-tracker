@@ -141,7 +141,7 @@ Chapter 1 is the reference example.
 
 ## Lesson-authored tests
 
-From Lesson 9 onward, **a lesson that adds behavior has the learner write the test for it**, not just read one. The capstone grader is then a harder version of something already written rather than an alien artifact. The [test-writing conventions](testing-standards/README.md) hold the full ownership table; the rules an author must apply are:
+From Lesson 9 onward, **a lesson that adds behavior has the learner write the test for it**, not just read one. The capstone grader is then a harder version of something already written rather than an alien artifact. The [test-writing conventions](ch00-testing-standards/README.md) hold the full ownership table; the rules an author must apply are:
 
 - Put the test file in the lesson's Initialization as a compilable shell with its `@DisplayName`, and grow it one test per step alongside the production code it covers.
 - The learner writes fixture plumbing and single-fact assertions. Multi-step ordered scenarios, structural reflection checks, and adversarial inputs stay in the grader.
