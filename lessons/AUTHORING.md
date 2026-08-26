@@ -2,7 +2,9 @@
 
 *How chapters in this repo get built. **This file is meant to be edited** — when something works badly, change the rule here rather than quietly doing it differently next chapter.*
 
-Last revised: 2026-08-19 (required method-level refactor destinations and inherited method inventories in minimal Initialization shells).
+Last revised: 2026-08-25 (defined standalone interludes, and made lessons author their own tests with owner-naming assertion messages).
+
+Previously: 2026-08-19 (required method-level refactor destinations and inherited method inventories in minimal Initialization shells).
 
 Previously: 2026-08-19 (added a pre-step Initialization section that establishes each lesson's file paths and compilable working shells from the previous recorded state).
 
@@ -39,6 +41,10 @@ lessons/chNN-slug/
 └── capstone/
     └── ChapterNNCapstoneTest.java       the grader
 ```
+
+## Standalone interludes
+
+An interlude may sit between chapter capstones when durable material belongs in the course sequence but not in either neighboring chapter. Give it its own `README.md`, numbered lesson files, and `GLOSSARY.md`; do not add a capstone, hidden grader, or separate XP award. Keep global lesson numbers continuous, state the completed chapter capstone as its prerequisite, and point its final lesson at the next chapter. Interludes follow every sub-lesson, Initialization, Verify, checkbox, source-formatting, and learner-ownership rule in this document.
 
 ---
 
@@ -132,6 +138,16 @@ Rules that keep it useful rather than noisy:
 - Prefer the imperative voice already in the text (`Create …`, `Run …`, `Finish the class yourself`) so converting a line to a box is usually just prefixing `- [ ]`.
 
 Chapter 1 is the reference example.
+
+## Lesson-authored tests
+
+From Lesson 9 onward, **a lesson that adds behavior has the learner write the test for it**, not just read one. The capstone grader is then a harder version of something already written rather than an alien artifact. The [test-writing conventions](testing-standards/README.md) hold the full ownership table; the rules an author must apply are:
+
+- Put the test file in the lesson's Initialization as a compilable shell with its `@DisplayName`, and grow it one test per step alongside the production code it covers.
+- The learner writes fixture plumbing and single-fact assertions. Multi-step ordered scenarios, structural reflection checks, and adversarial inputs stay in the grader.
+- **Every assertion the learner writes carries an `Owner:` / `Expected:` message.** An assertion failure discards the production frame before JUnit throws, so the assertion message is the only thing that can name the responsible method. Say this explicitly the first time a lesson asks for it rather than presenting it as a style preference.
+- Where the production method can honestly check its own invariant, have the learner add the throw as well, and contrast the two failure shapes with real captured output. This is a checkpoint: break it, run it, then explain it.
+- Never let a lesson test import from, duplicate, or reveal a chapter's hidden grader.
 
 ## Capstones
 

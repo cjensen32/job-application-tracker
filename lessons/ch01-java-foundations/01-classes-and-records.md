@@ -26,7 +26,7 @@ def create_application(company, role):
 
 A function floating at module level, returning a dict. Java has **no equivalent**. There are no free-floating functions — every function is a method attached to a class, and there are no anonymous dicts standing in for objects. You must declare the shape of your data up front.
 
-This feels like ceremony at first. The payoff shows up in Lesson 12: because the shape is declared and typed, Hibernate can read it and generate a database table, and Jackson can read it and generate JSON — neither needs you to describe the data twice.
+This feels like ceremony at first. The payoff shows up in Lesson 14: because the shape is declared and typed, Hibernate can read it and generate a database table, and Jackson can read it and generate JSON — neither needs you to describe the data twice.
 
 ---
 
@@ -209,7 +209,7 @@ Both should pass — and the first one passing is the surprising part.
 
 This bites people constantly: `list.contains(app)` returns false for a class even when an identical object is in the list, because `contains` uses `equals()`. You'll rely on record equality in Lesson 2 and again when writing test assertions.
 
-> `@Test` is your first annotation <sup>[J5](NOTES.md#annotations)</sup>. It's just metadata — it doesn't *do* anything. Surefire scans compiled classes, finds methods marked with it, and calls them. Keep that in mind for Lesson 9, where Spring does the same trick at much larger scale.
+> `@Test` is your first annotation <sup>[J5](NOTES.md#annotations)</sup>. It's just metadata — it doesn't *do* anything. Surefire scans compiled classes, finds methods marked with it, and calls them. Keep that in mind for Lesson 11, where Spring does the same trick at much larger scale.
 
 ---
 
@@ -219,7 +219,7 @@ The practical rule for this project:
 
 | Use a **class**                                        | Use a **record**                          |
 |--------------------------------------------------------|-------------------------------------------|
-| JPA entities (Lesson 12)                               | DTOs — request/response bodies (Lesson 11) |
+| JPA entities (Lesson 14)                               | DTOs — request/response bodies (Lesson 13) |
 | Anything with mutable state                            | Anything you just want to carry values    |
 | Anything a framework must construct empty and populate | Anything short-lived and immutable        |
 

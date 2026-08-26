@@ -167,7 +167,7 @@ public static void main(String[] args) {
 
 This is **the composition root** — the one place in the program that knows about concrete classes. Everything below it deals only in interfaces.
 
-Look at what you just built: a place that knows how to construct objects and hand them their dependencies. That is *literally* what the Spring application context is. In Lesson 9 you'll delete these two lines, annotate the classes, and Spring will build the identical object graph by scanning for them — and you'll be able to say exactly what it did, because you did it first.
+Look at what you just built: a place that knows how to construct objects and hand them their dependencies. That is *literally* what the Spring application context is. In Lesson 11 you'll delete these two lines, annotate the classes, and Spring will build the identical object graph by scanning for them — and you'll be able to say exactly what it did, because you did it first.
 
 ---
 
@@ -210,7 +210,7 @@ Now you can test "what does the service do when the application doesn't exist?" 
 2. So the service depends on the contract, not the storage mechanism — letting Chapter 3 swap in a database-backed implementation without editing the service.
 3. Reassignment. The field must be set in the constructor, so the object is never in a partially built state with a `null` dependency.
 4. Compile-time checking that the method actually implements something. Without it, a typo silently creates a new unused method and the interface method stays unimplemented (or, if it's abstract, you get a confusing error elsewhere).
-5. In `main` — the composition root. Spring's application context takes over that role in Lesson 9.
+5. In `main` — the composition root. Spring's application context takes over that role in Lesson 11.
 
 </details>
 

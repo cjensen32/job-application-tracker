@@ -10,7 +10,7 @@ A lesson track that builds [PROJECT.md](PROJECT.md) one concept at a time.
 - **No throwaway work:** Every capstone builds a real project layer; temporary adapters have named replacements.
 - **Course conventions:** [`lessons/course-standards/README.md`](lessons/course-standards/README.md) defines project layout, dependency direction, tests, and quality gates.
 
-Each chapter contains lessons, a glossary, optional version notes, a capstone contract, and an installable grader. [`lessons/AUTHORING.md`](lessons/AUTHORING.md) defines how those artifacts are written.
+Each chapter contains lessons, a glossary, optional version notes, a capstone contract, and an installable grader. A standalone interlude may extend the project between chapter capstones without adding another capstone or XP gate. [`lessons/AUTHORING.md`](lessons/AUTHORING.md) defines how those artifacts are written.
 
 Sub-lessons teach with small examples and self-checks. Capstones contain most of the typing and are graded by JUnit without requiring the learner to read the grader. XP is banked once after each capstone.
 
@@ -38,15 +38,28 @@ Tests begin in Chapter 1. Chapter 4 is the dedicated test-writing and robustness
 
 *Survives to v1:* the model, repository contract, service, request shapes, and testing habits. *Replaced later:* the console layer, in-memory storage, and manual wiring.
 
+## Interlude — Reliable Automation *(after the Chapter 1 capstone)*
+
+📁 [`lessons/interlude-reliable-automation/`](lessons/interlude-reliable-automation/README.md)
+
+*Goal: extend the plain-Java tracker with trustworthy data aggregation, then design an auditable scheduled workflow before choosing Spring or cloud infrastructure.*
+
+| #  | Lesson                                                                                                    | Concepts                                                                                 |
+|----|-----------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| 9  | [Data processing and reconciliation](lessons/interlude-reliable-automation/09-data-processing-and-reconciliation.md) | grouping, aggregation, zero categories, reconciliation, defensive copies, SQL translation, learner-written tests |
+| 10 | [Designing reliable automation workflows](lessons/interlude-reliable-automation/10-reliable-automation-workflows.md) | intake, failure models, retries, idempotency, auditability, AWS and RPA decision boundaries |
+
+There is no interlude capstone or separate XP award. Lesson 9 produces a tested dashboard summary seam; Lesson 10 produces the design for the stale-application reminder stretch goal.
+
 ## Chapter 2 — Spring Boot and the HTTP Layer *(PROJECT.md Milestones 1–2)*
 
 *Goal: watch the framework perform the same wiring and boundary work, then expose it over HTTP.*
 
 | #  | Lesson                               | Concepts                                                                             |
 |----|--------------------------------------|--------------------------------------------------------------------------------------|
-| 9  | Annotations and the Spring container | metadata, reflection, application context, scanning, auto-configuration, Boot plugin |
-| 10 | The HTTP layer                       | controllers, mappings, path/query parameters, request bodies, Jackson, status codes  |
-| 11 | DTOs and validation                  | request/response records, Bean Validation, mapping, API boundaries                   |
+| 11 | Annotations and the Spring container | metadata, reflection, application context, scanning, auto-configuration, Boot plugin |
+| 12 | The HTTP layer                       | controllers, mappings, path/query parameters, request bodies, Jackson, status codes  |
+| 13 | DTOs and validation                  | request/response records, Bean Validation, mapping, API boundaries                   |
 
 **★ Capstone — The Tracker API:** expose full CRUD at `/api/applications` with validated DTOs while retaining the in-memory repository.
 
@@ -56,9 +69,9 @@ Tests begin in Chapter 1. Chapter 4 is the dedicated test-writing and robustness
 
 | #  | Lesson                             | Concepts                                                                            |
 |----|------------------------------------|-------------------------------------------------------------------------------------|
-| 12 | JPA and Postgres                   | ORM tradeoffs, entities, persistence context, Hibernate, Spring Data, configuration |
-| 13 | Filtering, sorting, and pagination | derived queries, Pageable, Page, optional query parameters                          |
-| 14 | Entity relationships               | one-to-many, owning side, foreign keys, cascade, fetching, N+1, nested resources    |
+| 14 | JPA and Postgres                   | ORM tradeoffs, entities, persistence context, Hibernate, Spring Data, configuration |
+| 15 | Filtering, sorting, and pagination | derived queries, Pageable, Page, optional query parameters                          |
+| 16 | Entity relationships               | one-to-many, owning side, foreign keys, cascade, fetching, N+1, nested resources    |
 
 **★ Capstone — The Tracker, Persisted:** run the same API on Postgres, add `Interview`, query by status, and observe then fix N+1 behavior.
 
@@ -68,9 +81,9 @@ Tests begin in Chapter 1. Chapter 4 is the dedicated test-writing and robustness
 
 | #  | Lesson                            | Concepts                                                                                               |
 |----|-----------------------------------|--------------------------------------------------------------------------------------------------------|
-| 15 | Exceptions and error handling     | checked/unchecked exceptions, custom types, controller advice, error bodies                            |
-| 16 | Writing maintainable unit tests   | JUnit lifecycle, arrange/act/assert, fixtures, parameterization, assertion quality, Mockito boundaries |
-| 17 | Integration tests and test slices | WebMvcTest, MockMvc, DataJpaTest, focused contexts, subprocesses, error-contract tests                 |
+| 17 | Exceptions and error handling     | checked/unchecked exceptions, custom types, controller advice, error bodies                            |
+| 18 | Writing maintainable unit tests   | JUnit lifecycle, arrange/act/assert, fixtures, parameterization, assertion quality, Mockito boundaries |
+| 19 | Integration tests and test slices | WebMvcTest, MockMvc, DataJpaTest, focused contexts, subprocesses, error-contract tests                 |
 
 **★ Capstone — Hardened:** map `ApplicationNotFoundException` to a consistent 404 and cover controller, service, and repository behavior.
 
@@ -78,9 +91,9 @@ Tests begin in Chapter 1. Chapter 4 is the dedicated test-writing and robustness
 
 | #  | Lesson                     | Concepts                                                             |
 |----|----------------------------|----------------------------------------------------------------------|
-| 18 | Users and password hashing | user model, UserDetailsService, BCrypt, registration                 |
-| 19 | JWT and the filter chain   | token structure, signatures, filters, stateless auth versus sessions |
-| 20 | Scoping data to a user     | security context, query ownership, isolation failures                |
+| 20 | Users and password hashing | user model, UserDetailsService, BCrypt, registration                 |
+| 21 | JWT and the filter chain   | token structure, signatures, filters, stateless auth versus sessions |
+| 22 | Scoping data to a user     | security context, query ownership, isolation failures                |
 
 **★ Capstone — Multi-user:** add registration, login, JWT validation, and per-user application isolation.
 
@@ -88,8 +101,8 @@ Tests begin in Chapter 1. Chapter 4 is the dedicated test-writing and robustness
 
 | #  | Lesson                  | Concepts                                          |
 |----|-------------------------|---------------------------------------------------|
-| 21 | Wiring React to the API | CORS, loading/error states, real query parameters |
-| 22 | Auth in the browser     | attaching JWTs, storage tradeoffs, 401 handling   |
+| 23 | Wiring React to the API | CORS, loading/error states, real query parameters |
+| 24 | Auth in the browser     | attaching JWTs, storage tradeoffs, 401 handling   |
 
 **★ Capstone — v1:** deliver list/filter, add/edit, delete, and login screens against the completed API.
 
@@ -107,22 +120,24 @@ Tests begin in Chapter 1. Chapter 4 is the dedicated test-writing and robustness
 | 1  | 7  | [Testing console applications](lessons/ch01-java-foundations/07-testing-console-applications.md)                   | 7         | ☐     |
 | 1  | 8  | [Java quality standards](lessons/ch01-java-foundations/08-java-quality-standards.md)                               | —         | ☐     |
 | 1  | ★ | [**Capstone — The Tracker Core**](lessons/ch01-java-foundations/CAPSTONE.md)                                       | —         | ☐     |
-| 2  | 9  | Annotations and the Spring container                                                                               | 1         | ☐     |
-| 2  | 10 | The HTTP layer                                                                                                     | 2         | ☐     |
-| 2  | 11 | DTOs and validation                                                                                                | 2         | ☐     |
+| I  | 9  | [Data processing and reconciliation](lessons/interlude-reliable-automation/09-data-processing-and-reconciliation.md) | —         | ☐     |
+| I  | 10 | [Designing reliable automation workflows](lessons/interlude-reliable-automation/10-reliable-automation-workflows.md) | —         | ☐     |
+| 2  | 11 | Annotations and the Spring container                                                                               | 1         | ☐     |
+| 2  | 12 | The HTTP layer                                                                                                     | 2         | ☐     |
+| 2  | 13 | DTOs and validation                                                                                                | 2         | ☐     |
 | 2  | ★ | **Capstone — The Tracker API**                                                                                     | 1–2       | ☐     |
-| 3  | 12 | JPA and Postgres                                                                                                   | 1         | ☐     |
-| 3  | 13 | Filtering, sorting, and pagination                                                                                 | 3         | ☐     |
-| 3  | 14 | Entity relationships                                                                                               | 4         | ☐     |
+| 3  | 14 | JPA and Postgres                                                                                                   | 1         | ☐     |
+| 3  | 15 | Filtering, sorting, and pagination                                                                                 | 3         | ☐     |
+| 3  | 16 | Entity relationships                                                                                               | 4         | ☐     |
 | 3  | ★ | **Capstone — The Tracker, Persisted**                                                                              | 1, 3, 4   | ☐     |
-| 4  | 15 | Exceptions and error handling                                                                                      | 5         | ☐     |
-| 4  | 16 | Writing maintainable unit tests                                                                                    | 7         | ☐     |
-| 4  | 17 | Integration tests and test slices                                                                                  | 7         | ☐     |
+| 4  | 17 | Exceptions and error handling                                                                                      | 5         | ☐     |
+| 4  | 18 | Writing maintainable unit tests                                                                                    | 7         | ☐     |
+| 4  | 19 | Integration tests and test slices                                                                                  | 7         | ☐     |
 | 4  | ★ | **Capstone — Hardened**                                                                                            | 5, 7      | ☐     |
-| 5  | 18 | Users and password hashing                                                                                         | 6         | ☐     |
-| 5  | 19 | JWT and the filter chain                                                                                           | 6         | ☐     |
-| 5  | 20 | Scoping data to a user                                                                                             | 6         | ☐     |
+| 5  | 20 | Users and password hashing                                                                                         | 6         | ☐     |
+| 5  | 21 | JWT and the filter chain                                                                                           | 6         | ☐     |
+| 5  | 22 | Scoping data to a user                                                                                             | 6         | ☐     |
 | 5  | ★ | **Capstone — Multi-user**                                                                                          | 6         | ☐     |
-| 6  | 21 | Wiring React to the API                                                                                            | 8         | ☐     |
-| 6  | 22 | Auth in the browser                                                                                                | 8         | ☐     |
+| 6  | 23 | Wiring React to the API                                                                                            | 8         | ☐     |
+| 6  | 24 | Auth in the browser                                                                                                | 8         | ☐     |
 | 6  | ★ | **Capstone — v1**                                                                                                  | 8         | ☐     |

@@ -170,7 +170,7 @@ public record CreateApplicationRequest(
 
 The record is an immutable *instruction*. `Application` stays the mutable domain object: `update(...)` loads the entity, copies all six values onto it, and saves it. If you find yourself wanting to change a field on the request, that mutation belongs on the loaded `Application` instead.
 
-Note the seam: `IllegalArgumentException` for a missing id becomes `ApplicationNotFoundException` in Lesson 15 and an HTTP 404 in the same lesson. Keeping the throw here is what makes that swap a one-file change later.
+Note the seam: `IllegalArgumentException` for a missing id becomes `ApplicationNotFoundException` in Lesson 17 and an HTTP 404 in the same lesson. Keeping the throw here is what makes that swap a one-file change later.
 
 ### Verify
 

@@ -57,6 +57,35 @@ This is the course-wide reference for readable Java tests. Chapter 1 applies the
 - Do not catch an assertion failure to keep a test passing.
 - Treat coverage as evidence of exercised code, not as proof that assertions are meaningful.
 
+## Failure diagnosability
+
+A test failure has to say which production method to open. Two events end a test, and only one of them can say it by itself:
+
+- An **exception** captures the live method chain at the throw, so every production frame on the way down appears by file and line.
+- An **assertion failure** captures nothing of the kind. The production method already returned and its frame was discarded; JUnit throws at the assert line, so the only project file in the trace is the test.
+
+Most failures in this course are the second kind, so the missing frame is reconstructed by hand in the assertion message:
+
+- Give every assertion a message whose first line is `Owner:` naming the production method that must change, and whose second line is `Expected:` stating the requirement in words rather than in code.
+- Keep the literal `Expected:` wording free of implementation detail; a learner reading it should know what to build, not how the assertion was written.
+- Prefer one comparison over a whole value — a map, a record, a rendered table — to five comparisons over its parts. Independent assertions report only the first difference; one comparison prints both sides.
+- Add an in-method invariant that throws when a real one exists, such as reconciling a count against its source size. A throw restores a genuine production frame that no assertion message can imitate.
+- Do not wrap several independent `assertTrue(output.contains(...))` calls in `assertAll`. They carry no cursor into the output, and the report collapses to unlabeled `Multiple Failures`.
+
+## Who writes which tests
+
+Lessons have the learner write tests; capstone graders bring the layer above them. The grader is then a harder version of something already written, not an alien artifact.
+
+| Layer      | Learner writes in lessons                                | Capstone grader brings                            |
+|------------|----------------------------------------------------------|---------------------------------------------------|
+| Plumbing   | build the fixture, call the operation, capture the value | —                                                 |
+| Assertions | one fact per assertion                                   | ordered multi-step scenario composition           |
+| Reporting  | `Owner:` and `Expected:` on the assertion message        | the same fields plus a windowed output transcript |
+| Structure  | —                                                        | reflection checks on class and method shape       |
+| Inputs     | happy path plus one edge case                            | EOF, malformed input, unknown ids, retries        |
+
+Chapter 1's grader is frozen and predates this convention. Lesson 9 introduces the assertion form, and Chapter 2 adds the grader-side `R-##` requirement tag and windowed transcript.
+
 ## Reference examples
 
 - `lessons/ch01-java-foundations/capstone/Chapter01CapstoneTest.java` is the installable behavior contract.

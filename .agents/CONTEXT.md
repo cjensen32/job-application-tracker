@@ -6,7 +6,7 @@ Do not create provider-specific repository context files or aliases such as`AGEN
 
 ## Project state
 
-This is currently a Java 21, Maven, and JUnit 5 project. Chapter 1 has nine lessons and builds the complete plain-Java core: model, repository, service requests, role-specific console classes, tests, and quality gates.
+This is currently a Java 21, Maven, and JUnit 5 project. Chapter 1 has nine lessons and builds the complete plain-Java core: model, repository, service requests, role-specific console classes, tests, and quality gates. A two-lesson reliable-automation interlude follows its capstone before Spring begins at Lesson 11.
 
 No Spring Boot yet: it arrives in Chapter 2 of the learning plan. Do not add Spring, JPA, a database, or other future-stack dependencies ahead of the lesson sequence.
 
