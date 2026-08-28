@@ -18,7 +18,7 @@
 
 This lesson adds one production type, one service operation, and one focused learner-visible test class. It does not change CRUD behavior, the Chapter 1 grader, the console, or any existing constructor.
 
-- [ ] Create `src/main/java/com/connorjensen/jobtracker/service/ApplicationSummary.java` with this dependency-closed shell.
+- [x] Create `src/main/java/com/connorjensen/jobtracker/service/ApplicationSummary.java` with this dependency-closed shell.
 
 ```java
 package com.connorjensen.jobtracker.service;
@@ -40,7 +40,7 @@ public record ApplicationSummary(long total, Map<Status, Long> countsByStatus) {
 
 The compact constructor copies into an `EnumMap` before wrapping it. Callers cannot mutate the record through either the original map or the returned accessor, and enum iteration order remains the declaration order from `Status`.
 
-- [ ] Add this unfinished contract to the existing `ApplicationService` after `listAll()`; preserve every existing field, constructor, and operation.
+- [x] Add this unfinished contract to the existing `ApplicationService` after `listAll()`; preserve every existing field, constructor, and operation.
 
 ```java
 public ApplicationSummary summarize() {
