@@ -28,7 +28,7 @@ src/main/java/com/connorjensen/jobtracker/
 │   ├── ConsolePrompter.java          twelve prompt methods, each with its own retry loop
 │   ├── ConsoleView.java              header, menu, table, details, result and error messages
 │   └── TextTable.java                render(header, rows) -> String
-├── dto/ApplicationDto.java           Lesson 1's record-versus-class demo; Chapter 2's DTO home
+├── dto/ApplicationDto.java           Lesson 1's record-versus-class demo
 ├── model/
 │   ├── Application.java              mutable entity, plus toValuesList() / toLabelsList()
 │   ├── ApplicationDetails.java       your enum of labels and value extractors
@@ -101,7 +101,7 @@ Before the move the same command prints five matches and exits `1`; `TextTable.j
 
 Today `ApplicationDetails.getAllLabels()` filters out `NOTES` — so a type in `model` is deciding that the *list table* has six columns while the *detail view* has seven. That is a presentation decision, and it changes whenever the console's layout changes, not when a job application changes. It also means `getAllLabels()` no longer means "all labels", which is how the name and the body drifted apart.
 
-Ask the ownership question: if Chapter 2 replaces the console with a JSON controller, does this code follow the model or follow the view? Column order, column names, and "notes is too wide for a table" all follow the view.
+Ask the ownership question: if another adapter replaces the console, does this code follow the model or follow the view? Column order, column names, and "notes is too wide for a table" all follow the view.
 
 - [x] Give `ConsoleView` the six column names and a private method that turns one `Application` into one row.
 - [x] Give `ConsoleView` the detail-view lines directly, so the two layouts stop sharing one enum.
@@ -170,7 +170,7 @@ public record CreateApplicationRequest(
 
 The record is an immutable *instruction*. `Application` stays the mutable domain object: `update(...)` loads the entity, copies all six values onto it, and saves it. If you find yourself wanting to change a field on the request, that mutation belongs on the loaded `Application` instead.
 
-Note the seam: `IllegalArgumentException` for a missing id becomes `ApplicationNotFoundException` in Lesson 15 and an HTTP 404 in the same lesson. Keeping the throw here is what makes that swap a one-file change later.
+Note the seam: `IllegalArgumentException` for a missing ID could become `ApplicationNotFoundException` and map to an HTTP 404 at a web boundary. Keeping the throw here makes that change local to the service/boundary contract.
 
 ### Verify
 
@@ -208,7 +208,7 @@ Main → cli → service → repository contract → model
 repository implementation → repository contract + model
 ```
 
-This is a course architecture convention, not a restriction of the Java compiler. The compiler would happily let `ConsoleView` call the repository; the convention is what keeps Chapter 2's controller swap cheap.
+This is a course architecture convention, not a restriction of the Java compiler. The compiler would happily let `ConsoleView` call the repository; the convention is what keeps a presentation-adapter swap cheap.
 
 ### Verify
 

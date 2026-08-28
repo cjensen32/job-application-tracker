@@ -1,106 +1,31 @@
-# Chapter 1 Recalibration — Change and Rationale Record
+# Chapter 1 Recalibration Record
 
-**Date:** 2026-08-17
+This document explains why the original short foundation chapter expanded into Lessons 0-8 and a stricter capstone. It is historical learner-facing context, not an active roadmap.
 
-**Scope:** Curriculum, documentation, build rules, graders, and tests only. Learner-owned production implementation remains untouched.
+## Final baseline
 
-This record explains why each change belongs in the Chapter 1 expansion and points reviewers to the contract or standard that supports it.
+The chapter grew around the tracker the learner actually built. Its final boundary is a complete plain-Java CRUD console application with role-specific CLI classes, request records, local input recovery, exact output, a pure text renderer, JUnit coverage, Checkstyle, Spotless, and JaCoCo.
 
-## Baseline when recalibration began
+## Durable decisions
 
-- Chapter 1 contained Lessons 0–3, while its capstone already expected a multi-path console application.
-- The recorded `mvn test` baseline was 37 tests with two known failures: non-numeric menu recovery and rectangular rendering for ragged rows.
-- Maven already compiled Java 21 and ran Surefire and JaCoCo, but it did not enforce compiler lint warnings or Checkstyle for production and test sources.
-- Production classes grouped console coordination, prompting, output, and table rendering under broad `util` names.
-- Learner-owned production code was frozen for this documentation, build, grader, and test recalibration.
+| Decision | Reason | Evidence |
+|---|---|---|
+| Expand from Lessons 0-3 to Lessons 0-8 | The capstone required control flow, console I/O, package design, test boundaries, and quality gates that the shorter sequence had not taught | [Chapter map](README.md) |
+| Teach console control flow and EOF explicitly | A menu loop is incomplete unless invalid input retries locally and exhausted input terminates safely | [Lesson 4](04-control-flow-and-exception-boundaries.md), [capstone](CAPSTONE.md) |
+| Teach validation before refactoring | Dates, statuses, IDs, URLs, optional fields, and retry ownership need one consistent input boundary | [Lesson 5](05-console-io-and-validation.md) |
+| Split the CLI by responsibility | Prompting, coordination, output, and rendering have different reasons to change and different test boundaries | [Lesson 6](06-refactoring-and-package-design.md) |
+| Add console-testing instruction | Injected streams, exact rendering, full sessions, subprocess startup, EOF, and cleanup prove the real boundary without global-state leaks | [Lesson 7](07-testing-console-applications.md), [testing standards](TESTING_STANDARDS.md) |
+| Add Java quality instruction | Formatting, names, imports, warnings, and Maven phases need explanation before becoming required gates | [Lesson 8](08-java-quality-standards.md), [course standards](COURSE_STANDARDS.md) |
+| Keep `Main` as a composition root | Startup wiring stays reviewable while input, CRUD, and rendering live in testable collaborators | [Main contract](CAPSTONE.md#main) |
+| Publish a complete behavioral capstone contract | The grader may assert only types, signatures, behavior, and stable output disclosed to the learner | [Capstone](CAPSTONE.md) |
+| Keep two synchronized grader copies | The course copy remains installable while the `src/test` copy executes in the finished project | [Capstone test installation](CAPSTONE.md#install-the-synchronized-grader) |
+| Preserve learner-owned production code | Course revisions must clarify or verify the assignment without taking over its implementation | [Capstone constraints](CAPSTONE.md#constraints) |
 
-## Change inventory
+## Final verification record
 
-| Change                                                           | Why it belongs in this change set                                                                                                                                                            | Supporting document or evidence                                                                                                                                                    |
-|------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Expand Chapter 1 from Lessons 0–3 to Lessons 0–8                 | The existing capstone had already grown into a console application without first teaching its control flow, I/O, package design, test boundaries, or quality gates.                          | [Chapter map](README.md), [learning plan](../../LEARNING.md)                                                                                                                       |
-| Add control-flow and exception-boundary instruction              | Menu retries, parse failures, guard clauses, and EOF are Java boundary skills required by the executable CLI contract.                                                                       | [Lesson 4](04-control-flow-and-exception-boundaries.md), [capstone menu behavior](CAPSTONE.md#menu-behavior)                                                                       |
-| Add console I/O and validation instruction                       | `Scanner`, `PrintStream`, UTF-8, `LocalDate`, enums, IDs, and HTTP(S) URI policy must be understood before they are tested.                                                                  | [Lesson 5](05-console-io-and-validation.md), [stable CLI text](CAPSTONE.md#stable-cli-text)                                                                                        |
-| Add refactoring and package-design instruction                   | The previous `util` grouping mixed coordination, input, output, and rendering; role-specific classes make ownership and dependency direction visible.                                        | [Lesson 6](06-refactoring-and-package-design.md), [CLI type contract](CAPSTONE.md#cli-types-and-exact-public-api)                                                                  |
-| Add console-testing instruction                                  | Injected streams, exact rendering, full sessions, subprocess startup, EOF, and cleanup are needed to test the real boundary without global-state leaks.                                      | [Lesson 7](07-testing-console-applications.md), [test-writing conventions](../testing-standards/README.md)                                                                         |
-| Add Java quality instruction                                     | Two-space formatting, import discipline, warnings, and Maven quality phases need an explanation before they become required gates.                                                           | [Lesson 8](08-java-quality-standards.md), [course standards](../course-standards/README.md)                                                                                        |
-| Renumber later lessons through Lesson 22                         | Inserting five Chapter 1 lessons requires stable unique lesson numbers; Spring now starts at Lesson 9.                                                                                       | [Learning plan](../../LEARNING.md)                                                                                                                                                 |
-| Make Chapter 4 the dedicated test-writing and robustness chapter | Chapter 1 introduces testing mechanics, while a later chapter must teach maintainable test design, JUnit, Mockito, integration boundaries, and Spring slices in depth.                       | [Chapter 4 roadmap](../../LEARNING.md#chapter-4--test-writing-and-robustness-milestones-5-7), [test-writing conventions](../testing-standards/README.md)                           |
-| Add course-wide architecture and quality conventions             | Maven layout, dependency direction, visibility, testing, and framework timing are repository decisions that later chapters need to reference consistently.                                   | [Course standards](../course-standards/README.md), [Maven standard layout](https://maven.apache.org/guides/introduction/introduction-to-the-standard-directory-layout)             |
-| Tighten Markdown authoring rules                                 | Concise bullets and natural paragraph wrapping make lesson diffs easier to review and source easier to maintain.                                                                             | [Authoring spec](../AUTHORING.md)                                                                                                                                                  |
-| Rewrite the capstone as a compact behavioral contract            | The hidden grader may assert only types, signatures, behavior, and stable output fully disclosed to the learner.                                                                             | [Capstone contract](CAPSTONE.md), [authoring spec](../AUTHORING.md#capstone-tests)                                                                                                 |
-| Keep `Main` as a composition root                                | Startup wiring should be independently reviewable; input, CRUD, and rendering belong in testable collaborators.                                                                              | [Main contract](CAPSTONE.md#main), [course dependency direction](../course-standards/README.md#dependency-direction)                                                               |
-| Replace vague CLI utilities with four role-specific classes      | `ConsoleApplication`, `ConsolePrompter`, `ConsoleView`, and pure `TextTable` each have one reason to change.                                                                                 | [Target architecture](README.md#target-architecture), [Lesson 6 cohesion table](06-refactoring-and-package-design.md#step-1--split-by-reasons-to-change)                           |
-| Add create/update request records and service overloads          | A named immutable operation input avoids six positional parameters while compatibility methods remain useful and stable.                                                                     | [Request record contract](CAPSTONE.md#request-records), [service contract](CAPSTONE.md#applicationservice)                                                                         |
-| Define complete create/list/filter/edit/delete behavior          | Chapter 1 now owns the complete plain-Java CRUD experience before HTTP and Spring replace the boundary.                                                                                      | [Menu behavior](CAPSTONE.md#menu-behavior), [later replacements](CAPSTONE.md#what-later-chapters-replace)                                                                          |
-| Make table rendering pure and rectangular                        | Returning text makes exact tests independent of global output; null, whitespace, and ragged rows expose real boundary mistakes.                                                              | [TextTable contract](CAPSTONE.md#pure-texttable-contract), [Lesson 7 edge cases](07-testing-console-applications.md#step-2--test-tables-and-full-sessions-at-the-right-boundaries) |
-| Replace old CLI tests with the synchronized capstone grader      | Tests for deleted utilities would freeze the obsolete design; the new grader tests the published architecture and behavior instead.                                                          | [Executable acceptance checklist](CAPSTONE.md#executable-acceptance-checklist), both `Chapter01CapstoneTest.java` copies                                                           |
-| Structure the grader as a future test-writing reference          | Nested behavior groups, outcome names, visible arrange/act/assert spacing, explicit fixtures, exact small-boundary assertions, and bounded subprocesses model the later chapter's standards. | [Test-writing conventions](../testing-standards/README.md), [Lesson 7](07-testing-console-applications.md)                                                                         |
-| Add Checkstyle 13.9.0 through Maven Checkstyle Plugin 3.6.0      | A pinned validate-phase check makes source rules deterministic for production and test code on Java 21.                                                                                      | [`pom.xml`](../../pom.xml), [`checkstyle.xml`](../../config/checkstyle/checkstyle.xml), [Checkstyle](https://checkstyle.org/)                                                      |
-| Add compiler lint warnings and retarget JaCoCo                   | Warnings create review evidence, and coverage must follow the new CLI class names rather than deleted utilities.                                                                             | [`pom.xml`](../../pom.xml), [quality standards](08-java-quality-standards.md)                                                                                                      |
-| Preserve learner-owned production code                           | The assignment must remain the learner's implementation work; infrastructure can intentionally make the checkout red until the contract is implemented.                                      | [Project agent context](../../.agents/CONTEXT.md), [capstone constraints](CAPSTONE.md#constraints)                                                                                 |
-
-## Test-file structure decisions
-
-The capstone grader is deliberately organized as a reference rather than a one-off test dump:
-
-- `ExistingContractTests` protects the already learned model and repository behavior.
-- `ServiceTests` isolates request records, overloads, update behavior, and repository injection.
-- `ArchitectureTests` checks only documented public API and obsolete type removal.
-- `TextTableTests` treats pure returned text as an exact contract and checks caller immutability.
-- `ConsoleReadTests` and `ConsoleWriteTests` separate query and mutation workflows.
-- `ConsoleValidationTests` owns retries, quit, EOF, and real process startup.
-- Helpers are mechanical fixtures below the behavior groups and do not hide scenario values.
-- Ordinary session tests inject streams; only the real `Main` test starts a subprocess.
-
-Chapter 4 can cite this structure while adding parameterized tests, Mockito, integration test design, and Spring test slices.
-
-## Suggested commit grouping
-
-These are the review boundaries used for this recalibration. Commit messages follow the repository's existing `AREA(scope) - description` language and stay ordered by importance: groundwork, additional work, then minor synchronization.
-
-### Groundwork
-
-#### 1. `BUILD(ch 1) - add quality and authoring standards for expanded capstone`
-
-Include `pom.xml`, `config/checkstyle/checkstyle.xml`, `lessons/AUTHORING.md`, `lessons/course-standards/README.md`, `lessons/testing-standards/README.md`, and the applicable baseline and rationale from this record. These six groundwork files establish the historical starting point, Java 21 compiler warnings, Checkstyle validation, test-source enforcement, JaCoCo targets, lesson-writing rules, course conventions, and reusable test structure.
-
-#### 2. `LESSONS(ch 1) - add control flow validation and package design`
-
-Include Lessons 4–6, `GLOSSARY.md`, and the applicable rationale from this record. These five files teach control flow, EOF, console validation, constructor-injected streams, refactoring, request records, package dependencies, and the terms needed to discuss them.
-
-### Additional work
-
-#### 3. `LESSONS(ch 1) - add testing quality lessons and renumber roadmap`
-
-Include Lessons 7–8, `LEARNING.md`, `NOTES.md`, and the applicable rationale from this record. These five files add testing and Java quality instruction, make Chapter 4 the dedicated test-writing chapter, renumber the roadmap through Lesson 22, and record the associated Java version history.
-
-#### 4. `CAPSTONE(ch 1) - recalibrate architecture and behavior contract`
-
-Include `CAPSTONE.md`, the chapter `README.md`, the narrow cross-reference updates in Lessons 1 and 3, `.agents/CONTEXT.md`, and the applicable rationale from this record. These six files define the exact target architecture and behavior, connect earlier lessons to the expanded sequence, preserve learner ownership, and synchronize repository guidance.
-
-### Minor and supporting work
-
-#### 5. `LESSONS(capstone) - replace legacy cli tests with synchronized grader`
-
-Include both identical capstone grader copies, the formatted `ApplicationTest`, deletion of `TextTableTest` and `ConsoleExperienceTest`, and the applicable rationale from this record. These six paths replace tests tied to obsolete utility classes with executable evidence for the published contract and preserve the final verification record.
-
-Keeping these groups separate lets a reviewer evaluate enforcement, pedagogy, contract, tests, and repository synchronization independently while still understanding why they form one recalibration.
-
-## Verification record
-
-The grader and build rules were validated in a temporary reference copy, then the entire temporary implementation was deleted.
-
-- `mvn clean verify`: success.
-- Checkstyle: zero violations.
-- JUnit: 40 tests, zero failures, zero errors, zero skipped; 38 capstone tests plus 2 existing application tests.
-- JaCoCo: report generated and non-blocking CLI method check met.
+- `mvn verify`: 49 tests, zero failures, errors, or skips; Checkstyle, Spotless, and JaCoCo pass.
 - `mvn compile`: success.
-- `java -cp target/classes com.connorjensen.jobtracker.Main < /dev/null`: clean menu and `Goodbye.` output with exit code zero.
-- Temporary reference path: removed after validation and not recoverable from the working tree.
+- Real CLI clean quit: complete header/menu, one prompt, `Goodbye.`, successful exit.
+- Clean EOF: complete header/menu, `Goodbye.`, successful exit.
 
-The live learner checkout intentionally remains red because production was not implemented here:
-
-- Validate-phase Checkstyle currently reports 78 violations in the pre-refactor production sources.
-- `mvn -Dcheckstyle.skip test` currently reports 38 compilation errors for the six documented missing target types: four `cli` classes and two request records.
-- `git diff -- src/main/java` remains empty; no learner-owned production source was changed.
+The finished repository preserves this chapter as a self-contained learning artifact. Framework, database, browser, and automation work deliberately moved to a separate project.

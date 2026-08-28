@@ -2,7 +2,7 @@
 
 **Goal:** drive the real console classes from byte-backed streams, test a pure renderer exactly, prove the real `Main` starts, and read coverage as evidence rather than as a score.
 
-The test shape introduced here follows the reusable [test-writing conventions](../testing-standards/README.md). Chapter 4 turns those conventions into the dedicated test-writing curriculum.
+The test shape introduced here follows the reusable [Chapter 1 test-writing standards](TESTING_STANDARDS.md).
 
 **Prerequisite:** Lesson 6's finished CLI split, request records, and minimal public API.
 

@@ -472,7 +472,7 @@ class Chapter01CapstoneTest {
               "Acme", "Engineer", DATE, "Hidden note", "https://example.com/jobs/1")));
 
       assertAll(
-          () -> assertTrue(empty.output().contains("No applications found.\n")),
+          () -> assertTrue(empty.output().contains("No applications exist to list.\n")),
           () -> assertTrue(populated.output().contains(
               "| ID | Company |   Role   | Applied Date | Status  |")),
           () -> assertTrue(populated.output().contains("| 1  |  Acme   | Engineer |")),
@@ -622,13 +622,13 @@ class Chapter01CapstoneTest {
     void deleteSucceedsOnceAndThenReportsMissing() {
       SessionResult result = session(
           script("4", "1", "4", "1", "5"),
-          Chapter01CapstoneTest::seedCompleteApplication);
+          Chapter01CapstoneTest::seedCompleteApplications);
 
       assertAll(
           () -> assertTrue(result.output().contains("Deleted application 1.\n")),
           () -> assertTrue(result.output().contains(
               "No application found with ID 1.\n")),
-          () -> assertTrue(result.service().listAll().isEmpty()));
+          () -> assertEquals(1, result.service().listAll().size()));
     }
   }
 
@@ -756,6 +756,13 @@ class Chapter01CapstoneTest {
   private static void seedCompleteApplication(ApplicationService service) {
     service.create(createRequest(
         "Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1"));
+  }
+
+  private static void seedCompleteApplications(ApplicationService service) {
+    service.create(createRequest(
+        "Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1"));
+    service.create(createRequest(
+        "Apple", "Developer", DATE, "Online Site", "https://panaple/com/fake/test/1"));
   }
 
   private static SessionResult session(String input) {

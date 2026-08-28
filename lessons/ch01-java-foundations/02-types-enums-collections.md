@@ -27,8 +27,7 @@ com.connorjensen.jobtracker
 ├── model/             the things (Application, Status, later Interview)
 ├── repository/        how things are stored
 ├── service/           business rules
-├── dto/               what goes over the wire (Chapter 2)
-└── controller/        HTTP endpoints (Chapter 2)
+└── dto/               record-versus-class learning example
 ```
 
 - [x] Make the move
@@ -169,7 +168,7 @@ Green again. The lesson here isn't the file shuffling — it's that **`package` 
 
 ## Step 2 — The `enum`: your first real type
 
-PROJECT.md says an application's status is one of five values. In Python or JS you'd probably use a string and hope. In TypeScript you'd write a union type — which vanishes at runtime.
+The tracker contract says an application's status is one of five values. In Python or JS you'd probably use a string and hope. In TypeScript you'd write a union type — which vanishes at runtime.
 
 Java's `enum` <sup>[J5](NOTES.md#enums)</sup> is a real class with a fixed set of instances, checked at **compile time** and present at **runtime**.
 
@@ -191,7 +190,7 @@ Five lines, and you get a lot:
 
 - `Status.APPLIED` is a **singleton** — there is exactly one instance of it in the whole JVM, so `==` works for comparison (unlike `String`, where `==` compares identity and burns beginners).
 - `Status.values()` returns all five as an array.
-- `Status.valueOf("OFFER")` parses a string, and **throws** on anything else. That's your input validation for free — and in Chapter 2, Spring will call this method for you to turn `?status=OFFER` into a `Status`.
+- `Status.valueOf("OFFER")` parses a string, and **throws** on anything else. That's your input validation for free, and another input adapter can reuse the same conversion rule.
 - `switch` over an enum can be checked for exhaustiveness by the compiler.
 
 Now wire it into `Application`.
@@ -219,14 +218,14 @@ public void setStatus(Status status) {
 
 That default in the constructor is a **business rule enforced by the type system**. It is not possible to construct an `Application` with no status. Compare to a Python dict, where`app["status"]` might just... not be there.
 
-- [x] While you're in the file, add the two remaining fields from PROJECT.md — `notes` and `jobUrl`, both `String`, both with getter and setter, neither in the constructor (they're optional at creation time)
+- [x] While you're in the file, add the two remaining tracker fields — `notes` and `jobUrl`, both `String`, both with getter and setter, neither in the constructor (they're optional at creation time)
 - [x] And add an `id`:
 
 ```java
     private Long id;
 ```
 
-with `getId()` / `setId(Long id)`. Note **`Long`**, not `long` <sup>[J5](NOTES.md#long-vs-long-and-autoboxing)</sup> — the capital-L version is an *object* and can be `null`, which is exactly what you need to mean "not saved yet." The lowercase`long` is a primitive and would default to `0`. Chapter 3's database layer depends on this distinction.
+with `getId()` / `setId(Long id)`. Note **`Long`**, not `long` <sup>[J5](NOTES.md#long-vs-long-and-autoboxing)</sup> — the capital-L version is an *object* and can be `null`, which is exactly what you need to mean "not saved yet." The lowercase`long` is a primitive and would default to `0`. A database-backed implementation would depend on this distinction too.
 
 ### Verify
 
@@ -446,7 +445,7 @@ Application required = found.orElseThrow(() -> new IllegalArgumentException("No 
 
 `Optional` is for **return types**, where it documents "this may legitimately find nothing" in a way the compiler helps enforce. That's the whole answer.
 
-> Spring Data hands you `Optional<T>` from `findById()` in Chapter 3. The pattern you write by hand in the capstone is byte-for-byte the pattern the framework expects.
+> Repository libraries commonly return `Optional<T>` from `findById()`. The pattern you write by hand in the capstone is the same pattern a framework-backed implementation can preserve.
 
 ### Verify
 

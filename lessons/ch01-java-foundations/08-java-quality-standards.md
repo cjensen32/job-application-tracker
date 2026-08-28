@@ -21,7 +21,7 @@ Java can compile files from many layouts when given the right paths. This course
 - [x] Keep JUnit tests beneath `src/test/java`.
 - [x] Keep build output beneath `target`.
 - [x] Keep package declarations aligned with source paths.
-- [x] Read the [course standards](../course-standards/README.md).
+- [x] Read the [Chapter 1 course standards](COURSE_STANDARDS.md).
 
 Calling the layout a convention matters. It explains why Maven discovers files automatically without incorrectly teaching that the Java language requires Maven.
 

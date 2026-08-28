@@ -33,7 +33,7 @@ Every marker below owns one `##` section, and every section ends with a `### Ver
 - Use Java 21 and the standard library for production code.
 - Do not add Spring, a database, or a runtime dependency.
 - Keep the configured build plugins as they are; Checkstyle and Spotless are part of the gate, not settings to swap or disable.
-- Follow the [course standards](../course-standards/README.md) and `config/checkstyle/checkstyle.xml`.
+- Follow the [Chapter 1 course standards](COURSE_STANDARDS.md) and `config/checkstyle/checkstyle.xml`.
 - Treat `Main` as the composition root only.
 - Keep public CLI API limited to the exact constructors and methods listed below.
 - Keep helper names private or package-private; the grader does not prescribe them.
@@ -510,15 +510,15 @@ The total is larger than the previous section's 43 because `mvn verify` also run
 
 - [x] Run `/code-sensei:quiz` after every completion command passes.
 
-## What later chapters replace
+## What these boundaries enable
 
 | Chapter 1                                 | Later replacement                                        |
 |-------------------------------------------|----------------------------------------------------------|
-| Manual object graph in `Main`             | Spring application context in Lesson 9                   |
-| Console input and view                    | HTTP controller, binding, and JSON in Lessons 10–11      |
-| Request records                           | HTTP request DTOs with Bean Validation in Lesson 11      |
-| In-memory repository                      | Spring Data and Postgres in Lesson 12                    |
-| `IllegalArgumentException` for missing id | `ApplicationNotFoundException` and HTTP 404 in Lesson 15 |
-| Injected stream and subprocess tests      | Mockito and Spring test slices in Lessons 16–17          |
+| Manual object graph in `Main`             | A dependency-injection container can construct the same graph |
+| Console input and view                    | Another adapter can own binding and presentation              |
+| Request records                           | Other input boundaries can reuse explicit command shapes      |
+| In-memory repository                      | Persistent storage can implement the same repository contract |
+| `IllegalArgumentException` for missing ID | A boundary-specific exception can map absence appropriately    |
+| Injected stream and subprocess tests      | Other boundary tests can reuse the same isolation principles  |
 
-**Chapter:** [README](README.md) · **Glossary:** [GLOSSARY.md](GLOSSARY.md) · **Version history:** [NOTES.md](NOTES.md) · **Standards:** [course standards](../course-standards/README.md)
+**Chapter:** [README](README.md) · **Glossary:** [GLOSSARY.md](GLOSSARY.md) · **Version history:** [NOTES.md](NOTES.md) · **Standards:** [COURSE_STANDARDS.md](COURSE_STANDARDS.md)
