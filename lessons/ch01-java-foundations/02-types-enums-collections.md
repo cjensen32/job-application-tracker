@@ -170,7 +170,7 @@ Green again. The lesson here isn't the file shuffling — it's that **`package` 
 
 The tracker contract says an application's status is one of five values. In Python or JS you'd probably use a string and hope. In TypeScript you'd write a union type — which vanishes at runtime.
 
-Java's `enum` <sup>[J5](NOTES.md#enums)</sup> is a real class with a fixed set of instances, checked at **compile time** and present at **runtime**.
+Java's `enum` is a real class with a fixed set of instances, checked at **compile time** and present at **runtime**.
 
 - [x] Create `src/main/java/com/connorjensen/jobtracker/model/Status.java`:
 
@@ -225,7 +225,7 @@ That default in the constructor is a **business rule enforced by the type system
     private Long id;
 ```
 
-with `getId()` / `setId(Long id)`. Note **`Long`**, not `long` <sup>[J5](NOTES.md#long-vs-long-and-autoboxing)</sup> — the capital-L version is an *object* and can be `null`, which is exactly what you need to mean "not saved yet." The lowercase`long` is a primitive and would default to `0`. A database-backed implementation would depend on this distinction too.
+with `getId()` / `setId(Long id)`. Note **`Long`**, not `long` — the capital-L version is an *object* and can be `null`, which is exactly what you need to mean "not saved yet." The lowercase`long` is a primitive and would default to `0`. A database-backed implementation would depend on this distinction too.
 
 ### Verify
 
@@ -271,21 +271,21 @@ You need somewhere to put many applications. Java's collections are typed:
 List<Application> applications = new ArrayList<>();
 ```
 
-Read that as "a List of Application." The `<Application>` is a **generic type parameter**
-<sup>[J5](NOTES.md#generics)</sup> — it's what
-lets the compiler reject `applications.add("oops")` before the program ever runs.
+Read that as "a List of Application." The `<Application>` is a **generic type parameter** — it's what lets the compiler reject `applications.add("oops")` before the program ever runs.
 
 Two things to notice:
 
 - **`List` on the left, `ArrayList` on the right.** `List` is an *interface* (the contract: add, get, size); `ArrayList` is one *implementation* (backed by an array). Declaring the variable as the interface means you could swap in `LinkedList` later without touching any other line. This is a small preview of Lesson 3, and it's idiomatic Java — always declare the interface type.
-- **`new ArrayList<>()`** — the empty `<>` is the "diamond" <sup>[J7](NOTES.md#the-diamond-operator)</sup>. The compiler already knows the type from the left side, so you don't repeat it.
+- **`new ArrayList<>()`** — the empty `<>` is the "diamond" The compiler already knows the type from the left side, so you don't repeat it.
 
 The other collection you need is `Map<K, V>` — a dictionary:
 
 ```java
-Map<Long, Application> byId = new HashMap<>();
-byId.put(1L, app);          // 1L is a long literal; plain 1 is an int
-Application found = byId.get(1L);   // returns null if absent
+public MapExample {
+  Map<Long, Application> byId = new HashMap<>();
+  byId.put(1L, app);          // 1L is a long literal; plain 1 is an int
+  Application found = byId.get(1L);// returns null if absent
+}
 ```
 
 `Map` is how you'll fake a database table in the capstone: id → row.
@@ -318,7 +318,7 @@ public class Main {
 }
 ```
 
-`for (Application app : applications)` is the **enhanced for loop** <sup>[J5](NOTES.md#enhanced-for-loop)</sup> — Java's `for x in list`.
+`for (Application app : applications)` is the **enhanced for loop** — Java's `for x in list`.
 
 Note the five imports above the class. `Status` needs one now even though `Application` already had one — they're separate classes, and Java imports classes, not packages-worth-of-classes. (`importcom.connorjensen.jobtracker.model.*;` exists and is legal, but every style guide and IDE default prefers the explicit list, because `*` hides where a name came from.)
 
@@ -344,7 +344,7 @@ If you see `cannot find symbol: class List` or `variable Status`, you skipped an
 
 ## Step 4 — Streams: filtering without a loop
 
-You could filter with a `for` loop and an `if`. Java's idiomatic answer is a **stream** <sup>[J8](NOTES.md#lambdas-streams-and-method-references)</sup>, and it will look extremely familiar:
+You could filter with a `for` loop and an `if`. Java's idiomatic answer is a **stream**, and it will look extremely familiar:
 
 - [x] Try it in `Main`
 
@@ -361,9 +361,12 @@ The one non-obvious rule: a stream is **lazy and single-use**. Nothing happens u
 The other operations you'll actually use:
 
 ```java
-.map(Application::getCompany)                 // transform each element
-.sorted(Comparator.comparing(Application::getAppliedDate))
-    .count()
+public MapExampleOps {
+  Map<Application, Long> exampleMap = new HashMap<>();
+  exampleMap.map(Application::getCompany);          // transform each element
+  exampleMap.sorted(Comparator.comparing(Application::getAppliedDate));
+  exampleMap.count();
+}
 ```
 
 `Application::getCompany` is a **method reference** — shorthand for `app -> app.getCompany()`.
@@ -373,7 +376,9 @@ The other operations you'll actually use:
 - [x] Print the filtered list's size, then compile and run
 
 ```java
-        System.out.println("interviewing: " + interviewing.size());
+public exampleOutput {
+  System.out.println("interviewing: " + interviewing.size());
+}
 ```
 
 ```bash
@@ -392,9 +397,11 @@ One, not three — the filter ran. If you get a compile error on `.toList()`, th
 - [x] Now confirm the single-use rule for yourself — add a second terminal op to the *same* stream
 
 ```java
-        var s = applications.stream();
-        s.toList();
-        s.count();      // <- run it and read the exception
+public ApplicationStreamExample {
+  var s = applications.stream();
+  s.toList();
+  s.count();      // <- run it and read the exception
+}
 ```
 
 ```
@@ -409,32 +416,36 @@ Delete those three lines once you've seen it.
 
 Here's the problem. You want "find the application with this id." Sometimes there isn't one. In Python you return `None` and hope the caller checks. In Java, returning `null` has the same flaw, and it's the single most common source of production crashes — `NullPointerException`.
 
-`Optional<T>` <sup>[J8](NOTES.md#optional)</sup> is a box that either contains a value or doesn't, and **the type signature says so**:
+`Optional<T>` is a box that either contains a value or doesn't, and **the type signature says so**:
 
 - [x] Try it in `Main`, and handle the empty case at least two of the ways below
 
 ```java
-Optional<Application> found = applications.stream()
-    .filter(app -> app.getCompany().equals("Globex"))
-    .findFirst();
+public OptionalExample {
+  Optional<Application> found = applications.stream()
+      .filter(app -> app.getCompany().equals("Globex"))
+      .findFirst();
+}
 ```
 
 `.findFirst()` returns `Optional<Application>` because it genuinely might not find one. Now the caller *cannot* accidentally use the value without confronting the empty case:
 
 ```java
-if (found.isPresent()) {
+public foundIsPresentExample {
+  if (found.isPresent()) {
     System.out.println(found.get().summary());
-    }
+  }
 
 // or, better — no branch at all:
-    found.ifPresent(app -> System.out.println(app.summary()));
+  found.ifPresent(app -> System.out.println(app.summary()));
 
 // supply a fallback:
-Application app = found.orElse(null);
-String company = found.map(Application::getCompany).orElse("not found");
+  Application app = found.orElse(null);
+  String company = found.map(Application::getCompany).orElse("not found");
 
 // or blow up loudly with a message you chose:
-Application required = found.orElseThrow(() -> new IllegalArgumentException("No Globex application"));
+  Application required = found.orElseThrow(() -> new IllegalArgumentException("No Globex application"));
+}
 ```
 
 **When `Optional` is the wrong tool** — this is the second half of the interview question, and most candidates miss it:
@@ -454,10 +465,12 @@ The interesting case is the *empty* one — a search that finds nothing has to n
 - [x] Search for a company that isn't there, and handle it without an `if`
 
 ```java
-        Optional<Application> missing = applications.stream()
-    .filter(app -> app.getCompany().equals("Nope Inc"))
-    .findFirst();
-        System.out.println("missing: " + missing.map(Application::getCompany).orElse("not found"));
+public OptionalIfEmptyExample {
+  Optional<Application> missing = applications.stream()
+      .filter(app -> app.getCompany().equals("Nope Inc"))
+      .findFirst();
+  System.out.println("missing: " + missing.map(Application::getCompany).orElse("not found"));
+}
 ```
 
 - [x] Compile and run (you'll need `import java.util.Optional;`)

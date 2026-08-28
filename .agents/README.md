@@ -4,13 +4,13 @@ All canonical project authority and agent-specific content lives under `.agents/
 
 ## Authority map
 
-| File | Sole responsibility |
-|---|---|
-| [`CONTEXT.md`](CONTEXT.md) | Agent operating rules, ownership boundaries, verification, and maintenance limits |
-| [`PROJECT.md`](PROJECT.md) | Delivered product scope, technical architecture, definition of done, and non-goals |
-| [`LESSON_MAINTENANCE.md`](LESSON_MAINTENANCE.md) | Agent-only rules for correcting the frozen Chapter 1 curriculum |
-| [`notes/PROJECT_CLOSEOUT.md`](notes/PROJECT_CLOSEOUT.md) | Closeout evidence, archive checksums, reconstruction, and rollback record |
-| `README.md` | This backbone map and consolidation policy |
+| File                                                     | Sole responsibility                                                                |
+|----------------------------------------------------------|------------------------------------------------------------------------------------|
+| [`CONTEXT.md`](CONTEXT.md)                               | Agent operating rules, ownership boundaries, verification, and maintenance limits  |
+| [`PROJECT.md`](PROJECT.md)                               | Delivered product scope, technical architecture, definition of done, and non-goals |
+| [`LESSON_MAINTENANCE.md`](LESSON_MAINTENANCE.md)         | Agent-only rules for correcting the frozen Chapter 1 curriculum                    |
+| [`notes/PROJECT_CLOSEOUT.md`](notes/PROJECT_CLOSEOUT.md) | Closeout evidence, archive checksums, reconstruction, and rollback record          |
+| `README.md`                                              | This backbone map and consolidation policy                                         |
 
 Do not duplicate a normative rule across authorities. Keep the rule in its owner and link to it elsewhere.
 

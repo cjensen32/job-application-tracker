@@ -92,7 +92,7 @@ Create `pom.xml` in the repo root. Type it rather than pasting, and read the ann
 - **Coordinates** (`groupId` + `artifactId` + `version`) — the globally unique address of your artifact, like an npm `name` but namespaced to avoid collisions. Every dependency you ever add is identified by these same three fields.
 - **`-SNAPSHOT`** — means "in development, contents may change." Maven re-checks snapshots for updates; released versions are treated as immutable forever. This is why you never republish a release version.
 - **`<packaging>`** — what to produce. `jar` is the default (a zip of compiled classes + metadata).
-- **`<maven.compiler.release>21</...>`** — compile targeting Java 21. This is what unlocks `record` in Lesson 1. <sup>[J9](NOTES.md#mavencompilerrelease)</sup>
+- **`<maven.compiler.release>21</...>`** — compile targeting Java 21. This is what unlocks `record` in Lesson 1.
 
 ---
 

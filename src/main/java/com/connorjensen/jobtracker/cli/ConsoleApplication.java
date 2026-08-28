@@ -36,7 +36,6 @@ public class ConsoleApplication {
       }
     }
     this.view.showGoodbye();
-    return;
   }
 
   private boolean dispatch(int selection) {

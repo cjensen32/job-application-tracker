@@ -20,8 +20,8 @@ import com.connorjensen.jobtracker.service.ApplicationService;
 public class ConsoleSessionTest {
   private record Session(String output, ApplicationService service) {}
 
-  private static String script(String... lines) {
-    return String.join("\n", lines) + "\n";
+  private static String script() {
+    return String.join("\n", "0", "Apple", "Banana", "2026-08-24", "", "", "1", "5") + "\n";
   }
 
   private static String expected(String... lines) {
@@ -78,7 +78,7 @@ public class ConsoleSessionTest {
 
   @Test
   void testTableFormat() {
-    String testScript = script("0", "Apple", "Banana", "2026-08-24", "", "", "1", "5");
+    String testScript = script();
     String textExpected =
         expected(
             "Job Application Tracker",

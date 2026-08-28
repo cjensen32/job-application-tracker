@@ -7,15 +7,6 @@
  */
 package com.connorjensen.jobtracker.capstone;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -26,15 +17,7 @@ import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -54,6 +37,8 @@ import com.connorjensen.jobtracker.repository.InMemoryApplicationRepository;
 import com.connorjensen.jobtracker.service.ApplicationService;
 import com.connorjensen.jobtracker.service.CreateApplicationRequest;
 import com.connorjensen.jobtracker.service.UpdateApplicationRequest;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Chapter 1 Capstone — The Tracker Core")
 class Chapter01CapstoneTest {
@@ -90,7 +75,7 @@ class Chapter01CapstoneTest {
       Application application = sample("Acme");
 
       assertAll(
-          () -> assertEquals(null, application.getId()),
+          () -> assertNull(application.getId()),
           () -> assertEquals(Status.APPLIED, application.getStatus()),
           () -> assertEquals("Acme", application.getCompany()),
           () -> assertEquals("Engineer", application.getRole()),
@@ -147,9 +132,9 @@ class Chapter01CapstoneTest {
     @Test
     void requestRecordsHaveThePublishedComponentsAndValueEquality() {
       CreateApplicationRequest create =
-          createRequest("Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1");
+          createRequest("Acme", "Engineer", "Referral", "https://example.com/jobs/1");
       CreateApplicationRequest equal =
-          createRequest("Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1");
+          createRequest("Acme", "Engineer", "Referral", "https://example.com/jobs/1");
       UpdateApplicationRequest update =
           new UpdateApplicationRequest(
               "Globex", "Senior Engineer", DATE.plusDays(1), Status.OFFER, "Note", "");
@@ -172,7 +157,7 @@ class Chapter01CapstoneTest {
 
       Application created =
           service.create(
-              createRequest("Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1"));
+              createRequest("Acme", "Engineer", "Referral", "https://example.com/jobs/1"));
 
       assertAll(
           () -> assertEquals(1L, created.getId()),
@@ -247,7 +232,7 @@ class Chapter01CapstoneTest {
       RecordingRepository repository = new RecordingRepository();
       ApplicationService service = new ApplicationService(repository);
 
-      Application created = service.create(createRequest("Acme", "Engineer", DATE, "", ""));
+      Application created = service.create(createRequest("Acme", "Engineer", "", ""));
       service.update(
           created.getId(),
           new UpdateApplicationRequest("Globex", "SRE", DATE, Status.PHONE_SCREEN, "", ""));
@@ -470,7 +455,7 @@ class Chapter01CapstoneTest {
               service ->
                   service.create(
                       createRequest(
-                          "Acme", "Engineer", DATE, "Hidden note", "https://example.com/jobs/1")));
+                          "Acme", "Engineer", "Hidden note", "https://example.com/jobs/1")));
 
       assertAll(
           () -> assertTrue(empty.output().contains("No applications exist to list.\n")),
@@ -747,21 +732,21 @@ class Chapter01CapstoneTest {
   }
 
   private static CreateApplicationRequest createRequest(
-      String company, String role, LocalDate appliedDate, String notes, String jobUrl) {
-    return new CreateApplicationRequest(company, role, appliedDate, notes, jobUrl);
+      String company, String role, String notes, String jobUrl) {
+    return new CreateApplicationRequest(company, role, Chapter01CapstoneTest.DATE, notes, jobUrl);
   }
 
   private static void seedCompleteApplication(ApplicationService service) {
     service.create(
-        createRequest("Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1"));
+        createRequest("Acme", "Engineer", "Referral", "https://example.com/jobs/1"));
   }
 
   private static void seedCompleteApplications(ApplicationService service) {
     service.create(
-        createRequest("Acme", "Engineer", DATE, "Referral", "https://example.com/jobs/1"));
+        createRequest("Acme", "Engineer", "Referral", "https://example.com/jobs/1"));
     service.create(
         createRequest(
-            "Apple", "Developer", DATE, "Online Site", "https://panaple/com/fake/test/1"));
+            "Apple", "Developer", "Online Site", "https://panaple/com/fake/test/1"));
   }
 
   private static SessionResult session(String input) {
@@ -797,9 +782,7 @@ class Chapter01CapstoneTest {
   @SafeVarargs
   private static List<List<String>> body(List<String>... rows) {
     List<List<String>> body = new ArrayList<>();
-    for (List<String> row : rows) {
-      body.add(row);
-    }
+    Collections.addAll(body, rows);
     return body;
   }
 

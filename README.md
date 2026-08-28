@@ -6,7 +6,7 @@ The project is intentionally closed at the end of Chapter 1. More advanced frame
 
 ## Three repository surfaces
 
-- **Code and build:** [`src/`](src/) plus [`pom.xml`](pom.xml) and [`config/`](config/).
+- **Code and build:** `src/` plus [`pom.xml`](pom.xml) and `config/`.
 - **Learning and lessons:** [`lessons/`](lessons/README.md), containing the self-contained Chapter 1 course and capstone.
 - **Agent backbone:** [`.agents/`](.agents/README.md), containing project authority, maintenance rules, and closeout evidence.
 

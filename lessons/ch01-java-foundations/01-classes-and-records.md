@@ -151,8 +151,13 @@ It's the closest thing Java has to a TypeScript `interface` or a Python `@datacl
 - [x] Add to `main`, then recompile and run:
 
 ```java
-        ApplicationDto dto = new ApplicationDto("Acme Corp", "Backend Engineer", LocalDate.of(2026, 8, 1));
-        System.out.println(dto);
+public class Main {
+  public static void main(String[] args) {
+    // Other code estabished
+    ApplicationDto dto = new ApplicationDto("Acme Corp", "Backend Engineer", LocalDate.of(2026, 8, 1));
+    System.out.println(dto);
+  }
+}
 ```
 
 Recompile and run. You get `ApplicationDto[company=Acme Corp, role=Backend Engineer, appliedDate=2026-08-01]` — readable, for free.
@@ -209,7 +214,7 @@ Both should pass — and the first one passing is the surprising part.
 
 This bites people constantly: `list.contains(app)` returns false for a class even when an identical object is in the list, because `contains` uses `equals()`. You'll rely on record equality in Lesson 2 and again when writing test assertions.
 
-> `@Test` is your first annotation <sup>[J5](NOTES.md#annotations)</sup>. It's just metadata — it doesn't *do* anything. Surefire scans compiled classes, finds methods marked with it, and calls them. Frameworks use the same mechanism at a larger scale.
+> `@Test` is your first annotation, It's just metadata — it doesn't *do* anything. Surefire scans compiled classes, finds methods marked with it, and calls them. Frameworks use the same mechanism at a larger scale.
 
 ---
 
@@ -217,11 +222,11 @@ This bites people constantly: `list.contains(app)` returns false for a class eve
 
 The practical rule for this project:
 
-| Use a **class**                                        | Use a **record**                          |
-|--------------------------------------------------------|-------------------------------------------|
-| ORM-managed entities                                   | DTOs — request/response values             |
-| Anything with mutable state                            | Anything you just want to carry values    |
-| Anything a framework must construct empty and populate | Anything short-lived and immutable        |
+| Use a **class**                                        | Use a **record**                       |
+|--------------------------------------------------------|----------------------------------------|
+| ORM-managed entities                                   | DTOs — request/response values         |
+| Anything with mutable state                            | Anything you just want to carry values |
+| Anything a framework must construct empty and populate | Anything short-lived and immutable     |
 
 **Why can't a JPA entity be a record?** Hibernate needs to create an object *before* it has the data (it constructs it, then fills fields as rows come back), and it needs to mutate fields to track changes. Records have no no-arg constructor and no setters, so they're structurally incompatible. That's exactly why `Application` stays a class and `ApplicationDto` is a record — the split you just built is the split the real app keeps.
 

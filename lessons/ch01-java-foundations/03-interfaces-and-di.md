@@ -106,7 +106,7 @@ public class InMemoryApplicationRepository implements ApplicationRepository {
 Three things to read carefully:
 
 - **`implements ApplicationRepository`** — this is a promise to the compiler. Leave out any method and the class won't compile. That's the contract being enforced, not documented.
-- **`@Override`** <sup>[J5](NOTES.md#annotations)</sup> — optional but always write it. It tells the compiler "this is meant to implement something," so a typo in the method name becomes a compile error instead of a method nobody calls. This is your second annotation, and like `@Test` it's metadata, not behavior.
+- **`@Override`** optional but always write it. It tells the compiler "this is meant to implement something," so a typo in the method name becomes a compile error instead of a method nobody calls. This is your second annotation, and like `@Test` it's metadata, not behavior.
 - **`save` assigns the id when it's `null`** — exactly what a database does with an auto-increment column. Save an object that already has an id and it's an update instead. That's why `Long id` needed to be nullable back in Lesson 2.
 
 Now write the rest:

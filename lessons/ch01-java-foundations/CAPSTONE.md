@@ -512,13 +512,13 @@ The total is larger than the previous section's 43 because `mvn verify` also run
 
 ## What these boundaries enable
 
-| Chapter 1                                 | Later replacement                                        |
-|-------------------------------------------|----------------------------------------------------------|
+| Chapter 1                                 | Later replacement                                             |
+|-------------------------------------------|---------------------------------------------------------------|
 | Manual object graph in `Main`             | A dependency-injection container can construct the same graph |
 | Console input and view                    | Another adapter can own binding and presentation              |
 | Request records                           | Other input boundaries can reuse explicit command shapes      |
 | In-memory repository                      | Persistent storage can implement the same repository contract |
-| `IllegalArgumentException` for missing ID | A boundary-specific exception can map absence appropriately    |
+| `IllegalArgumentException` for missing ID | A boundary-specific exception can map absence appropriately   |
 | Injected stream and subprocess tests      | Other boundary tests can reuse the same isolation principles  |
 
 **Chapter:** [README](README.md) · **Glossary:** [GLOSSARY.md](GLOSSARY.md) · **Version history:** [NOTES.md](NOTES.md) · **Standards:** [COURSE_STANDARDS.md](COURSE_STANDARDS.md)
