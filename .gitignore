@@ -3,13 +3,6 @@ target/
 
 .idea/*
 
-# Keep shared configs
-!.idea/runConfigurations/
-!.idea/codeStyles/
-!.idea/inspectionProfiles/
-!.idea/vcs.xml
-!.idea/modules.xml
-
 *.swp
 *.swo
 
@@ -20,7 +13,8 @@ target/
 # Local agent state lives under the shared .agents directory
 .agents/settings.local.json
 .agents/worktrees/
-.agents/notes
+.agents/notes/*
+!.agents/notes/PROJECT_CLOSEOUT.md
 ***/.DS_Store
 
 # Scratch commit message buffer

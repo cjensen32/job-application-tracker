@@ -1,115 +1,64 @@
-# Project agent context
+# Project Agent Context
 
-This is the canonical repository guidance for every coding agent. Keep context, skills, local agent settings, and agent-managed worktrees under `.agents/`. Codex, Claude, and OpenCode discover this file through their user-level global bootstrap instructions.
+This repository is closed at the end of Chapter 1. It is a completed Java 21, Maven, and JUnit 5 learning artifact, not an active roadmap. Do not add another chapter, Spring, persistence, a frontend, interview-specific material, or unrelated features here; start that work in the successor project.
 
-Do not create provider-specific repository context files or aliases such as`AGENTS.md`, `CLAUDE.md`, `OPENCODE.md`, `.claude/`, `.codex/`, or `.opencode/`.
+## Repository boundaries
 
-## Project state
+The repository has three ownership surfaces:
 
-This is currently a Java 21, Maven, and JUnit 5 project. Chapter 1 has nine lessons and builds the complete plain-Java core: model, repository, service requests, role-specific console classes, tests, and quality gates.
+- Code and build: `src/`, `pom.xml`, `config/`, and portable root tooling.
+- Learning: learner-facing material under `lessons/`.
+- Agent backbone: project authority, operating rules, maintenance guidance, and durable notes under `.agents/`.
 
-No Spring Boot yet: it arrives in Chapter 2 of the learning plan. Do not add Spring, JPA, a database, or other future-stack dependencies ahead of the lesson sequence.
+Dependency direction is one-way: `.agents/` may coordinate code and lessons; lessons may reference code paths; code/build must not depend on either documentation surface. Lessons must remain understandable without opening `.agents/`.
 
-Leave `maven-surefire-plugin` pinned in `pom.xml`. Maven's default 2.12.4 binding silently skips JUnit 5 tests, so unpinning makes the suite "pass" by running nothing.
-
-## Commit messages
-
-Subject line: `C### GROUP(scope): summary`. `.githooks/prepare-commit-msg` prepends the counter.
-
-Groups separate authorship:
-
-- `COURSE(scope)` - agent-written course material. Author is `Course Author <noreply@teacher.ai>`.
-- `TRACKER(scope)` - the learner's Java under `src/`. Author is the learner.
-- `PROGRESS(scope)` - the learner's edits to lesson markdown, such as ticking checkboxes off.
-- `STYLE(scope)` - formatting only, no behavior change.
-- `FIX(scope)` - the learner correcting their own earlier Java.
-
-The body uses labelled sections in this order, omitting any that do not apply:
-
-- `DESCRIPTION:` - one or two sentences on what the commit is for.
-- `FILES:` - one bullet per file, written as `- path: what it is`.
-- `NOTES(subject):` - explanatory content that is not a file summary. Repeatable with different subjects.
-- `VERIFY(command):` - numbered steps and the real fenced output of that command.
-
-Never wrap a sentence or a bullet across lines. Keep every full statement on one line, at most 120 characters.
+Do not create canonical provider-specific context such as `AGENTS.md`, `CLAUDE.md`, `OPENCODE.md`, `.claude/`, `.codex/`, or `.opencode/`. Tool-mandated local caches may exist only when ignored and are not repository authority.
 
 ## Sources of truth
 
-- `PROJECT.md` defines the target domain model, stack, milestones, and v1.
-- `LEARNING.md` defines the teaching sequence and records lesson progress.
-- Each chapter's `README.md`, lessons, `GLOSSARY.md`, `NOTES.md`, and`CAPSTONE.md` define that chapter's work.
-- `lessons/AUTHORING.md` defines how lessons and capstones are written.
-- `pom.xml` defines the dependencies and Java/build configuration that exist now. Do not treat the planned stack in `PROJECT.md` as already installed.
+- `.agents/PROJECT.md` defines the delivered product scope and technical architecture.
+- `.agents/CONTEXT.md` defines agent behavior and repository boundaries.
+- `.agents/README.md` maps the agent backbone and its consolidation policy.
+- `.agents/LESSON_MAINTENANCE.md` defines how to correct the frozen Chapter 1 curriculum.
+- `.agents/notes/PROJECT_CLOSEOUT.md` records closeout evidence and rollback information.
+- `lessons/README.md` is the learner-facing Chapter 1 map and completion record.
+- `lessons/ch01-java-foundations/` owns the lessons, references, glossary, notes, history, capstone contract, and frozen grader.
+- `pom.xml` owns the actual build configuration and dependencies.
 
-When these disagree, preserve the learner's current working code and resolve the documentation conflict explicitly instead of guessing from the roadmap.
+When authorities disagree, preserve learner Java, verify the current checkout, and resolve the conflict explicitly. Do not infer current behavior from historical notes.
 
-## This is a teaching repo first
+## Learner ownership
 
-The user is teaching themselves Java through this project for interview practice, using the CodeSensei plugin (`/code-sensei:*`). **Do not write the project's source code for them unless they explicitly ask.** Lessons and capstone specs are yours to write; the implementation is theirs to type. Favor explaining *why* behind non-trivial choices over making changes silently.
+The learner owns Java under `src/` and lesson-progress edits. Agents may maintain course documents and test infrastructure, but must not rewrite learner production code unless explicitly asked. Never use the capstone grader as a solution guide during coaching; work from `CAPSTONE.md` and Maven output.
 
-When coaching a capstone, do not open or use either copy of its grader as a solution guide:
+## Commit messages
 
-- `lessons/**/capstone/ChapterNNCapstoneTest.java`
-- `src/test/**/capstone/ChapterNNCapstoneTest.java`
+`.githooks/prepare-commit-msg` prepends `C###`. Use these groups:
 
-Work from `CAPSTONE.md` and the Maven test output. Reading or changing a grader is appropriate only when the user explicitly asks to author or revise lesson or capstone infrastructure.
+- `COURSE(scope)` for agent-authored course, repository, and agent-backbone material; author `Course Author <noreply@teacher.ai>`.
+- `TRACKER(scope)` for learner Java.
+- `PROGRESS(scope)` for learner progress records.
+- `STYLE(scope)` for formatting-only changes.
+- `FIX(scope)` for learner corrections to earlier Java.
 
-`LEARNING.md` (repo root) sequences PROJECT.md's milestones into 6 chapters / 23 numbered lessons (0–22) and drives the order of work. Its conventions:
+Bodies use `DESCRIPTION:`, `FILES:`, optional `NOTES(subject):`, and `VERIFY(command):` in that order. Keep each statement on one physical line and no longer than 120 characters.
 
-- **Explain before automating.** The first time a tool or concept appears, walk through it manually before reaching for the thing that generates it — hand-written `pom.xml` before start.spring.io, manual constructor wiring before `@Autowired`, a console loop before `@RestController`.
-- **Revisit, don't restart.** Apply new concepts to code that already exists rather than greenfield examples.
-- **No throwaway work.** Every capstone builds part of the real project. Where something is temporary (in-memory repo, console UI), say up front what replaces it and what interface survives.
-- **Tests from Lesson 1**, not PROJECT.md's Milestone 7; formal deep-dive in Chapter 4.
+## Verification
 
-Update the progress table at the bottom of LEARNING.md as lessons complete.
+Chapter 1 is complete only when all three commands succeed:
 
-### Authoring lessons
-
-**Writing or revising a chapter?** [`lessons/AUTHORING.md`](../lessons/AUTHORING.md) is the spec — read it before writing one, and revise it rather than silently deviating. The `authoring-lessons` skill carries the rules that are easiest to get wrong.
-
-### End-of-lesson course review
-
-When the learner finishes a lesson, asks to close it out, or explicitly requests a lesson retrospective, read [`.agents/skills/course-author-review/SKILL.md`](skills/course-author-review/SKILL.md) completely and follow it before marking the lesson complete or closing the retrospective. Run this review as `Course Author <noreply@teacher.ai>`; search lesson-related `.agents/notes/` and available project chat history, improve and simplify the course only where the evidence supports it, store the retrospective locally, and ask the learner for feedback. When the learner later answers those feedback questions, run the skill again and update the same retrospective. Do not run this closeout for ordinary mid-lesson implementation coaching.
-
-### End-of-task notes
-
-Before the final response for every user-requested task, chat, or answered question, create or update one descriptively named Markdown note under `.agents/notes/`. Recap the request and important context, evidence inspected, decisions, actions or file changes, verification and outcome, and any unresolved items or useful next steps. Keep the note concise and durable; do not store secrets, raw chat transcripts, or unfiltered tool output.
-
-Treat follow-ups within the same task as one continuing record and update the existing note instead of creating duplicates. When another workflow already creates a canonical note, such as `lesson-NN-course-author-review.md`, that note also satisfies this requirement. These notes are local agent context and ignored by Git; do not stage or commit them unless the user explicitly asks.
-
-Background for calibrating explanations: one university Java course (exercises, never a full app), but real project experience with React/TSX and Python Flask/uvicorn. HTTP, REST, and JSON are familiar; Java idioms and the Spring layer are not. Analogies to Flask/React land well. Pacing after Chapter 1 can be faster than Lessons 0–1.
-
-## Navigation and verification
-
-This repository is indexed by CodeGraph. When `.codegraph/` exists, use it before text search or broad file reading to locate or understand Java code:
-
-```sh
-codegraph explore "<symbol names or question>"
-```
-
-Use `rg`/`rg --files` for follow-up text and file searches. Do not regenerate, delete, or commit CodeGraph state unless the user asks.
-
-There is no Maven wrapper; use the installed `mvn`. The standard full verification command is:
-
-```sh
+```bash
 mvn verify
-```
-
-Run `mvn -Dcheckstyle.skip test` while a structural capstone refactor is missing required types, then use `mvn verify` for final tests, Checkstyle, and JaCoCo reporting. A green Maven invocation must report a non-zero JUnit test count.
-
-There is no `exec-maven-plugin` and no IDE run configuration in version control, so the console app runs off the plain classpath:
-
-```sh
 mvn compile
 java -cp target/classes com.connorjensen.jobtracker.Main
 ```
 
-Chapter 1's capstone is done only when `mvn verify`, `mvn compile`, and that command all succeed, so check all three before calling the chapter finished.
+`mvn verify` must run 49 tests and pass Checkstyle, Spotless, and JaCoCo. Leave `maven-surefire-plugin` pinned; Maven's default binding can silently skip JUnit 5 tests.
 
-Before editing, inspect `git status` and preserve unrelated user work. Local agent settings and agent-managed worktrees belong under `.agents/`; the repository ignores `.agents/settings.local.json` and `.agents/worktrees/`.
+The repository is indexed locally when `.codegraph/` exists. Use CodeGraph before broad code searches, but do not commit, delete, or regenerate its state without explicit approval.
 
-## Intended architecture
+Before editing, inspect `git status`, registered worktrees, and the relevant authority file. Agent worktrees live under ignored `.agents/worktrees/`. Preserve unrelated and uncommitted work.
 
-Full-stack CRUD job-application tracker (`Application` + nested `Interview`), built to practice Full Stack Java Developer interview skills. **`PROJECT.md` is the source of truth** for the domain model, stack, and milestone list — read it rather than trusting a summary here.
+## Maintenance only
 
-Follow PROJECT.md's milestone order rather than jumping ahead (e.g. don't add auth before CRUD endpoints exist).
+Allowed work is narrowly scoped to defect correction, security or dependency maintenance, documentation repair, and restoration from the closeout archive. Use `.agents/LESSON_MAINTENANCE.md` for lesson corrections. Record durable closeout changes in `.agents/notes/PROJECT_CLOSEOUT.md`; transient task notes remain ignored.
