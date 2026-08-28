@@ -57,6 +57,10 @@ public class ApplicationService {
     return this.repository.findAll();
   }
 
+  public ApplicationSummary summarize() {
+    throw new UnsupportedOperationException("TODO");
+  }
+
   public Optional<Application> findById(Long id) {
     return this.repository.findById(id);
   }
